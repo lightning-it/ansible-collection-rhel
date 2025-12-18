@@ -1,0 +1,18 @@
+---
+# Collection-level example playbook for lit.rhel
+#
+# This playbook is used as the "canonical" example entrypoint in CI
+# and for users who want to see how to apply the foundational roles.
+
+- name: RHEL foundational baseline example
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  roles:
+    - role: lit.rhel.selinux
+      vars:
+        selinux_state: enforcing
+        selinux_policy: targeted
+        selinux_manage_config: false
+        selinux_fail_if_kernel_disabled: false

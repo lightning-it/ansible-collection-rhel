@@ -1,0 +1,18 @@
+---
+- name: Verify SELinux state on RHEL 9
+  hosts: rhel_selinux_hosts
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Check SELinux mode
+      ansible.builtin.command: getenforce
+      register: verify_selinux
+      changed_when: false
+
+    - name: Assert SELinux is in enforcing mode
+      ansible.builtin.assert:
+        that:
+          - verify_selinux.stdout | lower == "enforcing"
+        fail_msg: "SELinux is not enforcing (got: {{ verify_selinux.stdout }})"
+        success_msg: "SELinux is enforcing as expected."

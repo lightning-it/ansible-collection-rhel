@@ -1,0 +1,21 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: default
+
+platforms:
+  - name: rhel9_vagrant
+    address: rhel9-vagrant
+    groups:
+      - rhel_selinux_hosts
+
+provisioner:
+  name: ansible
+  playbooks:
+    converge: converge.yml
+    verify: verify.yml
+
+verifier:
+  name: ansible

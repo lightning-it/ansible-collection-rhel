@@ -1,0 +1,23 @@
+---
+galaxy_info:
+  role_name: selinux
+  namespace: lit
+  author: Lightning IT
+  description: SELinux configuration role for the lit.rhel collection.
+  company: Lightning IT
+  license: GPL-2.0-only
+  min_ansible_version: "2.15"
+
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+
+  galaxy_tags:
+    - rhel
+    - selinux
+    - security
+    - hardening
+    - baseline
+
+dependencies: []

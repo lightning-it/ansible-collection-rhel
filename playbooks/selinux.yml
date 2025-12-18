@@ -1,0 +1,25 @@
+---
+# Focused example playbook for the lit.rhel.selinux role.
+#
+# Use this when you only want to test or apply SELinux configuration
+# independently of other foundational roles.
+
+- name: Configure SELinux on RHEL hosts
+  hosts: rhel_selinux_hosts
+  become: true
+
+  vars:
+    # Desired SELinux state: enforcing | permissive | disabled
+    selinux_state: enforcing
+
+    # SELinux policy type: targeted | mls
+    selinux_policy: targeted
+
+    # Whether to manage /etc/selinux/config persistently
+    selinux_manage_config: true
+
+    # If SELinux is disabled in the kernel, warn instead of failing
+    selinux_fail_if_kernel_disabled: false
+
+  roles:
+    - role: lit.rhel.selinux

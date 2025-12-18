@@ -1,0 +1,10 @@
+---
+- name: Converge SELinux role on RHEL 9 (Vagrant)
+  hosts: rhel_selinux_hosts
+  become: true
+
+  roles:
+    - role: lit.rhel.selinux
+      vars:
+        selinux_state: enforcing
+        selinux_policy: targeted
