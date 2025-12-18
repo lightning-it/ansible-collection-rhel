@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This script runs an RHEL9 Vagrant VM and executes the rhel9-rdp Molecule
+# This script runs an RHEL9 Vagrant VM and executes the rdp-rhel9 Molecule
 # scenario inside the wunder-devtools-ee container.
 #
 # It is intended as a **manual** heavy-weight scenario:
@@ -44,7 +44,7 @@ fi
 
 # 0) Check if vagrant is available at all
 if ! command -v vagrant >/dev/null 2>&1; then
-  echo "NOTE: vagrant is not installed. Skipping rhel9-rdp scenario."
+  echo "NOTE: vagrant is not installed. Skipping rdp-rhel9 scenario."
   exit 9
 fi
 
@@ -85,7 +85,7 @@ fi
 popd >/dev/null
 
 # 2) Molecule (inside wunder-devtools-ee)
-scenario_dir="molecule/rhel9-rdp"
+scenario_dir="molecule/rdp-rhel9"
 if [ ! -f "${scenario_dir}/molecule.yml" ]; then
   echo "NOTE: Molecule scenario '${scenario_dir}' not found. Skipping."
   # Clean up the VM we just created
@@ -98,7 +98,7 @@ fi
 ANSIBLE_COLLECTIONS_PATHS="$PWD" \
 ANSIBLE_ROLES_PATH="$PWD/roles" \
 bash scripts/wunder-devtools-ee.sh \
-  molecule test -s rhel9-rdp
+  molecule test -s rdp-rhel9
 
 # 3) VM destroy
 pushd vagrant/rhel9 >/dev/null
