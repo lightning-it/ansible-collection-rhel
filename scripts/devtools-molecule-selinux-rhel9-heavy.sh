@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This script runs an RHEL9 Vagrant VM and executes the selinux-rhel9 Molecule
+skip() {
+  echo "Skipping selinux_rhel9_heavy: $*"
+  exit 0
+}
+
+# This script runs an RHEL9 Vagrant VM and executes the selinux_rhel9_heavy Molecule
 # scenario inside the wunder-devtools-ee container.
 #
 # It is intended as a **manual** heavy-weight scenario:
@@ -44,12 +49,34 @@ fi
 
 # 0) Check if vagrant is available at all
 if ! command -v vagrant >/dev/null 2>&1; then
-  echo "NOTE: vagrant is not installed. Skipping selinux-rhel9 scenario."
-  exit 9
+  echo "NOTE: vagrant is not installed. Skipping selinux_rhel9_heavy scenario."
+  skip "vagrant not installed"
 fi
 
 # 1) VM start (but first check provider availability)
+if [ ! -d vagrant/rhel9 ]; then
+  echo "NOTE: Vagrant environment vagrant/rhel9 not found. Skipping selinux_rhel9_heavy scenario."
+  skip "vagrant env missing"
+fi
+
+# Prefer a non-conflicting SSH port for heavy tests; override via VAGRANT_SSH_PORT
+if [ -z "${VAGRANT_SSH_PORT:-}" ]; then
+  VAGRANT_SSH_PORT="$(python3 - <<'PY'
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(("127.0.0.1", 0))
+port = s.getsockname()[1]
+s.close()
+print(port)
+PY
+)"
+fi
+export VAGRANT_SSH_PORT
+
 pushd vagrant/rhel9 >/dev/null
+
+# Reset previous VM state to ensure new port mappings take effect
+rm -rf .vagrant
 
 # Capture provider errors (e.g. Parallels Standard edition lacks CLI)
 status_out="$(vagrant status 2>&1 || true)"
@@ -70,7 +97,7 @@ if echo "${status_out}" | grep -qi "could not be found, but was requested"; then
   echo "Tip: Parallels requires Pro/Business edition for vagrant; otherwise use"
   echo "     another provider (VirtualBox/VMware/libvirt) or set VAGRANT_DEFAULT_PROVIDER."
   popd >/dev/null
-  exit 9
+  skip "provider unusable"
 fi
 
 # Try to bring up the VM; if box is missing (e.g. ARM box not found), skip
@@ -80,25 +107,41 @@ if ! vagrant up; then
   echo "      - If a VM with the same name already exists in Parallels/QEMU, set VAGRANT_VM_NAME to a unique name"
   echo "        or remove the old VM, then retry."
   popd >/dev/null
-  exit 9
+  skip "vagrant up failed"
 fi
+
+# Extract SSH connection details from vagrant ssh-config (actual port/key)
+ssh_cfg="$(vagrant ssh-config default 2>/dev/null || true)"
+VAGRANT_SSH_HOST="host.docker.internal"
+VAGRANT_SSH_PORT="$(echo "$ssh_cfg" | awk '/Port/ {print $2; exit}' )"
+VAGRANT_SSH_USER="$(echo "$ssh_cfg" | awk '/User/ {print $2; exit}' )"
+VAGRANT_SSH_KEY="/workspace/vagrant/rhel9/.vagrant/machines/default/qemu/private_key"
+export VAGRANT_SSH_HOST VAGRANT_SSH_PORT VAGRANT_SSH_USER VAGRANT_SSH_KEY
+
 popd >/dev/null
 
 # 2) Molecule (inside wunder-devtools-ee)
-scenario_dir="molecule/selinux-rhel9"
+scenario_dir="molecule/selinux_rhel9_heavy"
 if [ ! -f "${scenario_dir}/molecule.yml" ]; then
   echo "NOTE: Molecule scenario '${scenario_dir}' not found. Skipping."
   # Clean up the VM we just created
   pushd vagrant/rhel9 >/dev/null
   vagrant destroy -f
   popd >/dev/null
-  exit 9
+  skip "scenario missing"
 fi
 
-ANSIBLE_COLLECTIONS_PATHS="$PWD" \
-ANSIBLE_ROLES_PATH="$PWD/roles" \
+WUNDER_DEVTOOLS_RUN_AS_HOST_UID=0 \
+WUNDER_DEVTOOLS_RUN_AS_HOST_UID=0 \
+ANSIBLE_COLLECTIONS_PATHS="/tmp/wunder/collections" \
+ANSIBLE_ROLES_PATH="/workspace/roles" \
+VAGRANT_SSH_HOST="${VAGRANT_SSH_HOST:-127.0.0.1}" \
+VAGRANT_SSH_PORT="${VAGRANT_SSH_PORT:-55222}" \
+VAGRANT_SSH_USER="${VAGRANT_SSH_USER:-vagrant}" \
+VAGRANT_SSH_KEY="${VAGRANT_SSH_KEY:-/workspace/vagrant/rhel9/.vagrant/machines/default/qemu/private_key}" \
+ANSIBLE_SSH_ARGS="-o ControlMaster=no -o ControlPath=none -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" \
 bash scripts/wunder-devtools-ee.sh \
-  molecule test -s selinux-rhel9
+  molecule test -s selinux_rhel9_heavy
 
 # 3) VM destroy
 pushd vagrant/rhel9 >/dev/null
