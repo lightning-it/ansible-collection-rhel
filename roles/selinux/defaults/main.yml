@@ -1,0 +1,19 @@
+---
+# Desired SELinux state:
+#   - enforcing
+#   - permissive
+#   - disabled
+selinux_state: "enforcing"
+
+# SELinux policy type:
+#   - targeted
+#   - mls
+selinux_policy: "targeted"
+
+# Whether to manage /etc/selinux/config persistently
+selinux_manage_config: true
+
+# If SELinux is disabled in the kernel, we can:
+#   - warn and continue (false)
+#   - or fail the play (true)
+selinux_fail_if_kernel_disabled: false

@@ -1,0 +1,43 @@
+---
+- name: Gather current SELinux status
+  ansible.builtin.command: getenforce
+  register: selinux_getenforce
+  changed_when: false
+  failed_when: false
+
+- name: Debug current SELinux mode
+  ansible.builtin.debug:
+    msg: >-
+      Current SELinux mode:
+      {{ selinux_getenforce.stdout | default('unknown') }}
+
+- name: Set SELinux mode and policy via ansible.posix.selinux
+  ansible.posix.selinux:
+    policy: "{{ selinux_policy }}"
+    state: "{{ selinux_state }}"
+  register: selinux_result
+  when: selinux_manage_config | bool
+
+# Optional safety check if SELinux is disabled in the kernel
+- name: Handle SELinux disabled in kernel
+  when: selinux_manage_config | bool
+  block:
+    - name: Fail if SELinux is disabled in kernel and strict mode is enabled
+      ansible.builtin.fail:
+        msg: >-
+          SELinux is disabled in the running kernel (getenforce=Disabled). The
+          configuration has been updated, but SELinux cannot be enabled without
+          a reboot. Set selinux_fail_if_kernel_disabled=false to only warn.
+      when:
+        - selinux_fail_if_kernel_disabled | bool
+        - selinux_getenforce.stdout | lower == "disabled"
+
+    - name: Warn if SELinux is disabled in kernel
+      ansible.builtin.debug:
+        msg: >-
+          SELinux is disabled in the running kernel (getenforce=Disabled). The
+          configuration has been updated, but SELinux will only be effective
+          after a reboot.
+      when:
+        - not selinux_fail_if_kernel_disabled | bool
+        - selinux_getenforce.stdout | lower == "disabled"
