@@ -1,3 +1,7 @@
+## 1.1.0 (2025-12-19)
+
+* feat: Add SELinux role for RHEL hosts with configuration options ([3e4701e](https://github.com/lightning-it/ansible-collection-rhel/commit/3e4701e))
+
 ## 1.1.0 (2025-12-17)
 
 * feat: Add workflow to publish collection to Ansible Galaxy (#4) ([32699a5](https://github.com/lightning-it/ansible-collection-supplementary/commit/32699a5)), closes [#4](https://github.com/lightning-it/ansible-collection-supplementary/issues/4)
