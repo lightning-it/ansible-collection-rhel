@@ -1,0 +1,23 @@
+---
+galaxy_info:
+  role_name: baseline
+  namespace: lit
+  author: Lightning IT
+  description: Install baseline packages and configure timezone, locale,
+    chrony, and sysctl defaults.
+  company: Lightning IT
+  license: GPL-2.0-only
+  min_ansible_version: "2.15"
+  platforms:
+    - name: EL
+      versions: ["9"]
+  galaxy_tags:
+    - rhel
+    - baseline
+    - packages
+    - timezone
+    - locale
+    - chrony
+    - sysctl
+    - automation
+dependencies: []

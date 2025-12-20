@@ -1,0 +1,52 @@
+---
+- name: Verify rhel.baseline
+  hosts: rhel-baseline
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Assert baseline packages present
+      ansible.builtin.assert:
+        that:
+          - "'curl' in ansible_facts.packages"
+          - >-
+            'vim-enhanced' in ansible_facts.packages
+            or 'vim' in ansible_facts.packages
+        fail_msg: "Baseline packages missing"
+
+    - name: Read timezone
+      ansible.builtin.command: timedatectl show -p Timezone --value
+      register: tz_out
+      changed_when: false
+
+    - name: Assert timezone is correct
+      ansible.builtin.assert:
+        that:
+          - tz_out.stdout == 'Europe/Berlin'
+        fail_msg: "Timezone not set to expected value (Europe/Berlin)"
+
+    - name: Read locale
+      ansible.builtin.command: localectl status
+      register: locale_out
+      changed_when: false
+
+    - name: Assert locale is correct
+      ansible.builtin.assert:
+        that:
+          - "'LANG=\"en_US.UTF-8\"' in locale_out.stdout"
+        fail_msg: "Locale not set to en_US.UTF-8"
+
+    - name: Check sysctl value
+      ansible.builtin.command: sysctl -n net.ipv4.ip_forward
+      register: sysctl_out
+      changed_when: false
+
+    - name: Assert sysctl is applied
+      ansible.builtin.assert:
+        that:
+          - sysctl_out.stdout == '0'
+        fail_msg: "net.ipv4.ip_forward not set to 0"

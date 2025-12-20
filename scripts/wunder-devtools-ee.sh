@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE="${WUNDER_DEVTOOLS_EE_IMAGE:-ghcr.io/lightning-it/wunder-devtools-ee:v1.1.1}"
+IMAGE="${WUNDER_DEVTOOLS_EE_IMAGE:-ghcr.io/lightning-it/wunder-devtools-ee:v1.1.2}"
 CONTAINER_HOME="${CONTAINER_HOME:-/tmp/wunder}"
 HOST_HOME_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/wunder-devtools-ee/home"
 
@@ -14,9 +14,17 @@ DOCKER_ARGS=(
   -v "$HOST_HOME_CACHE":"${CONTAINER_HOME}"
 )
 
-# Mount Docker-Socket
+# Mount Docker socket (supports Docker Desktop/Colima path on macOS too)
+DOCKER_SOCKET=""
 if [ -S /var/run/docker.sock ]; then
-  DOCKER_ARGS+=(-v /var/run/docker.sock:/var/run/docker.sock)
+  DOCKER_SOCKET="/var/run/docker.sock"
+elif [ -S "$HOME/.docker/run/docker.sock" ]; then
+  DOCKER_SOCKET="$HOME/.docker/run/docker.sock"
+fi
+
+if [ -n "$DOCKER_SOCKET" ]; then
+  DOCKER_ARGS+=(-v "$DOCKER_SOCKET":/var/run/docker.sock)
+  DOCKER_ARGS+=(-e DOCKER_HOST=unix:///var/run/docker.sock)
 
   # By default, run as host UID to avoid permission issues with bind mounts.
   # For SSH-heavy workflows (e.g. Vagrant + Molecule), this can be disabled by

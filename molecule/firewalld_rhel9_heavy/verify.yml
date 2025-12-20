@@ -1,0 +1,40 @@
+---
+- name: Verify firewalld on RHEL 9
+  hosts: rhel_firewalld_hosts
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Check firewalld service status
+      ansible.builtin.systemd:
+        name: firewalld
+      register: firewalld_service
+      changed_when: false
+
+    - name: Assert firewalld is running
+      ansible.builtin.assert:
+        that:
+          - firewalld_service.status.SubState == 'running'
+        fail_msg: "firewalld service is not running"
+
+    - name: List allowed services
+      ansible.builtin.command: firewall-cmd --list-services
+      register: firewalld_services
+      changed_when: false
+
+    - name: Assert ssh service is allowed
+      ansible.builtin.assert:
+        that:
+          - "'ssh' in firewalld_services.stdout.split()"
+        fail_msg: "ssh service not enabled in firewalld"
+
+    - name: List allowed ports
+      ansible.builtin.command: firewall-cmd --list-ports
+      register: firewalld_ports
+      changed_when: false
+
+    - name: Assert custom port is allowed
+      ansible.builtin.assert:
+        that:
+          - "'8080/tcp' in firewalld_ports.stdout.split()"
+        fail_msg: "8080/tcp not enabled in firewalld"

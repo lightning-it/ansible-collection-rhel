@@ -1,0 +1,5 @@
+---
+firewalld_manage_service: true
+
+firewalld_services: ["ssh"]
+firewalld_ports: []

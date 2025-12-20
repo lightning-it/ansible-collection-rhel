@@ -1,0 +1,19 @@
+---
+- name: Verify rhel.repos
+  hosts: rhel-repos
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Read custom repo file
+      ansible.builtin.slurp:
+        src: /etc/yum.repos.d/test-custom.repo
+      register: repo_file
+      changed_when: false
+
+    - name: Assert repo file present and disabled
+      ansible.builtin.assert:
+        that:
+          - repo_file is defined
+          - repo_file.content | b64decode is search('enabled=0')
+        fail_msg: "Custom repo not created or not disabled"

@@ -1,0 +1,25 @@
+---
+driver:
+  name: docker
+
+platforms:
+  - name: rhel-users
+    image: quay.io/centos/centos:stream9
+    privileged: true
+    command: /usr/sbin/init
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    tmpfs:
+      - /tmp
+      - /run
+    environment:
+      container: docker
+
+provisioner:
+  name: ansible
+  playbooks:
+    converge: converge.yml
+    verify: verify.yml
+
+verifier:
+  name: ansible

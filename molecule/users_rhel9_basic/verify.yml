@@ -1,0 +1,41 @@
+---
+- name: Verify rhel.users
+  hosts: rhel-users
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Check user exists
+      ansible.builtin.command: id ops-admin
+      register: user_id
+      changed_when: false
+
+    - name: Assert user creation succeeded
+      ansible.builtin.assert:
+        that:
+          - user_id.rc == 0
+        fail_msg: "User ops-admin not present"
+
+    - name: Check authorized_keys
+      ansible.builtin.slurp:
+        src: /home/ops-admin/.ssh/authorized_keys
+      register: auth_keys
+      changed_when: false
+
+    - name: Assert SSH key present
+      ansible.builtin.assert:
+        that:
+          - "'DemoKeyForTestingOnly' in (auth_keys.content | b64decode)"
+        fail_msg: "SSH key not deployed for ops-admin"
+
+    - name: Ensure removed user is absent
+      ansible.builtin.command: id temp-user
+      register: temp_user_id
+      changed_when: false
+      failed_when: false
+
+    - name: Assert temp-user is absent
+      ansible.builtin.assert:
+        that:
+          - temp_user_id.rc != 0
+        fail_msg: "temp-user still present"

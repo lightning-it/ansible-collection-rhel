@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  role_name: users
+  namespace: lit
+  author: Lightning IT
+  description: Manage local users, groups, and authorized SSH keys on RHEL
+    hosts.
+  company: Lightning IT
+  license: GPL-2.0-only
+  min_ansible_version: "2.15"
+  platforms:
+    - name: EL
+      versions: ["9"]
+  galaxy_tags:
+    - rhel
+    - users
+    - ssh
+    - accounts
+    - security
+dependencies: []
