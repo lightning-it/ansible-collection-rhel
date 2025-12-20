@@ -1,3 +1,7 @@
+## <small>1.1.1 (2025-12-20)</small>
+
+* fix: Update WUNDER_DEVTOOLS_EE_IMAGE to version 1.1.1 ([43e0bc6](https://github.com/lightning-it/ansible-collection-rhel/commit/43e0bc6))
+
 ## 1.1.0 (2025-12-19)
 
 * feat: Add SELinux role for RHEL hosts with configuration options ([3e4701e](https://github.com/lightning-it/ansible-collection-rhel/commit/3e4701e))
