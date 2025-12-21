@@ -1,6 +1,5 @@
 ---
 baseline_packages_present:
-  - curl
   - vim
   - jq
   - tar
@@ -8,13 +7,6 @@ baseline_packages_present:
 
 baseline_timezone: Etc/UTC
 baseline_locale: en_US.UTF-8
-
-baseline_chrony_manage: true
-baseline_chrony_pools:
-  - "pool.ntp.org iburst"
-baseline_chrony_servers: []
-baseline_chrony_driftfile: /var/lib/chrony/drift
-baseline_chrony_makestep: "1.0 3"
 
 # Optional sysctl key/value map, e.g.:
 # baseline_sysctl:

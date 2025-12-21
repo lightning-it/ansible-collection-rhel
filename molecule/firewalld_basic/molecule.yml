@@ -3,20 +3,19 @@ driver:
   name: docker
 
 platforms:
-  - name: firewalld-instance
-    image: quay.io/centos/centos:stream9
+  - name: firewalld_instance
+    image: quay.io/rockylinux/rockylinux:9
+    pre_build_image: true
     privileged: true
-    command: /usr/sbin/init
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    tmpfs:
-      - /tmp
-      - /run
-    environment:
-      container: docker
 
 provisioner:
   name: ansible
+  inventory:
+    hosts:
+      all:
+        hosts:
+          firewalld_instance:
+            ansible_connection: docker
   playbooks:
     converge: converge.yml
     verify: verify.yml

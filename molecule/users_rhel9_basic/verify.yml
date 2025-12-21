@@ -1,7 +1,7 @@
 ---
 - name: Verify rhel.users
-  hosts: rhel-users
-  become: true
+  hosts: rhel_users
+  become: false
   gather_facts: false
 
   tasks:

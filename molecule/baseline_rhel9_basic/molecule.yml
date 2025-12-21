@@ -3,20 +3,18 @@ driver:
   name: docker
 
 platforms:
-  - name: rhel-baseline
-    image: quay.io/centos/centos:stream9
-    privileged: true
-    command: /usr/sbin/init
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    tmpfs:
-      - /tmp
-      - /run
-    environment:
-      container: docker
+  - name: rhel_baseline
+    image: quay.io/rockylinux/rockylinux:9
+    pre_build_image: true
 
 provisioner:
   name: ansible
+  inventory:
+    hosts:
+      all:
+        hosts:
+          rhel_baseline:
+            ansible_connection: docker
   playbooks:
     converge: converge.yml
     verify: verify.yml

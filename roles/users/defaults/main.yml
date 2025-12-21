@@ -1,3 +1,4 @@
+---
 # List of user definitions to manage on the host.
 # Each item supports:
 #   name (required), state (present|absent), uid, gid, groups (list),

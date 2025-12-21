@@ -1,7 +1,7 @@
 ---
 - name: Verify rhel.repos
-  hosts: rhel-repos
-  become: true
+  hosts: rhel_repos
+  become: false
   gather_facts: false
 
   tasks:
@@ -15,5 +15,5 @@
       ansible.builtin.assert:
         that:
           - repo_file is defined
-          - repo_file.content | b64decode is search('enabled=0')
+          - repo_file.content | b64decode is search('enabled\\s*=\\s*0')
         fail_msg: "Custom repo not created or not disabled"

@@ -3,9 +3,10 @@ driver:
   name: docker
 
 platforms:
-  - name: rhel_users
+  - name: chrony_instance
     image: quay.io/rockylinux/rockylinux:9
     pre_build_image: true
+    privileged: true
 
 provisioner:
   name: ansible
@@ -13,7 +14,7 @@ provisioner:
     hosts:
       all:
         hosts:
-          rhel_users:
+          chrony_instance:
             ansible_connection: docker
   playbooks:
     converge: converge.yml

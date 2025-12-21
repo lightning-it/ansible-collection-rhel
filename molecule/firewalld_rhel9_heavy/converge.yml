@@ -1,4 +1,4 @@
-# ansible-lint: disable=var-naming
+---
 - name: Converge firewalld role on RHEL 9 (Vagrant)
   hosts: rhel_firewalld_hosts
   become: true

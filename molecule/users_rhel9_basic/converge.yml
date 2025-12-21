@@ -1,8 +1,9 @@
 ---
 - name: Converge rhel.users
-  hosts: rhel-users
-  become: true
+  hosts: rhel_users
+  become: false
   vars:
+    ansible_user: root
     ansible_python_interpreter: /usr/bin/python3
     users_manage_groups: true
     users_accounts:

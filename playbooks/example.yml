@@ -24,8 +24,15 @@
       vars:
         baseline_timezone: Etc/UTC
         baseline_packages_present:
-          - curl
           - vim
+
+    - role: lit.rhel.chrony
+      vars:
+        chrony_manage: true
+        chrony_service_manage: false  # <— smoke only
+        chrony_manage_package: false  # <— smoke only
+        chrony_pools:
+          - "pool.ntp.org iburst"
 
     - role: lit.rhel.selinux
       vars:

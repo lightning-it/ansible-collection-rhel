@@ -1,16 +1,14 @@
 ---
-- name: Converge rhel.repos
-  hosts: rhel_repos
+- name: Converge chrony role
+  hosts: chrony_instance
   become: false
   vars:
     ansible_user: root
     ansible_python_interpreter: /usr/bin/python3
-    repos_custom:
-      - id: test-custom
-        name: Test Custom Repo
-        baseurl: http://example.com/repo
-        enabled: false
-        gpgcheck: false
+    chrony_manage: true
+    chrony_service_manage: false  # skip service control in container
+    chrony_pools:
+      - "pool.ntp.org iburst"
   pre_tasks:
     - name: Ensure python3 is present
       ansible.builtin.raw: |
@@ -20,4 +18,4 @@
       changed_when: false
 
   roles:
-    - role: lit.rhel.repos
+    - role: lit.rhel.chrony

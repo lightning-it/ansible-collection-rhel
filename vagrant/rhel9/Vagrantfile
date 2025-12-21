@@ -1,7 +1,9 @@
 Vagrant.configure("2") do |config|
-  # RHEL 9 generic box (x86_64); adjust if you use a different box/provider
-  config.vm.box = "generic/rhel9"
-  config.vm.hostname = "rhel9-vagrant"
+  # Rocky Linux 9 generic box (x86_64); adjust if you use a different box/provider
+  #
+  # Wähle die, die zu deinem Provider passt.
+  config.vm.box = "generic/rocky9"
+  config.vm.hostname = "rocky9-vagrant"
 
   # Simple private network with a stable hostname/address for Ansible
   config.vm.network "private_network", type: "dhcp"
@@ -9,10 +11,10 @@ Vagrant.configure("2") do |config|
   # Explicit SSH port forward with auto-correct to avoid host conflicts
   host_ssh_port = ENV.fetch("VAGRANT_SSH_PORT", "55222")
   config.vm.network "forwarded_port",
-    guest: 22,
-    host: host_ssh_port,
-    id: "ssh",
-    auto_correct: true
+                    guest: 22,
+                    host: host_ssh_port,
+                    id: "ssh",
+                    auto_correct: true
 
   # Provider tuning example (VirtualBox, Parallels, etc.)
   config.vm.provider "virtualbox" do |vb|
@@ -25,20 +27,4 @@ Vagrant.configure("2") do |config|
     q.ssh_port = host_ssh_port if q.respond_to?(:ssh_port=)
   end
 
-  # Optional: RHSM/Satellite registration via environment variables
-  # Uncomment and adapt if you want automatic registration.
-  #
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   set -euo pipefail
-  #
-  #   if [ -n "${RHSM_ORG:-}" ] && [ -n "${RHSM_ACTIVATION_KEY:-}" ]; then
-  #     echo "Registering RHEL against RHSM..."
-  #     subscription-manager register \
-  #       --org="${RHSM_ORG}" \
-  #       --activationkey="${RHSM_ACTIVATION_KEY}"
-  #     subscription-manager attach --auto || true
-  #   else
-  #     echo "No RHSM_ORG / RHSM_ACTIVATION_KEY set, skipping registration."
-  #   fi
-  # SHELL
 end

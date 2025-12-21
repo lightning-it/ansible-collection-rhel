@@ -19,23 +19,6 @@
     mode: "0644"
   when: baseline_locale | default("") | length > 0
 
-- name: Render chrony configuration
-  ansible.builtin.template:
-    src: chrony.conf.j2
-    dest: /etc/chrony.conf
-    owner: root
-    group: root
-    mode: "0644"
-  notify: restart chronyd
-  when: baseline_chrony_manage | bool
-
-- name: Ensure chronyd is enabled and running
-  ansible.builtin.service:
-    name: chronyd
-    state: started
-    enabled: true
-  when: baseline_chrony_manage | bool
-
 - name: Apply baseline sysctl settings
   ansible.posix.sysctl:
     name: "{{ item.key }}"
