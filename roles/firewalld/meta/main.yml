@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  role_name: firewalld
+  namespace: lit
+  author: Lightning IT
+  description: Manage firewalld packages, service state, and allowed services
+    or ports.
+  company: Lightning IT
+  license: GPL-2.0-only
+  min_ansible_version: "2.15"
+  platforms:
+    - name: EL
+      versions: ["9"]
+  galaxy_tags:
+    - rhel
+    - firewalld
+    - firewall
+    - security
+    - networking
+dependencies: []

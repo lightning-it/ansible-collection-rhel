@@ -1,0 +1,31 @@
+---
+- name: Converge rhel.baseline
+  hosts: rhel_baseline
+  become: false
+  vars:
+    ansible_user: root
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_remote_tmp: /tmp/.ansible-tmp
+    baseline_packages_present:
+      - vim-minimal
+      - jq
+    baseline_chrony_manage: false
+    baseline_timezone: Europe/Berlin
+    baseline_locale: en_US.UTF-8
+    baseline_chrony_pools: []
+    baseline_sysctl: {}
+  pre_tasks:
+    - name: Show current user
+      ansible.builtin.command: whoami
+      register: whoami_out
+      changed_when: false
+
+    - name: Ensure python3 is present
+      ansible.builtin.raw: |
+        if ! command -v python3 >/dev/null 2>&1; then
+          dnf -y install python3
+        fi
+      changed_when: false
+
+  roles:
+    - role: lit.rhel.baseline

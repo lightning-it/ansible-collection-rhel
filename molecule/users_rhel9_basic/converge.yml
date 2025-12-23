@@ -1,0 +1,29 @@
+---
+- name: Converge rhel.users
+  hosts: rhel_users
+  become: false
+  vars:
+    ansible_user: root
+    ansible_python_interpreter: /usr/bin/python3
+    users_manage_groups: true
+    users_accounts:
+      - name: ops-admin
+        uid: 1001
+        groups: ["wheel"]
+        shell: /bin/bash
+        ssh_keys:
+          - >-
+            ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDemoKeyForTestingOnly ops-admin
+      - name: temp-user
+        state: absent
+        remove: true
+  pre_tasks:
+    - name: Ensure python3 is present
+      ansible.builtin.raw: |
+        if ! command -v python3 >/dev/null 2>&1; then
+          dnf -y install python3
+        fi
+      changed_when: false
+
+  roles:
+    - role: lit.rhel.users

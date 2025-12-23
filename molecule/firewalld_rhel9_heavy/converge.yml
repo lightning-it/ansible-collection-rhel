@@ -1,6 +1,6 @@
 ---
-- name: Converge SELinux role on RHEL 9 (Vagrant)
-  hosts: rhel_selinux_hosts
+- name: Converge firewalld role on RHEL 9 (Vagrant)
+  hosts: rhel_firewalld_hosts
   become: true
   vars:
     ansible_host: >-
@@ -20,7 +20,10 @@
       -o ControlPersist=no
 
   roles:
-    - role: lit.rhel.selinux
+    - role: lit.rhel.firewalld
       vars:
-        selinux_state: enforcing
-        selinux_policy: targeted
+        firewalld_manage_service: true
+        firewalld_services:
+          - ssh
+        firewalld_ports:
+          - 8080/tcp

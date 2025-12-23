@@ -1,0 +1,14 @@
+---
+- name: Verify chrony heavy
+  hosts: all
+  become: true
+  tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert chronyd is enabled and running
+      ansible.builtin.assert:
+        that:
+          - services['chronyd.service'].state == 'running'
+          - services['chronyd.service'].status == 'enabled'
+        fail_msg: "chronyd service is not running or not enabled"

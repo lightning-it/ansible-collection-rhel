@@ -1,0 +1,14 @@
+---
+# Repo IDs to explicitly enable or disable via subscription-manager.
+repos_enabled: []
+repos_disabled: []
+
+# Custom repositories to manage via yum_repository.
+# Example:
+# repos_custom:
+#   - id: custom-appstream
+#     name: Custom AppStream
+#     baseurl: http://repo.example.com/appstream
+#     enabled: true
+#     gpgcheck: false
+repos_custom: []

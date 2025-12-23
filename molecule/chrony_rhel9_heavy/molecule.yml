@@ -6,9 +6,9 @@ driver:
   name: default
 
 platforms:
-  - name: rhel9_target
+  - name: chrony_rhel9_target
     groups:
-      - rhel_selinux_hosts
+      - chrony_hosts
 
 provisioner:
   name: ansible
@@ -17,7 +17,7 @@ provisioner:
     verify: verify.yml
   inventory:
     host_vars:
-      rhel9_target:
+      chrony_rhel9_target:
         ansible_host: >-
           {{ lookup('env', 'VAGRANT_SSH_HOST')
              | default('host.docker.internal', true) }}

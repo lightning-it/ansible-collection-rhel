@@ -1,0 +1,75 @@
+---
+- name: Build group list from user definitions
+  ansible.builtin.set_fact:
+    users_groups_all: >-
+      {{
+        users_accounts
+        | map(attribute='groups', default=[])
+        | sum(start=[])
+        | map('string')
+        | list
+      }}
+  when: users_manage_groups | bool and users_accounts | length > 0
+
+- name: Ensure referenced groups exist
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ users_groups_all | default([]) | unique }}"
+  when:
+    - users_manage_groups | bool
+    - users_accounts | length > 0
+
+- name: Manage users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default('present') }}"
+    uid: "{{ item.uid | default(omit) }}"
+    group: "{{ item.gid | default(omit) }}"
+    groups: "{{ item.groups | default(omit) }}"
+    append: "{{ (item.groups | default([])) | length > 0 }}"
+    shell: "{{ item.shell | default(omit) }}"
+    home: "{{ item.home | default(omit) }}"
+    create_home: "{{ item.create_home | default(omit) }}"
+    password_lock: "{{ item.password_lock | default(omit) }}"
+    remove: "{{ item.remove | default(false) }}"
+  loop: "{{ users_accounts }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Build list of users with SSH keys in present state
+  ansible.builtin.set_fact:
+    rhel_users_with_ssh_keys: >-
+      {{
+        (
+          users_accounts
+          | default([])
+          | selectattr('ssh_keys', 'defined')
+          | rejectattr('ssh_keys', 'equalto', [])
+          | selectattr('state', 'undefined')
+          | list
+        )
+        +
+        (
+          users_accounts
+          | default([])
+          | selectattr('ssh_keys', 'defined')
+          | rejectattr('ssh_keys', 'equalto', [])
+          | selectattr('state', 'defined')
+          | selectattr('state', 'equalto', 'present')
+          | list
+        )
+      }}
+
+- name: Manage authorized keys for present users
+  ansible.posix.authorized_key:
+    user: "{{ item.0.name }}"
+    state: present
+    key: "{{ item.1 }}"
+    manage_dir: true
+  loop: "{{ rhel_users_with_ssh_keys | subelements('ssh_keys') }}"
+  when:
+    - rhel_users_with_ssh_keys is defined
+    - rhel_users_with_ssh_keys | length > 0
+  loop_control:
+    label: "{{ item.0.name }}"

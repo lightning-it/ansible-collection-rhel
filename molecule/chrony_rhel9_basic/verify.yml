@@ -1,0 +1,17 @@
+---
+- name: Verify chrony configuration
+  hosts: chrony_instance
+  gather_facts: false
+  become: false
+
+  tasks:
+    - name: Read chrony configuration
+      ansible.builtin.slurp:
+        src: /etc/chrony.conf
+      register: chrony_conf
+
+    - name: Assert pool entry present
+      ansible.builtin.assert:
+        that:
+          - "'pool.ntp.org iburst' in (chrony_conf.content | b64decode)"
+        fail_msg: "chrony pool entry not rendered"

@@ -1,0 +1,8 @@
+---
+- name: Converge podman
+  hosts: all
+  become: false
+  gather_facts: true
+  connection: local
+  roles:
+    - role: lit.rhel.podman

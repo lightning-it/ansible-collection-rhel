@@ -1,4 +1,5 @@
 ---
+# ansible-lint: disable=var-naming
 # Collection-level example playbook for lit.rhel
 #
 # This playbook is used as the "canonical" example entrypoint in CI
@@ -10,9 +11,39 @@
   gather_facts: false
 
   roles:
+    - role: lit.rhel.rhsm
+      vars:
+        rhsm_method: none   # set to rhsm|satellite when registering
+
+    - role: lit.rhel.repos
+      vars:
+        repos_enabled: []
+        repos_disabled: []
+
+    - role: lit.rhel.baseline
+      vars:
+        baseline_timezone: Etc/UTC
+        baseline_packages_present:
+          - vim
+
+    - role: lit.rhel.chrony
+      vars:
+        chrony_manage: true
+        chrony_service_manage: false  # <— smoke only
+        chrony_manage_package: false  # <— smoke only
+        chrony_pools:
+          - "pool.ntp.org iburst"
+
     - role: lit.rhel.selinux
       vars:
         selinux_state: enforcing
         selinux_policy: targeted
         selinux_manage_config: false
         selinux_fail_if_kernel_disabled: false
+
+    - role: lit.rhel.users
+      vars:
+        users_accounts:
+          - name: ops-admin
+            groups: ["wheel"]
+            shell: /bin/bash

@@ -1,0 +1,23 @@
+---
+- name: Converge rhel.repos
+  hosts: rhel_repos
+  become: false
+  vars:
+    ansible_user: root
+    ansible_python_interpreter: /usr/bin/python3
+    repos_custom:
+      - id: test-custom
+        name: Test Custom Repo
+        baseurl: http://example.com/repo
+        enabled: false
+        gpgcheck: false
+  pre_tasks:
+    - name: Ensure python3 is present
+      ansible.builtin.raw: |
+        if ! command -v python3 >/dev/null 2>&1; then
+          dnf -y install python3
+        fi
+      changed_when: false
+
+  roles:
+    - role: lit.rhel.repos

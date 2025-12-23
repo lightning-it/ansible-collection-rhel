@@ -1,0 +1,9 @@
+---
+rhsm_method: none          # none | rhsm | satellite
+rhsm_org: ""
+rhsm_activation_key: ""
+rhsm_username: ""
+rhsm_password: ""
+rhsm_auto_attach: true
+rhsm_server: ""            # e.g. satellite.example.com
+rhsm_baseurl: ""           # e.g. https://satellite/pulp/content

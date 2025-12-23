@@ -8,7 +8,7 @@ driver:
 platforms:
   - name: rhel9_target
     groups:
-      - rhel_selinux_hosts
+      - rhel_firewalld_hosts
 
 provisioner:
   name: ansible

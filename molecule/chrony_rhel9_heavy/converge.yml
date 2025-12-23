@@ -1,0 +1,16 @@
+---
+- name: Converge chrony heavy
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Refresh DNF metadata
+      ansible.builtin.command: dnf -y makecache
+      changed_when: false
+
+  vars:
+    chrony_manage: true
+    chrony_service_manage: true
+    chrony_pools:
+      - pool.ntp.org
+  roles:
+    - role: lit.rhel.chrony

@@ -1,0 +1,17 @@
+---
+driver:
+  name: docker
+platforms:
+  - name: control
+    image: quay.io/rockylinux/rockylinux:9
+    pre_build_image: true
+provisioner:
+  name: ansible
+  inventory:
+    hosts:
+      all:
+        hosts:
+          control:
+            ansible_connection: docker
+verifier:
+  name: ansible

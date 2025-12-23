@@ -1,0 +1,23 @@
+---
+driver:
+  name: docker
+
+platforms:
+  - name: rhel_baseline
+    image: quay.io/rockylinux/rockylinux:9
+    pre_build_image: true
+
+provisioner:
+  name: ansible
+  inventory:
+    hosts:
+      all:
+        hosts:
+          rhel_baseline:
+            ansible_connection: docker
+  playbooks:
+    converge: converge.yml
+    verify: verify.yml
+
+verifier:
+  name: ansible

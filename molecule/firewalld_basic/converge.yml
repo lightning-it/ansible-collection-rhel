@@ -1,0 +1,24 @@
+---
+- name: Converge firewalld role
+  hosts: firewalld_instance
+  become: false
+  vars:
+    ansible_user: root
+    ansible_python_interpreter: /usr/bin/python3
+    firewalld_manage_service: false
+  pre_tasks:
+    - name: Ensure python3 is present
+      ansible.builtin.raw: |
+        if ! command -v python3 >/dev/null 2>&1; then
+          dnf -y install python3
+        fi
+      changed_when: false
+
+  roles:
+    - role: lit.rhel.firewalld
+      vars:
+        firewalld_manage_service: false
+        firewalld_services:
+          - ssh
+        firewalld_ports:
+          - 8080/tcp

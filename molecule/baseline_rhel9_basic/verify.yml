@@ -1,0 +1,71 @@
+---
+- name: Verify rhel.baseline
+  hosts: rhel_baseline
+  become: false
+  vars:
+    ansible_user: root
+    ansible_remote_tmp: /tmp/.ansible-tmp
+    baseline_packages_present:
+      - vim-minimal
+      - jq
+    baseline_sysctl: {}
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Assert baseline packages present
+      ansible.builtin.assert:
+        that:
+          - "item in ansible_facts.packages"
+        fail_msg: "Baseline package {{ item }} missing"
+      loop: "{{ baseline_packages_present }}"
+
+    - name: Read timezone
+      ansible.builtin.command: timedatectl show -p Timezone --value
+      register: tz_out
+      changed_when: false
+      when:
+        - ansible_facts.service_mgr is defined
+        - ansible_facts.service_mgr == "systemd"
+
+    - name: Assert timezone is correct
+      ansible.builtin.assert:
+        that:
+          - tz_out.stdout == 'Europe/Berlin'
+        fail_msg: "Timezone not set to expected value (Europe/Berlin)"
+      when:
+        - ansible_facts.service_mgr is defined
+        - ansible_facts.service_mgr == "systemd"
+
+    - name: Read locale
+      ansible.builtin.command: localectl status
+      register: locale_out
+      changed_when: false
+      when:
+        - ansible_facts.service_mgr is defined
+        - ansible_facts.service_mgr == "systemd"
+
+    - name: Assert locale is correct
+      ansible.builtin.assert:
+        that:
+          - "'LANG=\"en_US.UTF-8\"' in locale_out.stdout"
+        fail_msg: "Locale not set to en_US.UTF-8"
+      when:
+        - ansible_facts.service_mgr is defined
+        - ansible_facts.service_mgr == "systemd"
+
+    - name: Check sysctl value
+      ansible.builtin.command: sysctl -n net.ipv4.ip_forward
+      register: sysctl_out
+      changed_when: false
+      when: baseline_sysctl | length > 0
+
+    - name: Assert sysctl is applied
+      ansible.builtin.assert:
+        that:
+          - sysctl_out.stdout == '0'
+        fail_msg: "net.ipv4.ip_forward not set to 0"
+      when: baseline_sysctl | length > 0

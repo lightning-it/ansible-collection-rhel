@@ -1,0 +1,15 @@
+---
+baseline_packages_present:
+  - vim
+  - jq
+  - tar
+  - bash-completion
+
+baseline_timezone: Etc/UTC
+baseline_locale: en_US.UTF-8
+
+# Optional sysctl key/value map, e.g.:
+# baseline_sysctl:
+#   net.ipv4.ip_forward: 0
+#   net.ipv4.conf.all.rp_filter: 1
+baseline_sysctl: {}
