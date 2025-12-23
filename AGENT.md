@@ -328,8 +328,8 @@ When the user asks you to:
   - assume `vagrant/rhel9/Vagrantfile` exists or propose one,
   - wire it to environment-based SSH host/port/user/key.
   - For roles expected to run on real RHEL (e.g. SELinux, firewalld), add such a
-  heavy scenario and a helper script to start the Vagrant VM and pass SSH env
-  vars into `wunder-devtools-ee`.
+    heavy scenario and a helper script to start the Vagrant VM and pass SSH env
+    vars into `wunder-devtools-ee`.
 
 - “update CI to run the example playbook”:
   - integrate `EXAMPLE_PLAYBOOK=playbooks/example.yml` into the existing
