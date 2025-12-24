@@ -1,8 +1,6 @@
 ---
 repos:
-  # >>> BEGIN shared-assets pre-commit
-  # Everything between these markers is managed by lightning-it/shared-assets.
-  # Do not edit here – changes will be overwritten by the sync.
+    # >>> BEGIN shared-assets pre-commit
   - repo: local
     hooks:
       # -------------------------------------------------------------------
@@ -14,7 +12,6 @@ repos:
         entry: bash scripts/wunder-devtools-ee.sh yamllint
         pass_filenames: true
         files: \.(yml|yaml)$
-
 
       # -------------------------------------------------------------------
       # ansible-lint (via wunder-devtools-ee)
@@ -83,7 +80,6 @@ repos:
         entry: bash scripts/devtools-galaxy-verify.sh
         pass_filenames: false
         files: ^(roles/|galaxy\.yml)
-
   # <<< END shared-assets pre-commit
 
   # >>> BEGIN repo-specific pre-commit
