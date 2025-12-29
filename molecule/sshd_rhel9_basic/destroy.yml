@@ -1,0 +1,5 @@
+---
+- name: Destroy sshd scenario
+  hosts: localhost
+  gather_facts: false
+  tasks: []

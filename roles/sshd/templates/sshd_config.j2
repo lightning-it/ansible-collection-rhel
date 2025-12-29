@@ -1,0 +1,27 @@
+# Ansible managed
+Port {{ rhel_sshd_port }}
+Protocol 2
+
+PermitRootLogin {{ rhel_sshd_permit_root_login }}
+PasswordAuthentication {{ rhel_sshd_password_authentication }}
+ChallengeResponseAuthentication {{ rhel_sshd_challenge_response_authentication }}
+UsePAM yes
+PrintMotd no
+Subsystem sftp /usr/libexec/openssh/sftp-server
+
+{% if rhel_sshd_allow_users|length > 0 -%}
+AllowUsers {{ rhel_sshd_allow_users | join(' ') }}
+{% endif -%}
+{% if rhel_sshd_allow_groups|length > 0 -%}
+AllowGroups {{ rhel_sshd_allow_groups | join(' ') }}
+{% endif -%}
+{% if rhel_sshd_deny_users|length > 0 -%}
+DenyUsers {{ rhel_sshd_deny_users | join(' ') }}
+{% endif -%}
+{% if rhel_sshd_deny_groups|length > 0 -%}
+DenyGroups {{ rhel_sshd_deny_groups | join(' ') }}
+{% endif -%}
+
+{% for opt in rhel_sshd_extra_options | dict2items -%}
+{{ opt.key }} {{ opt.value }}
+{% endfor -%}
