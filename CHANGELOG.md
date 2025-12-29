@@ -1,3 +1,9 @@
+## [1.4.1](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.4.0...v1.4.1) (2025-12-29)
+
+### Bug Fixes
+
+* standardize variable names by removing 'rhel_' prefix ([#22](https://github.com/lightning-it/ansible-collection-rhel/issues/22)) ([12d7dba](https://github.com/lightning-it/ansible-collection-rhel/commit/12d7dba7e3fc1e747bd0a82c878b826fc95da53a))
+
 ## [1.4.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.3.0...v1.4.0) (2025-12-29)
 
 ### Features
