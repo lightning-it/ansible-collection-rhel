@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.3.0...v1.4.0) (2025-12-29)
+
+### Features
+
+* **fail2ban:** add fail2ban role with configuration, templates, and tasks ([#20](https://github.com/lightning-it/ansible-collection-rhel/issues/20)) ([2dfc9ba](https://github.com/lightning-it/ansible-collection-rhel/commit/2dfc9baa0a57c81f6587caa1f10c87d642c4a11f))
+
 ## [1.3.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.2.0...v1.3.0) (2025-12-29)
 
 ### Features
