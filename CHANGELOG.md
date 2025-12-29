@@ -1,3 +1,13 @@
+## 1.2.0 (2025-12-29)
+
+* chore: sync shared assets from lightning-it/shared-assets (#16) ([c820950](https://github.com/lightning-it/ansible-collection-rhel/commit/c820950)), closes [#16](https://github.com/lightning-it/ansible-collection-rhel/issues/16)
+* chore: sync shared assets from lightning-it/shared-assets (#5) ([6598ec7](https://github.com/lightning-it/ansible-collection-rhel/commit/6598ec7)), closes [#5](https://github.com/lightning-it/ansible-collection-rhel/issues/5)
+* chore: sync shared assets from lightning-it/shared-assets (#7) ([8877f13](https://github.com/lightning-it/ansible-collection-rhel/commit/8877f13)), closes [#7](https://github.com/lightning-it/ansible-collection-rhel/issues/7)
+* chore: sync shared assets from lightning-it/shared-assets (#8) ([1e4300e](https://github.com/lightning-it/ansible-collection-rhel/commit/1e4300e)), closes [#8](https://github.com/lightning-it/ansible-collection-rhel/issues/8)
+* chore: sync shared assets from lightning-it/shared-assets (#9) ([8068ce4](https://github.com/lightning-it/ansible-collection-rhel/commit/8068ce4)), closes [#9](https://github.com/lightning-it/ansible-collection-rhel/issues/9)
+* feat: Add baseline, firewalld, podman, repos, rhsm, and users roles with documentation and tasks (#6 ([ccfd8cd](https://github.com/lightning-it/ansible-collection-rhel/commit/ccfd8cd)), closes [#6](https://github.com/lightning-it/ansible-collection-rhel/issues/6)
+* Enhance security policy with reporting guidelines (#4) ([8a07114](https://github.com/lightning-it/ansible-collection-rhel/commit/8a07114)), closes [#4](https://github.com/lightning-it/ansible-collection-rhel/issues/4)
+
 ## <small>1.1.1 (2025-12-20)</small>
 
 * fix: Update WUNDER_DEVTOOLS_EE_IMAGE to version 1.1.1 ([43e0bc6](https://github.com/lightning-it/ansible-collection-rhel/commit/43e0bc6))
