@@ -1,0 +1,19 @@
+---
+- name: Verify fail2ban role
+  hosts: fail2ban_instance
+  become: false
+  vars:
+    ansible_user: root
+    ansible_python_interpreter: /usr/bin/python3
+  gather_facts: false
+
+  tasks:
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Assert fail2ban installed
+      ansible.builtin.assert:
+        that:
+          - "'fail2ban' in ansible_facts.packages"
+        fail_msg: "fail2ban package not installed"

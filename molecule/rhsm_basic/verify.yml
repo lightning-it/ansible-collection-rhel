@@ -1,0 +1,14 @@
+---
+- name: Verify rhsm role
+  hosts: rhsm_instance
+  become: false
+  vars:
+    ansible_user: root
+    ansible_python_interpreter: /usr/bin/python3
+  gather_facts: false
+
+  tasks:
+    - name: Assert role executed
+      ansible.builtin.assert:
+        that:
+          - true

@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  role_name: fail2ban
+  author: Lightning IT
+  description: Configure fail2ban service
+  company: Lightning IT
+  license: GPL-2.0-only
+  min_ansible_version: "2.15"
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+  galaxy_tags:
+    - security
+    - fail2ban
+dependencies: []

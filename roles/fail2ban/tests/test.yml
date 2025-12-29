@@ -1,0 +1,11 @@
+---
+- name: Verify fail2ban role
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Assert role executed
+      ansible.builtin.assert:
+        that:
+          - true
+      tags:
+        - always

@@ -1,0 +1,18 @@
+---
+- name: Converge fail2ban role
+  hosts: fail2ban_instance
+  become: false
+  vars:
+    ansible_user: root
+    ansible_python_interpreter: /usr/bin/python3
+    fail2ban_manage_service: false
+  pre_tasks:
+    - name: Ensure python3 is present
+      ansible.builtin.raw: |
+        if ! command -v python3 >/dev/null 2>&1; then
+          dnf -y install python3
+        fi
+      changed_when: false
+
+  roles:
+    - role: lit.rhel.fail2ban
