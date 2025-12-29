@@ -1,17 +1,17 @@
 ---
-rhel_sshd_manage_service: true
-rhel_sshd_port: 22
-rhel_sshd_permit_root_login: "no"
-rhel_sshd_password_authentication: "no"
-rhel_sshd_challenge_response_authentication: "no"
-rhel_sshd_allow_users: []
-rhel_sshd_allow_groups: []
-rhel_sshd_deny_users: []
-rhel_sshd_deny_groups: []
+sshd_manage_service: true
+sshd_port: 22
+sshd_permit_root_login: "no"
+sshd_password_authentication: "no"
+sshd_challenge_response_authentication: "no"
+sshd_allow_users: []
+sshd_allow_groups: []
+sshd_deny_users: []
+sshd_deny_groups: []
 
 # Additional sshd_config key/value pairs to render (string values only).
 # Example:
-# rhel_sshd_extra_options:
+# sshd_extra_options:
 #   ClientAliveInterval: 300
 #   ClientAliveCountMax: 2
-rhel_sshd_extra_options: {}
+sshd_extra_options: {}
