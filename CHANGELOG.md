@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.2.0...v1.3.0) (2025-12-29)
+
+### Features
+
+* Add SSHD role with configuration, tasks, and verification for RHEL hosts ([#17](https://github.com/lightning-it/ansible-collection-rhel/issues/17)) ([92204e4](https://github.com/lightning-it/ansible-collection-rhel/commit/92204e482da7a68f7dcfd2697798482e40c0f9b5))
+
 ## 1.2.0 (2025-12-29)
 
 * chore: sync shared assets from lightning-it/shared-assets (#16) ([c820950](https://github.com/lightning-it/ansible-collection-rhel/commit/c820950)), closes [#16](https://github.com/lightning-it/ansible-collection-rhel/issues/16)
