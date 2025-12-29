@@ -1,0 +1,17 @@
+---
+- name: Verify sshd configuration
+  hosts: rhel_sshd
+  gather_facts: false
+  tasks:
+    - name: Read rendered sshd_config
+      ansible.builtin.slurp:
+        src: /etc/ssh/sshd_config
+      register: sshd_cfg
+
+    - name: Assert sshd_config content
+      ansible.builtin.assert:
+        that:
+          - "'Port 2222' in sshd_cfg.content | b64decode"
+          - "'PermitRootLogin no' in sshd_cfg.content | b64decode"
+          - "'AllowUsers ansible' in sshd_cfg.content | b64decode"
+          - "'ClientAliveInterval 300' in sshd_cfg.content | b64decode"
