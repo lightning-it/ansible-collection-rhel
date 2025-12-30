@@ -10,13 +10,14 @@ authors:
 license:
 - GPL-2.0-only
 tags:
-- rhel
-- linux
-- hardening
-- baseline
-- security
-- compliance
-- automation
+  - modulix
+  - rhel
+  - linux
+  - hardening
+  - baseline
+  - security
+  - compliance
+  - automation
 dependencies:
   ansible.posix: '*'
   community.general: '*'

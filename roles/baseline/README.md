@@ -10,7 +10,7 @@ Installs a minimal set of operational packages and configures timezone, locale, 
     - role: lit.rhel.baseline
       vars:
         baseline_packages_present:
-          - vim
+          - vim-minimal
         baseline_timezone: Europe/Berlin
         baseline_locale: en_US.UTF-8
         baseline_sysctl:
@@ -19,7 +19,7 @@ Installs a minimal set of operational packages and configures timezone, locale, 
 
 ## Variables
 
-- `baseline_packages_present`: list of packages to ensure are installed (default: `["vim", "jq", "tar", "bash-completion"]`)
+- `baseline_packages_present`: list of packages to ensure are installed (default: `["vim-minimal", "jq", "tar", "bash-completion"]`)
 - `baseline_timezone`: IANA timezone string configured via `community.general.timezone` (default: `Etc/UTC`, set empty to skip)
 - `baseline_locale`: locale string written to `/etc/locale.conf` (default: `en_US.UTF-8`, set empty to skip)
 - `baseline_sysctl`: map of sysctl key/value pairs to enforce (default: `{}`)

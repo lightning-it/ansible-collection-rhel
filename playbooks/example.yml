@@ -24,7 +24,7 @@
       vars:
         baseline_timezone: Etc/UTC
         baseline_packages_present:
-          - vim
+          - vim-minimal
 
     - role: lit.rhel.chrony
       vars:
