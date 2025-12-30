@@ -3,11 +3,11 @@
   hosts: rhel_sshd
   gather_facts: false
   vars:
-    rhel_sshd_manage_service: false  # systemd not available in this container
-    rhel_sshd_port: 2222
-    rhel_sshd_allow_users:
+    sshd_manage_service: false  # systemd not available in this container
+    sshd_port: 2222
+    sshd_allow_users:
       - ansible
-    rhel_sshd_extra_options:
+    sshd_extra_options:
       ClientAliveInterval: 300
   roles:
     - role: sshd

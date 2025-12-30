@@ -1,16 +1,14 @@
----
 namespace: lit
 name: rhel
-version: 1.3.0
+version: 1.4.1
 readme: README.md
-description: >-
-  RHEL-focused collection for OS baseline, hardening, user/package management,
+description: RHEL-focused collection for OS baseline, hardening, user/package management,
   and day-2 operational tasks.
 repository: https://github.com/lightning-it/ansible-collection-rhel
 authors:
-  - Lightning IT
+- Lightning IT
 license:
-  - GPL-2.0-only
+- GPL-2.0-only
 tags:
   - modulix
   - rhel
@@ -21,16 +19,16 @@ tags:
   - compliance
   - automation
 dependencies:
-  ansible.posix: "*"
-  community.general: "*"
+  ansible.posix: '*'
+  community.general: '*'
 build_ignore:
-  - node_modules
-  - vagrant
-  - .git
-  - .github
-  - .gitignore
-  - .molecule
-  - ansible_collections
-  - infra
-  - "*.terraform*"
-  - "*.tar.gz"
+- node_modules
+- vagrant
+- .git
+- .github
+- .gitignore
+- .molecule
+- ansible_collections
+- infra
+- '*.terraform*'
+- '*.tar.gz'

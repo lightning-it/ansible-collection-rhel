@@ -1,3 +1,15 @@
+## [1.4.1](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.4.0...v1.4.1) (2025-12-29)
+
+### Bug Fixes
+
+* standardize variable names by removing 'rhel_' prefix ([#22](https://github.com/lightning-it/ansible-collection-rhel/issues/22)) ([12d7dba](https://github.com/lightning-it/ansible-collection-rhel/commit/12d7dba7e3fc1e747bd0a82c878b826fc95da53a))
+
+## [1.4.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.3.0...v1.4.0) (2025-12-29)
+
+### Features
+
+* **fail2ban:** add fail2ban role with configuration, templates, and tasks ([#20](https://github.com/lightning-it/ansible-collection-rhel/issues/20)) ([2dfc9ba](https://github.com/lightning-it/ansible-collection-rhel/commit/2dfc9baa0a57c81f6587caa1f10c87d642c4a11f))
+
 ## [1.3.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.2.0...v1.3.0) (2025-12-29)
 
 ### Features
