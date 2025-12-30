@@ -18,4 +18,4 @@
     name: sshd
     state: started
     enabled: true
-  when: rhel_sshd_manage_service | bool
+  when: sshd_manage_service | bool

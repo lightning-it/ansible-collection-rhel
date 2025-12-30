@@ -8,7 +8,6 @@
     ansible_remote_tmp: /tmp/.ansible-tmp
     baseline_packages_present:
       - vim-minimal
-      - jq
     baseline_chrony_manage: false
     baseline_timezone: Europe/Berlin
     baseline_locale: en_US.UTF-8

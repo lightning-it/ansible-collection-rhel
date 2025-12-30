@@ -1,6 +1,6 @@
 ---
 baseline_packages_present:
-  - vim
+  - vim-minimal
   - jq
   - tar
   - bash-completion

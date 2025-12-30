@@ -7,7 +7,6 @@
     ansible_remote_tmp: /tmp/.ansible-tmp
     baseline_packages_present:
       - vim-minimal
-      - jq
     baseline_sysctl: {}
   gather_facts: false
 
