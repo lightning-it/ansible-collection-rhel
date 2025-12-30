@@ -1,3 +1,9 @@
+## [1.4.2](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.4.1...v1.4.2) (2025-12-30)
+
+### Bug Fixes
+
+* role linting ([#24](https://github.com/lightning-it/ansible-collection-rhel/issues/24)) ([ea4045d](https://github.com/lightning-it/ansible-collection-rhel/commit/ea4045d0b1ce9358ee886a2ce8cd483aaf2ed302))
+
 ## [1.4.1](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.4.0...v1.4.1) (2025-12-29)
 
 ### Bug Fixes

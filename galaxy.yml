@@ -1,6 +1,6 @@
 namespace: lit
 name: rhel
-version: 1.4.1
+version: 1.4.2
 readme: README.md
 description: RHEL-focused collection for OS baseline, hardening, user/package management,
   and day-2 operational tasks.
@@ -10,14 +10,14 @@ authors:
 license:
 - GPL-2.0-only
 tags:
-  - modulix
-  - rhel
-  - linux
-  - hardening
-  - baseline
-  - security
-  - compliance
-  - automation
+- modulix
+- rhel
+- linux
+- hardening
+- baseline
+- security
+- compliance
+- automation
 dependencies:
   ansible.posix: '*'
   community.general: '*'
