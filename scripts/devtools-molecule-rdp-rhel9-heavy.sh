@@ -95,7 +95,7 @@ if [ ! -f "${scenario_dir}/molecule.yml" ]; then
   exit 9
 fi
 
-ANSIBLE_COLLECTIONS_PATHS="$PWD" \
+ANSIBLE_COLLECTIONS_PATH="$PWD" \
 ANSIBLE_ROLES_PATH="$PWD/roles" \
 bash scripts/wunder-devtools-ee.sh \
   molecule test -s rdp-rhel9

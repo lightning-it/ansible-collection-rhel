@@ -111,7 +111,7 @@ if [ ! -f "${scenario_dir}/molecule.yml" ]; then
 fi
 
 WUNDER_DEVTOOLS_RUN_AS_HOST_UID=0 \
-ANSIBLE_COLLECTIONS_PATHS="/tmp/wunder/collections" \
+ANSIBLE_COLLECTIONS_PATH="/tmp/wunder/collections" \
 ANSIBLE_ROLES_PATH="/workspace/roles" \
 VAGRANT_SSH_HOST="${VAGRANT_SSH_HOST:-127.0.0.1}" \
 VAGRANT_SSH_PORT="${VAGRANT_SSH_PORT:-55222}" \
