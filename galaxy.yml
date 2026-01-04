@@ -1,6 +1,6 @@
 namespace: lit
 name: rhel
-version: 1.4.2
+version: 1.4.3
 readme: README.md
 description: RHEL-focused collection for OS baseline, hardening, user/package management,
   and day-2 operational tasks.

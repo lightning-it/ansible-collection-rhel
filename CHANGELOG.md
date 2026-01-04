@@ -1,3 +1,9 @@
+## [1.4.3](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.4.2...v1.4.3) (2026-01-04)
+
+### Bug Fixes
+
+* correct ANSIBLE_COLLECTIONS_PATHS variable to ANSIBLE_COLLECTIONS_PATH in multiple scripts ([#32](https://github.com/lightning-it/ansible-collection-rhel/issues/32)) ([984d4f6](https://github.com/lightning-it/ansible-collection-rhel/commit/984d4f6840f7f0d92f6fc7e6d0d96091a65af627))
+
 ## [1.4.2](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.4.1...v1.4.2) (2025-12-30)
 
 ### Bug Fixes
