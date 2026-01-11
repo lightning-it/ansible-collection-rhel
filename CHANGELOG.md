@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.4.3...v1.5.0) (2026-01-11)
+
+### Features
+
+* Add automatic updates role for RHEL systems ([#34](https://github.com/lightning-it/ansible-collection-rhel/issues/34)) ([84e74cf](https://github.com/lightning-it/ansible-collection-rhel/commit/84e74cf437505369b829dfa16179bc55834ff842))
+
 ## [1.4.3](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.4.2...v1.4.3) (2026-01-04)
 
 ### Bug Fixes
