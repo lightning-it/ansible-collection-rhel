@@ -4,15 +4,15 @@
 
 - name: Build automatic updates cron job line
   ansible.builtin.set_fact:
-    rhel_automatic_updates_job: "{{ rhel_automatic_updates_command }} >{{ rhel_automatic_updates_log_file }} 2>&1"
+    automatic_updates_job: "{{ automatic_updates_command }} >{{ automatic_updates_log_file }} 2>&1"
   changed_when: false
 
 - name: Manage automatic updates cron entry
   ansible.builtin.cron:
-    name: "{{ rhel_automatic_updates_cron_name }}"
-    user: "{{ rhel_automatic_updates_user }}"
-    minute: "{{ rhel_automatic_updates_minute }}"
-    hour: "{{ rhel_automatic_updates_hour }}"
-    weekday: "{{ rhel_automatic_updates_weekday }}"
-    job: "{{ rhel_automatic_updates_job }}"
-    state: "{{ 'present' if rhel_automatic_updates_enabled | bool else 'absent' }}"
+    name: "{{ automatic_updates_cron_name }}"
+    user: "{{ automatic_updates_user }}"
+    minute: "{{ automatic_updates_minute }}"
+    hour: "{{ automatic_updates_hour }}"
+    weekday: "{{ automatic_updates_weekday }}"
+    job: "{{ automatic_updates_job }}"
+    state: "{{ 'present' if automatic_updates_enabled | bool else 'absent' }}"

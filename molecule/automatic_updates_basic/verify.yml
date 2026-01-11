@@ -25,7 +25,7 @@
       ansible.builtin.include_role:
         name: lit.rhel.automatic_updates
       vars:
-        rhel_automatic_updates_enabled: false
+        automatic_updates_enabled: false
 
     - name: Check cron file after disabling
       ansible.builtin.stat:
