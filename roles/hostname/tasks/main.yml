@@ -1,0 +1,26 @@
+---
+- name: Determine effective FQDN
+  ansible.builtin.set_fact:
+    hostname_fqdn_effective: "{{ (hostname_fqdn | default('', true) | trim) | default(inventory_hostname, true) }}"
+  changed_when: false
+
+- name: Derive short hostname
+  ansible.builtin.set_fact:
+    hostname_short: "{{ (hostname_fqdn_effective | string).split('.')[0] }}"
+  changed_when: false
+
+- name: Ensure /etc/hosts has hostname entry
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: "^{{ hostname_etc_hosts_ip | regex_escape() }}\\s+"
+    line: >-
+      {{ hostname_etc_hosts_ip }}
+      {{ hostname_fqdn_effective }}
+      {{ (hostname_add_shortname | bool and hostname_short != hostname_fqdn_effective)
+          | ternary(hostname_short, '') }}
+    create: true
+  when: hostname_manage_etc_hosts | bool
+
+- name: Set system hostname (systemd)
+  ansible.builtin.hostname:
+    name: "{{ hostname_fqdn_effective }}"
