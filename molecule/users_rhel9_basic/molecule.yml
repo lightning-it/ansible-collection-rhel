@@ -2,6 +2,11 @@
 driver:
   name: docker
 
+dependency:
+  name: galaxy
+  options:
+    requirements-file: "${MOLECULE_PROJECT_DIRECTORY}/collections/requirements.yml"
+
 platforms:
   - name: rhel_users
     image: quay.io/rockylinux/rockylinux:9
