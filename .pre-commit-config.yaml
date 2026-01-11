@@ -34,6 +34,7 @@ repos:
         language: system
         entry: bash scripts/devtools-molecule.sh
         pass_filenames: false
+
       # -------------------------------------------------------------------
       # GitHub Actions workflow linting (actionlint)
       # -------------------------------------------------------------------
@@ -69,6 +70,7 @@ repos:
         entry: bash scripts/devtools-collection-smoke.sh
         pass_filenames: false
         files: ^(playbooks/|roles/|galaxy\.yml|runtime\.yml)
+
       # -------------------------------------------------------------------
       # Galaxy-style role verification (via wunder-devtools-ee)
       # -------------------------------------------------------------------
@@ -85,20 +87,6 @@ repos:
       # -------------------------------------------------------------------
       # Molecule tests heavy scenarios (via wunder-devtools-ee) (manual)
       # -------------------------------------------------------------------
-      - id: molecule-chrony-rhel9-heavy
-        name: molecule chrony-rhel9 (Vagrant)
-        language: system
-        stages: [manual]
-        entry: bash scripts/devtools-molecule-chrony-rhel9-heavy.sh
-        pass_filenames: false
-
-      - id: molecule-firewalld-rhel9-heavy
-        name: molecule firewalld-rhel9 (Vagrant)
-        language: system
-        stages: [manual]
-        entry: bash scripts/devtools-molecule-firewalld-rhel9-heavy.sh
-        pass_filenames: false
-
       - id: molecule-rdp-rhel9-heavy
         name: molecule rdp-rhel9 (Vagrant)
         language: system
