@@ -8,7 +8,7 @@ dependency:
     requirements-file: "${MOLECULE_PROJECT_DIRECTORY}/collections/requirements.yml"
 
 platforms:
-  - name: rhel_baseline
+  - name: automatic_updates
     image: quay.io/rockylinux/rockylinux:9
     pre_build_image: true
 
@@ -18,7 +18,7 @@ provisioner:
     hosts:
       all:
         hosts:
-          rhel_baseline:
+          automatic_updates:
             ansible_connection: docker
   playbooks:
     converge: converge.yml

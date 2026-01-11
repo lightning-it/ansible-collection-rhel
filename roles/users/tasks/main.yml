@@ -1,15 +1,28 @@
 ---
+- name: Normalize users_accounts to a list
+  ansible.builtin.set_fact:
+    users_accounts_effective: >-
+      {%- set ua = users_accounts | default([]) -%}
+      {%- if ua is mapping -%}
+        {{ ua | dict2items | map(attribute='value') | list }}
+      {%- elif ua is sequence and (ua is not string) -%}
+        {{ ua }}
+      {%- else -%}
+        []
+      {%- endif -%}
+  changed_when: false
+
 - name: Build group list from user definitions
   ansible.builtin.set_fact:
     users_groups_all: >-
       {{
-        users_accounts
+        users_accounts_effective
         | map(attribute='groups', default=[])
         | sum(start=[])
         | map('string')
         | list
       }}
-  when: users_manage_groups | bool and users_accounts | length > 0
+  when: users_manage_groups | bool and users_accounts_effective | length > 0
 
 - name: Ensure referenced groups exist
   ansible.builtin.group:
@@ -18,7 +31,7 @@
   loop: "{{ users_groups_all | default([]) | unique }}"
   when:
     - users_manage_groups | bool
-    - users_accounts | length > 0
+    - users_accounts_effective | length > 0
 
 - name: Manage users
   ansible.builtin.user:
@@ -31,9 +44,10 @@
     shell: "{{ item.shell | default(omit) }}"
     home: "{{ item.home | default(omit) }}"
     create_home: "{{ item.create_home | default(omit) }}"
+    password: "{{ item.password | default(omit) }}"
     password_lock: "{{ item.password_lock | default(omit) }}"
     remove: "{{ item.remove | default(false) }}"
-  loop: "{{ users_accounts }}"
+  loop: "{{ users_accounts_effective }}"
   loop_control:
     label: "{{ item.name }}"
 
@@ -42,8 +56,8 @@
     rhel_users_with_ssh_keys: >-
       {{
         (
-          users_accounts
-          | default([])
+          users_accounts_effective
+          | select('mapping')
           | selectattr('ssh_keys', 'defined')
           | rejectattr('ssh_keys', 'equalto', [])
           | selectattr('state', 'undefined')
@@ -51,8 +65,8 @@
         )
         +
         (
-          users_accounts
-          | default([])
+          users_accounts_effective
+          | select('mapping')
           | selectattr('ssh_keys', 'defined')
           | rejectattr('ssh_keys', 'equalto', [])
           | selectattr('state', 'defined')
@@ -67,7 +81,7 @@
     state: present
     key: "{{ item.1 }}"
     manage_dir: true
-  loop: "{{ rhel_users_with_ssh_keys | subelements('ssh_keys') }}"
+  loop: "{{ rhel_users_with_ssh_keys | default([]) | subelements('ssh_keys') }}"
   when:
     - rhel_users_with_ssh_keys is defined
     - rhel_users_with_ssh_keys | length > 0

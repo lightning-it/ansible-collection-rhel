@@ -117,8 +117,23 @@ PY
 
   for dep_fqcn in "${dep_fqcns[@]}"; do
     if [ -n "$dep_fqcn" ]; then
-      echo "Installing dependency ${dep_fqcn} into ${COLLECTIONS_DIR}..."
-      ansible-galaxy collection install "$dep_fqcn" -p "${COLLECTIONS_DIR}" --force
+      ns_part="${dep_fqcn%%.*}"
+      name_part="${dep_fqcn#*.}"
+      target_path="${COLLECTIONS_DIR}/ansible_collections/${ns_part}/${name_part}"
+      bundled_path="/workspace/collections/ansible_collections/${ns_part}/${name_part}"
+
+      if [ -d "${target_path}" ]; then
+        echo "Dependency ${dep_fqcn} already present in ${COLLECTIONS_DIR}, skipping."
+        continue
+      fi
+
+      if [ -d "${bundled_path}" ]; then
+        echo "Installing dependency ${dep_fqcn} from bundled path ${bundled_path}..."
+        ansible-galaxy collection install "${bundled_path}" -p "${COLLECTIONS_DIR}" --force --offline
+      else
+        echo "Installing dependency ${dep_fqcn} into ${COLLECTIONS_DIR} (online fallback)..."
+        ansible-galaxy collection install "$dep_fqcn" -p "${COLLECTIONS_DIR}" --force
+      fi
     fi
   done
 
