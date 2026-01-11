@@ -8,10 +8,8 @@
     ansible_remote_tmp: /tmp/.ansible-tmp
     baseline_packages_present:
       - vim-minimal
-    baseline_chrony_manage: false
     baseline_timezone: Europe/Berlin
     baseline_locale: en_US.UTF-8
-    baseline_chrony_pools: []
     baseline_sysctl: {}
   pre_tasks:
     - name: Show current user

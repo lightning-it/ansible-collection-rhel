@@ -1,0 +1,9 @@
+---
+rhel_automatic_updates_enabled: true
+rhel_automatic_updates_minute: "0"
+rhel_automatic_updates_hour: "6"
+rhel_automatic_updates_weekday: "0"  # Sunday
+rhel_automatic_updates_user: "root"
+rhel_automatic_updates_log_file: "/var/log/dnf-auto-weekly.log"
+rhel_automatic_updates_command: "dnf -y update"
+rhel_automatic_updates_cron_name: "Weekly automatic updates"

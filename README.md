@@ -14,9 +14,11 @@ Planned and initial roles include:
 - `lit.rhel.selinux`  
   Manage SELinux policy and mode (enforcing/permissive/disabled) in an
   idempotent way, using `ansible.posix.selinux`.
+- `lit.rhel.automatic_updates`  
+  Schedule weekly OS updates via cron (dnf/yum) with configurable timing and
+  logging.
 
-Further roles (baseline, users, firewalld, ssh_hardening, patching, etc.) will
-be added over time.
+Further roles (baseline, users, patching, etc.) will be added over time.
 
 ## Example
 

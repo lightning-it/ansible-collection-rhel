@@ -3,10 +3,9 @@ driver:
   name: docker
 
 platforms:
-  - name: firewalld_instance
+  - name: automatic_updates
     image: quay.io/rockylinux/rockylinux:9
     pre_build_image: true
-    privileged: true
 
 provisioner:
   name: ansible
@@ -14,7 +13,7 @@ provisioner:
     hosts:
       all:
         hosts:
-          firewalld_instance:
+          automatic_updates:
             ansible_connection: docker
   playbooks:
     converge: converge.yml
