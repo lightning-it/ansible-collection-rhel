@@ -11,6 +11,10 @@ The short hostname is derived from the first label of the FQDN.
 - `hostname_etc_hosts_ip` (string, default: `"127.0.1.1"`): IP address to map to the hostname.
 - `hostname_add_shortname` (bool, default: `true`): Add short hostname alias
   when it differs from the FQDN.
+- `hostname_etc_hosts_unsafe_writes` (bool, default: `false`): Allow non-atomic
+  writes to `/etc/hosts` (needed for some container runtimes).
+- `hostname_etc_hostname_unsafe_writes` (bool, default: `false`): Allow
+  non-atomic writes to `/etc/hostname` (needed for some container runtimes).
 
 ## Example
 
@@ -31,4 +35,13 @@ To skip `/etc/hosts` management:
     - role: lit.rhel.hostname
       vars:
         hostname_manage_etc_hosts: false
+```
+
+For containerized testing where `/etc/hosts` is a bind mount:
+
+```yaml
+    - role: lit.rhel.hostname
+      vars:
+        hostname_etc_hosts_unsafe_writes: true
+        hostname_etc_hostname_unsafe_writes: true
 ```

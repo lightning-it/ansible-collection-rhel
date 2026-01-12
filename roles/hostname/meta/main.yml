@@ -1,0 +1,24 @@
+---
+galaxy_info:
+  role_name: hostname
+  namespace: lit
+  author: Rene Osorio
+  description: Set the system hostname and manage an /etc/hosts entry.
+  company: Lightning IT
+  license: GPL-3.0-only
+  min_ansible_version: "2.15"
+
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+
+  galaxy_tags:
+    - modulix
+    - rhel
+    - hostname
+    - networking
+    - system
+    - automation
+
+dependencies: []

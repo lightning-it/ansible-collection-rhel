@@ -184,6 +184,7 @@ PY
 
   for scen in "${scenarios[@]}"; do
     echo ">>> molecule test -s ${scen}"
+    export MOLECULE_EPHEMERAL_DIRECTORY="${HOME}/.cache/molecule/${scen}"
     molecule test -s "${scen}"
   done
 '

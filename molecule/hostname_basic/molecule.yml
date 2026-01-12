@@ -11,6 +11,7 @@ platforms:
   - name: hostname_instance
     image: quay.io/rockylinux/rockylinux:9
     pre_build_image: true
+    privileged: true
 
 provisioner:
   name: ansible

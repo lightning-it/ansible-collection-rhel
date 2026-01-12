@@ -9,6 +9,8 @@
     hostname_manage_etc_hosts: true
     hostname_etc_hosts_ip: "127.0.1.1"
     hostname_add_shortname: true
+    hostname_etc_hosts_unsafe_writes: true
+    hostname_etc_hostname_unsafe_writes: true
 
   pre_tasks:
     - name: Ensure python3 is present
