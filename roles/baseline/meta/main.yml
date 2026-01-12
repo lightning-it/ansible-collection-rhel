@@ -3,8 +3,7 @@ galaxy_info:
   role_name: baseline
   namespace: lit
   author: Lightning IT
-  description: Install baseline packages and configure timezone, locale, and
-    sysctl defaults.
+  description: Install baseline packages and configure timezone and locale.
   company: Lightning IT
   license: GPL-2.0-only
   min_ansible_version: "2.15"
@@ -17,6 +16,4 @@ galaxy_info:
     - packages
     - timezone
     - locale
-    - sysctl
-    - automation
 dependencies: []
