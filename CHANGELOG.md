@@ -1,3 +1,9 @@
+## [1.6.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.5.0...v1.6.0) (2026-01-12)
+
+### Features
+
+* roles expanded ([#35](https://github.com/lightning-it/ansible-collection-rhel/issues/35)) ([0d1134d](https://github.com/lightning-it/ansible-collection-rhel/commit/0d1134dc7dcc58fa490ce479f5277613f87403b8))
+
 ## [1.5.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.4.3...v1.5.0) (2026-01-11)
 
 ### Features
