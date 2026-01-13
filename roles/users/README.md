@@ -18,6 +18,7 @@ users_accounts:
     shell: /bin/bash
     home: /home/ops-admin
     create_home: true
+    update_password: on_create
     password_lock: false
     remove: false             # remove home on absent if true
     ssh_keys:

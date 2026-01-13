@@ -45,6 +45,7 @@
     home: "{{ item.home | default(omit) }}"
     create_home: "{{ item.create_home | default(omit) }}"
     password: "{{ item.password | default(omit) }}"
+    update_password: "{{ item.update_password | default(omit) }}"
     password_lock: "{{ item.password_lock | default(omit) }}"
     remove: "{{ item.remove | default(false) }}"
   loop: "{{ users_accounts_effective }}"
