@@ -6,7 +6,7 @@
   when: rhsm_method in ['rhsm', 'satellite']
 
 - name: Configure Satellite/RHSM endpoints when provided
-  community.general.ini_file:
+  ansible.builtin.ini_file:
     path: /etc/rhsm/rhsm.conf
     section: "{{ item.section }}"
     option: "{{ item.option }}"
@@ -50,7 +50,6 @@
     subscription-manager register
     --org {{ rhsm_org }}
     --activationkey {{ rhsm_activation_key }}
-    {{ rhsm_attach_flag }}
   register: rhsm_register
   changed_when: rhsm_register.rc == 0
   when:

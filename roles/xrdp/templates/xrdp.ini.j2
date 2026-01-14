@@ -1,0 +1,17 @@
+; Ansible managed by lit.rhel.xrdp
+[Globals]
+address={{ xrdp_listen_address }}
+port={{ xrdp_listen_port }}
+
+{% if xrdp_tls_enable %}
+security_layer=tls
+certificate={{ xrdp_tls_cert_path }}
+key_file={{ xrdp_tls_key_path }}
+{% else %}
+security_layer=negotiate
+{% endif %}
+
+crypt_level=high
+bitmap_cache=yes
+bitmap_compression=yes
+enable_clipboard=true
