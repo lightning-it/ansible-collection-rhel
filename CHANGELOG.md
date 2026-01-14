@@ -1,3 +1,9 @@
+## [1.7.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.6.0...v1.7.0) (2026-01-14)
+
+### Features
+
+* add update_password option for user management ([#36](https://github.com/lightning-it/ansible-collection-rhel/issues/36)) ([d1b8946](https://github.com/lightning-it/ansible-collection-rhel/commit/d1b894669df403e2c82c8c3ae78f5b744464ced7))
+
 ## [1.6.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.5.0...v1.6.0) (2026-01-12)
 
 ### Features
