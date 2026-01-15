@@ -3,7 +3,7 @@ galaxy_info:
   role_name: xrdp
   namespace: lit
   author: Lightning IT
-  description: Install and configure XRDP on RHEL (RDP remote desktop). Optional desktop helper.
+  description: Install and configure XRDP on RHEL. Does not enable repos; use lit.rhel.repos.
   company: Lightning IT
   license: GPL-2.0-only
   min_ansible_version: "2.15"
@@ -14,5 +14,4 @@ galaxy_info:
     - rhel
     - rdp
     - xrdp
-    - desktop
 dependencies: []

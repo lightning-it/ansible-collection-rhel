@@ -1,68 +1,76 @@
 ---
-- name: Check for subscription-manager presence
-  ansible.builtin.stat:
-    path: /usr/sbin/subscription-manager
-  register: repos_sm
+- name: Skip when disabled
+  ansible.builtin.meta: end_host
+  when: not (repos_enabled | bool)
 
-- name: Warn if subscription-manager is unavailable for enable/disable lists
-  ansible.builtin.debug:
-    msg: "subscription-manager not found; skipping enable/disable operations."
+# Proxy (optional)
+- name: Configure DNF proxy (optional)
+  ansible.builtin.ini_file:
+    path: /etc/dnf/dnf.conf
+    section: main
+    option: proxy
+    value: "{{ repos_proxy_url }}"
+    mode: "0644"
   when:
-    - not repos_sm.stat.exists
-    - (repos_enabled | length > 0 or repos_disabled | length > 0)
+    - repos_proxy_enabled | bool
+    - repos_proxy_apply_to_dnf | bool
+    - repos_proxy_url | length > 0
 
-- name: Gather enabled repos
-  ansible.builtin.command: subscription-manager repos --list-enabled
-  register: repos_enabled_list
+- name: Configure RHSM proxy (optional)
+  ansible.builtin.ini_file:
+    path: /etc/rhsm/rhsm.conf
+    section: server
+    option: proxy_hostname
+    value: "{{ repos_proxy_url | regex_replace('^https?://', '') | regex_replace(':.*$', '') }}"
+    mode: "0644"
+  when:
+    - repos_proxy_enabled | bool
+    - repos_proxy_apply_to_rhsm | bool
+    - repos_proxy_url | length > 0
+
+# CodeReady Builder (optional, best-effort)
+- name: Check if subscription-manager is present (for CodeReady enablement)
+  ansible.builtin.command: "command -v subscription-manager"
+  register: _sm_present
   changed_when: false
-  failed_when: repos_enabled_list.rc != 0
-  when:
-    - repos_sm.stat.exists
-    - (repos_enabled | length > 0) or (repos_disabled | length > 0)
+  failed_when: false
+  when: repos_enable_codeready | bool
 
-- name: Set fact with currently enabled repo IDs
-  ansible.builtin.set_fact:
-    repos_current_enabled: >-
-      {{
-        repos_enabled_list.stdout_lines
-        | select('match', '^Repo ID:')
-        | map('regex_replace', '^Repo ID:\\s*', '')
-        | list
-      }}
+- name: Enable CodeReady Builder repo (best-effort)
+  ansible.builtin.command: "subscription-manager repos --enable={{ repos_codeready_repo }}"
+  register: _codeready
+  changed_when: _codeready.rc == 0
+  failed_when: false
   when:
-    - repos_sm.stat.exists
-    - repos_enabled_list is defined
-    - repos_enabled_list.stdout_lines is defined
+    - repos_enable_codeready | bool
+    - _sm_present.rc == 0
 
-- name: Enable requested repos
-  ansible.builtin.command: "subscription-manager repos --enable={{ item }}"
-  loop: "{{ repos_enabled }}"
-  when:
-    - repos_sm.stat.exists
-    - repos_enabled | length > 0
-    - item not in (repos_current_enabled | default([]))
-  changed_when: true
-
-- name: Disable requested repos
-  ansible.builtin.command: "subscription-manager repos --disable={{ item }}"
-  loop: "{{ repos_disabled }}"
-  when:
-    - repos_sm.stat.exists
-    - repos_disabled | length > 0
-    - item in (repos_current_enabled | default([]))
-  changed_when: true
-
-- name: Manage custom yum repositories
-  ansible.builtin.yum_repository:
-    name: "{{ item.id }}"
-    description: "{{ item.name | default(item.id) }}"
-    baseurl: "{{ item.baseurl | default(omit) }}"
-    metalink: "{{ item.metalink | default(omit) }}"
-    mirrorlist: "{{ item.mirrorlist | default(omit) }}"
-    gpgcheck: "{{ item.gpgcheck | default(false) }}"
-    gpgkey: "{{ item.gpgkey | default(omit) }}"
-    enabled: "{{ item.enabled | default(true) }}"
+# EPEL enablement (policy)
+- name: Import EPEL GPG key
+  ansible.builtin.rpm_key:
+    key: "{{ repos_epel_gpg_key_url }}"
     state: present
-  loop: "{{ repos_custom }}"
-  loop_control:
-    label: "{{ item.id }}"
+  when:
+    - repos_enable_epel | bool
+    - repos_epel_gpg_key_url | length > 0
+
+- name: Install EPEL release (rpm_url)
+  ansible.builtin.package:
+    name: "{{ repos_epel_rpm_url }}"
+    state: present
+  when:
+    - repos_enable_epel | bool
+    - repos_epel_method == 'rpm_url'
+
+- name: Install EPEL release (package)
+  ansible.builtin.package:
+    name: "{{ repos_epel_package_name }}"
+    state: present
+  when:
+    - repos_enable_epel | bool
+    - repos_epel_method == 'package'
+
+- name: Refresh dnf metadata (makecache)
+  ansible.builtin.command: "dnf -y makecache"
+  changed_when: false
+  when: repos_makecache | bool

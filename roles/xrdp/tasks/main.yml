@@ -3,6 +3,39 @@
   ansible.builtin.meta: end_host
   when: not (xrdp_enabled | bool)
 
+- name: Precheck - check if xrdp is already installed
+  ansible.builtin.command: "rpm -q xrdp"
+  register: _xrdp_rpm
+  changed_when: false
+  failed_when: false
+
+- name: Precheck - verify XRDP packages are available in enabled repos
+  ansible.builtin.command: "dnf -q list --available {{ xrdp_packages | join(' ') }}"
+  register: _xrdp_repo_check
+  changed_when: false
+  failed_when: false
+  when: _xrdp_rpm.rc != 0
+
+- name: Fail with guidance when XRDP packages are not available
+  ansible.builtin.fail:
+    msg: |
+      XRDP packages are not available in currently enabled repositories.
+      This role does NOT enable EPEL or any repos.
+
+      Fix:
+      - Enable EPEL/CodeReady (or your internal mirror) using role: lit.rhel.repos
+        (or your repo policy of choice)
+      - Then rerun this role.
+
+      Debug:
+      - dnf repolist
+      - dnf list --available xrdp xorgxrdp
+  when:
+    - xrdp_fail_if_unavailable | bool
+    - _xrdp_rpm.rc != 0
+    - _xrdp_repo_check is defined
+    - _xrdp_repo_check.rc != 0
+
 - name: Install XRDP packages
   ansible.builtin.package:
     name: "{{ xrdp_packages }}"
@@ -17,9 +50,6 @@
   no_log: "{{ xrdp_no_log }}"
   when: (xrdp_optional_packages | default([]) | length) > 0
 
-# --------------------------------------------------------------------
-# Desktop environment helper (optional)
-# --------------------------------------------------------------------
 - name: Determine effective desktop mode
   ansible.builtin.set_fact:
     _xrdp_desktop_effective: >-
@@ -40,16 +70,13 @@
 
 - name: Install XFCE group (optional, may require EPEL)
   ansible.builtin.package:
-    name:
-      - "@Xfce"
+    name: ["@Xfce"]
+    state: present
   failed_when: false
   when:
     - xrdp_install_desktop | bool
     - _xrdp_desktop_effective == 'xfce'
 
-# --------------------------------------------------------------------
-# TLS materials (optional)
-# --------------------------------------------------------------------
 - name: Check TLS certificate exists
   ansible.builtin.stat:
     path: "{{ xrdp_tls_cert_path }}"
@@ -83,9 +110,12 @@
     - xrdp_tls_key_path | length > 0
   notify: Restart xrdp
 
-# --------------------------------------------------------------------
-# XRDP configuration
-# --------------------------------------------------------------------
+- name: Assert XRDP listen address is set
+  ansible.builtin.assert:
+    that:
+      - xrdp_listen_address | default('') | length > 0
+    fail_msg: "xrdp_listen_address is empty; set net_ifaces.mgmt.ipv4 or override xrdp_listen_address."
+
 - name: Configure xrdp.ini
   ansible.builtin.template:
     src: xrdp.ini.j2
@@ -104,9 +134,6 @@
     mode: "0755"
   notify: Restart xrdp
 
-# --------------------------------------------------------------------
-# SELinux port label (best effort)
-# --------------------------------------------------------------------
 - name: Ensure SELinux port label for RDP (add)
   ansible.builtin.command: >
     semanage port -a -t {{ xrdp_selinux_type }} -p {{ xrdp_selinux_proto }} {{ xrdp_listen_port }}
@@ -125,9 +152,6 @@
     - _semanage_add is defined
     - _semanage_add.rc != 0
 
-# --------------------------------------------------------------------
-# Firewalld
-# --------------------------------------------------------------------
 - name: Ensure firewalld is installed (when managing firewall)
   ansible.builtin.package:
     name: firewalld
@@ -150,9 +174,6 @@
     state: "{{ xrdp_firewalld_state }}"
   when: xrdp_firewalld_manage | bool
 
-# --------------------------------------------------------------------
-# Services
-# --------------------------------------------------------------------
 - name: Enable and start xrdp service
   ansible.builtin.service:
     name: xrdp

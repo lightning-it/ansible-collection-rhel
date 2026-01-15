@@ -1,8 +1,11 @@
 ---
 # lit.rhel.xrdp
-# RHEL9-focused XRDP server role (remote desktop over RDP).
+# XRDP server role for RHEL 9.
+# IMPORTANT: This role NEVER enables EPEL or any repository sources.
+# Use lit.rhel.repos (or your internal mirror policy) to enable required repos.
 
 xrdp_enabled: true
+xrdp_fail_if_unavailable: true
 
 xrdp_listen_address: "0.0.0.0"
 xrdp_listen_port: 3389
@@ -15,13 +18,10 @@ xrdp_selinux_manage: true
 xrdp_selinux_type: "ms-wbt-server"
 xrdp_selinux_proto: "tcp"
 
-# Desktop/session handling
-# This role primarily installs/configures XRDP. A desktop environment must exist.
-xrdp_desktop: "auto"                 # auto | gnome | xfce | custom
-xrdp_install_desktop: false          # try to install desktop (GNOME group); XFCE best-effort
-xrdp_custom_startwm: ""              # when xrdp_desktop=custom (e.g. "exec /usr/bin/startxfce4")
+xrdp_desktop: "auto"      # auto | gnome | xfce | custom
+xrdp_install_desktop: false
+xrdp_custom_startwm: ""
 
-# TLS
 xrdp_tls_enable: true
 xrdp_tls_cert_path: "/etc/xrdp/cert.pem"
 xrdp_tls_key_path: "/etc/xrdp/key.pem"

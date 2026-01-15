@@ -1,40 +1,29 @@
-# Repos Role
+# lit.rhel.repos
 
-Manage RHEL repositories by enabling/disabling IDs via subscription-manager and creating custom yum repo definitions.
+Enable/prepare repository sources (CodeReady, EPEL, proxies).
 
-## Variables
+- This role **only** enables repositories and refreshes metadata.
+- It does **not** install service packages (those belong to service roles like `lit.rhel.xrdp`).
 
-- `repos_enabled`: list of repo IDs to enable (default: `[]`).
-- `repos_disabled`: list of repo IDs to disable (default: `[]`).
-- `repos_custom`: list of custom repositories managed via `yum_repository`. Example:
-
-  ```yaml
-  repos_custom:
-    - id: custom-appstream
-      name: Custom AppStream
-      baseurl: http://repo.example.com/appstream
-      enabled: true
-      gpgcheck: false
-  ```
-
-## Example
-
+## Example (Workstations)
 ```yaml
-- hosts: all
+- hosts: workstations
   become: true
-
   roles:
     - role: lit.rhel.repos
       vars:
-        repos_enabled:
-          - rhel-9-baseos-rpms
-          - rhel-9-appstream-rpms
-        repos_disabled:
-          - codeready-builder-for-rhel-9-x86_64-rpms
-        repos_custom:
-          - id: internal-tools
-            name: Internal Tools
-            baseurl: http://repo.example.com/tools
-            enabled: true
-            gpgcheck: false
+        repos_enable_epel: true
+        repos_enable_codeready: true
+    - role: lit.rhel.gui
+    - role: lit.rhel.xrdp
 ```
+
+## Variables
+- `repos_enable_codeready`: enable CodeReady Builder (default: `false`)
+- `repos_codeready_repo`: repo id to enable (default: `codeready-builder-for-rhel-9-x86_64-rpms`)
+- `repos_enable_epel`: enable EPEL (default: `false`)
+- `repos_epel_method`: `rpm_url` or `package` (default: `rpm_url`)
+- `repos_epel_rpm_url`: RPM URL for EPEL release (default: EPEL 9 release RPM)
+- `repos_epel_package_name`: package name when using `package` method (default: `epel-release`)
+- `repos_epel_gpg_key_url`: EPEL GPG key URL to import before install (default: EPEL 9 GPG key)
+- `repos_makecache`: run `dnf -y makecache` (default: `true`)
