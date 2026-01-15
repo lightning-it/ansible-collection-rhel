@@ -17,3 +17,7 @@ argument_specs:
       repos_epel_gpg_key_url: {type: str, default: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9"}
       repos_makecache: {type: bool, default: true}
       repos_no_log: {type: bool, default: false}
+      repos_custom:
+        type: list
+        elements: dict
+        default: []

@@ -28,6 +28,25 @@
     - repos_proxy_apply_to_rhsm | bool
     - repos_proxy_url | length > 0
 
+# Custom repositories (optional)
+- name: Configure custom repositories
+  ansible.builtin.yum_repository:
+    name: "{{ item.id }}"
+    description: "{{ item.name | default(item.id) }}"
+    baseurl: "{{ item.baseurl | default(omit) }}"
+    mirrorlist: "{{ item.mirrorlist | default(omit) }}"
+    metalink: "{{ item.metalink | default(omit) }}"
+    enabled: "{{ item.enabled | default(true) | bool }}"
+    gpgcheck: "{{ item.gpgcheck | default(true) | bool }}"
+    gpgkey: "{{ item.gpgkey | default(omit) }}"
+    priority: "{{ item.priority | default(omit) }}"
+    cost: "{{ item.cost | default(omit) }}"
+    module_hotfixes: "{{ item.module_hotfixes | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ repos_custom }}"
+  no_log: "{{ repos_no_log }}"
+  when: repos_custom | length > 0
+
 # CodeReady Builder (optional, best-effort)
 - name: Check if subscription-manager is present (for CodeReady enablement)
   ansible.builtin.command: "command -v subscription-manager"

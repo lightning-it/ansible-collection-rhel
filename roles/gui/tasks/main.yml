@@ -14,9 +14,9 @@
 # Install GNOME
 # --------------------------------------------------------------------
 - name: Install GNOME group (RHEL) - {{ gui_gnome_group }}
-  ansible.builtin.command: "dnf -y groupinstall '{{ gui_gnome_group }}'"
-  register: _gnome_group
-  changed_when: _gnome_group.rc == 0
+  ansible.builtin.dnf:
+    name: "{{ gui_gnome_group if gui_gnome_group.startswith('@') else '@' ~ gui_gnome_group }}"
+    state: present
   when: gui_variant == 'gnome'
   no_log: "{{ gui_no_log }}"
 

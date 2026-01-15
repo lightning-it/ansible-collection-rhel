@@ -24,3 +24,6 @@ repos_epel_gpg_key_url: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-
 
 repos_makecache: true
 repos_no_log: false
+
+# Custom repositories (optional)
+repos_custom: []

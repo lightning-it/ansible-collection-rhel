@@ -27,3 +27,4 @@ Enable/prepare repository sources (CodeReady, EPEL, proxies).
 - `repos_epel_package_name`: package name when using `package` method (default: `epel-release`)
 - `repos_epel_gpg_key_url`: EPEL GPG key URL to import before install (default: EPEL 9 GPG key)
 - `repos_makecache`: run `dnf -y makecache` (default: `true`)
+- `repos_custom`: list of custom repo definitions (default: `[]`)
