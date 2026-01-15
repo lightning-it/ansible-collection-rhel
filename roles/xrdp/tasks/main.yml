@@ -3,18 +3,21 @@
   ansible.builtin.meta: end_host
   when: not (xrdp_enabled | bool)
 
-- name: Precheck - check if xrdp is already installed
-  ansible.builtin.command: "rpm -q xrdp"
-  register: _xrdp_rpm
+- name: Gather installed packages (XRDP precheck)
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Set XRDP installed flag
+  ansible.builtin.set_fact:
+    _xrdp_installed: "{{ 'xrdp' in ansible_facts.packages }}"
   changed_when: false
-  failed_when: false
 
 - name: Precheck - verify XRDP packages are available in enabled repos
   ansible.builtin.command: "dnf -q list --available {{ xrdp_packages | join(' ') }}"
   register: _xrdp_repo_check
   changed_when: false
   failed_when: false
-  when: _xrdp_rpm.rc != 0
+  when: not _xrdp_installed
 
 - name: Fail with guidance when XRDP packages are not available
   ansible.builtin.fail:
@@ -32,7 +35,7 @@
       - dnf list --available xrdp xorgxrdp
   when:
     - xrdp_fail_if_unavailable | bool
-    - _xrdp_rpm.rc != 0
+    - not _xrdp_installed
     - _xrdp_repo_check is defined
     - _xrdp_repo_check.rc != 0
 

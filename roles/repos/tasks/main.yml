@@ -5,7 +5,7 @@
 
 # Proxy (optional)
 - name: Configure DNF proxy (optional)
-  ansible.builtin.ini_file:
+  community.general.ini_file:
     path: /etc/dnf/dnf.conf
     section: main
     option: proxy
@@ -17,7 +17,7 @@
     - repos_proxy_url | length > 0
 
 - name: Configure RHSM proxy (optional)
-  ansible.builtin.ini_file:
+  community.general.ini_file:
     path: /etc/rhsm/rhsm.conf
     section: server
     option: proxy_hostname
@@ -37,9 +37,10 @@
   when: repos_enable_codeready | bool
 
 - name: Enable CodeReady Builder repo (best-effort)
-  ansible.builtin.command: "subscription-manager repos --enable={{ repos_codeready_repo }}"
+  community.general.rhsm_repository:
+    name: "{{ repos_codeready_repo }}"
+    state: enabled
   register: _codeready
-  changed_when: _codeready.rc == 0
   failed_when: false
   when:
     - repos_enable_codeready | bool

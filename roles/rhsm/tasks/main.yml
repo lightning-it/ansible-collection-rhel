@@ -1,9 +1,7 @@
 ---
-- name: Check if subscription-manager is installed
-  ansible.builtin.command: rpm -q subscription-manager
-  register: rhsm_subscription_manager
-  changed_when: false
-  failed_when: false
+- name: Gather installed packages (subscription-manager check)
+  ansible.builtin.package_facts:
+    manager: auto
   when: rhsm_method in ['rhsm', 'satellite']
 
 - name: Ensure subscription-manager is present
@@ -12,10 +10,10 @@
     state: present
   when:
     - rhsm_method in ['rhsm', 'satellite']
-    - rhsm_subscription_manager.rc != 0
+    - "'subscription-manager' not in ansible_facts.packages"
 
 - name: Configure Satellite/RHSM endpoints when provided
-  ansible.builtin.ini_file:
+  community.general.ini_file:
     path: /etc/rhsm/rhsm.conf
     section: "{{ item.section }}"
     option: "{{ item.option }}"
