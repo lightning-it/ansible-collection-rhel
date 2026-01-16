@@ -1,0 +1,79 @@
+---
+- name: Skip when disabled
+  ansible.builtin.meta: end_host
+  when: not (gui_enabled | bool)
+
+- name: Validate gui_variant
+  ansible.builtin.assert:
+    that:
+      - gui_variant in ['gnome', 'xfce']
+    fail_msg: "gui_variant must be one of: gnome, xfce"
+  changed_when: false
+
+# --------------------------------------------------------------------
+# Install GNOME
+# --------------------------------------------------------------------
+- name: Install GNOME group (RHEL) - {{ gui_gnome_group }}
+  ansible.builtin.dnf:
+    name: "{{ gui_gnome_group if gui_gnome_group.startswith('@') else '@' ~ gui_gnome_group }}"
+    state: present
+  when: gui_variant == 'gnome'
+  no_log: "{{ gui_no_log }}"
+
+# --------------------------------------------------------------------
+# Install XFCE (best effort)
+# --------------------------------------------------------------------
+- name: Install XFCE group (best-effort) - {{ gui_xfce_group }}
+  ansible.builtin.package:
+    name: "{{ gui_xfce_group }}"
+    state: present
+  register: _xfce_group
+  failed_when: false
+  when: gui_variant == 'xfce'
+  no_log: "{{ gui_no_log }}"
+
+- name: Install XFCE packages fallback (best-effort)
+  ansible.builtin.package:
+    name: "{{ gui_xfce_packages }}"
+    state: present
+  register: _xfce_pkgs
+  failed_when: false
+  when: gui_variant == 'xfce'
+  no_log: "{{ gui_no_log }}"
+
+# --------------------------------------------------------------------
+# Extras
+# --------------------------------------------------------------------
+- name: Install extra GUI packages (optional)
+  ansible.builtin.package:
+    name: "{{ gui_extra_packages }}"
+    state: present
+  when: (gui_extra_packages | default([]) | length) > 0
+  no_log: "{{ gui_no_log }}"
+
+# --------------------------------------------------------------------
+# Boot target & display manager
+# --------------------------------------------------------------------
+- name: Set default target to graphical.target
+  ansible.builtin.command: "systemctl set-default graphical.target"
+  changed_when: false
+  when: gui_set_graphical_target | bool
+
+- name: Enable GDM for GNOME (if requested)
+  ansible.builtin.service:
+    name: gdm
+    enabled: true
+    state: started
+  failed_when: false
+  when:
+    - gui_enable_display_manager | bool
+    - gui_variant == 'gnome'
+
+# For XFCE we do not enforce a display manager by default, because XRDP doesn't
+# require it and package availability varies (lightdm/gdm/sddm).
+- name: Note about XFCE display manager (no-op)
+  ansible.builtin.debug:
+    msg: "XFCE installed (best-effort). No display manager enforced by default."
+  when:
+    - gui_variant == 'xfce'
+    - gui_enable_display_manager | bool

@@ -1,0 +1,23 @@
+---
+argument_specs:
+  main:
+    short_description: Enable/prepare repository sources (EPEL, CodeReady, proxy) for RHEL.
+    options:
+      repos_enabled: {type: bool, default: true}
+      repos_proxy_enabled: {type: bool, default: false}
+      repos_proxy_url: {type: str, default: ""}
+      repos_proxy_apply_to_dnf: {type: bool, default: true}
+      repos_proxy_apply_to_rhsm: {type: bool, default: false}
+      repos_enable_codeready: {type: bool, default: false}
+      repos_codeready_repo: {type: str, default: "codeready-builder-for-rhel-9-x86_64-rpms"}
+      repos_enable_epel: {type: bool, default: false}
+      repos_epel_method: {type: str, default: "rpm_url"}
+      repos_epel_rpm_url: {type: str, default: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm"}
+      repos_epel_package_name: {type: str, default: "epel-release"}
+      repos_epel_gpg_key_url: {type: str, default: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9"}
+      repos_makecache: {type: bool, default: true}
+      repos_no_log: {type: bool, default: false}
+      repos_custom:
+        type: list
+        elements: dict
+        default: []

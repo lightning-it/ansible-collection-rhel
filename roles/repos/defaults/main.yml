@@ -1,14 +1,29 @@
 ---
-# Repo IDs to explicitly enable or disable via subscription-manager.
-repos_enabled: []
-repos_disabled: []
+# lit.rhel.repos
+# Central role to enable/prepare repository sources (CodeReady, EPEL, proxies).
+# NOTE: This role is repo policy/enabling only. Package installation belongs to service roles.
 
-# Custom repositories to manage via yum_repository.
-# Example:
-# repos_custom:
-#   - id: custom-appstream
-#     name: Custom AppStream
-#     baseurl: http://repo.example.com/appstream
-#     enabled: true
-#     gpgcheck: false
+repos_enabled: true
+
+# Proxy (optional)
+repos_proxy_enabled: false
+repos_proxy_url: ""          # e.g. http://proxy.corp.l-it.io:3128
+repos_proxy_apply_to_dnf: true
+repos_proxy_apply_to_rhsm: false
+
+# RHEL CodeReady Builder / CRB (optional)
+repos_enable_codeready: false
+repos_codeready_repo: "codeready-builder-for-rhel-9-x86_64-rpms"
+
+# EPEL (optional) - explicit enablement here
+repos_enable_epel: false
+repos_epel_method: "rpm_url"   # rpm_url | package
+repos_epel_rpm_url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm"
+repos_epel_package_name: "epel-release"
+repos_epel_gpg_key_url: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-9"
+
+repos_makecache: true
+repos_no_log: false
+
+# Custom repositories (optional)
 repos_custom: []

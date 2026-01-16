@@ -1,9 +1,9 @@
 ---
 galaxy_info:
-  role_name: repos
+  role_name: xrdp
   namespace: lit
   author: Lightning IT
-  description: Enable/prepare repositories (EPEL, CodeReady, proxies). Service roles install packages.
+  description: Install and configure XRDP on RHEL. Does not enable repos; use lit.rhel.repos.
   company: Lightning IT
   license: GPL-2.0-only
   min_ansible_version: "2.15"
@@ -12,8 +12,6 @@ galaxy_info:
       versions: ["9"]
   galaxy_tags:
     - rhel
-    - repos
-    - epel
-    - codeready
-    - dnf
+    - rdp
+    - xrdp
 dependencies: []

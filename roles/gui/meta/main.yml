@@ -1,9 +1,9 @@
 ---
 galaxy_info:
-  role_name: repos
+  role_name: gui
   namespace: lit
   author: Lightning IT
-  description: Enable/prepare repositories (EPEL, CodeReady, proxies). Service roles install packages.
+  description: Install a GUI stack on RHEL 9 (GNOME or XFCE).
   company: Lightning IT
   license: GPL-2.0-only
   min_ansible_version: "2.15"
@@ -12,8 +12,8 @@ galaxy_info:
       versions: ["9"]
   galaxy_tags:
     - rhel
-    - repos
-    - epel
-    - codeready
-    - dnf
+    - gui
+    - desktop
+    - gnome
+    - xfce
 dependencies: []

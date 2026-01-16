@@ -1,9 +1,16 @@
 ---
+- name: Gather installed packages (subscription-manager check)
+  ansible.builtin.package_facts:
+    manager: auto
+  when: rhsm_method in ['rhsm', 'satellite']
+
 - name: Ensure subscription-manager is present
   ansible.builtin.package:
     name: subscription-manager
     state: present
-  when: rhsm_method in ['rhsm', 'satellite']
+  when:
+    - rhsm_method in ['rhsm', 'satellite']
+    - "'subscription-manager' not in ansible_facts.packages"
 
 - name: Configure Satellite/RHSM endpoints when provided
   community.general.ini_file:
@@ -50,7 +57,6 @@
     subscription-manager register
     --org {{ rhsm_org }}
     --activationkey {{ rhsm_activation_key }}
-    {{ rhsm_attach_flag }}
   register: rhsm_register
   changed_when: rhsm_register.rc == 0
   when:

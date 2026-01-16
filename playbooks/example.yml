@@ -17,8 +17,7 @@
 
     - role: lit.rhel.repos
       vars:
-        repos_enabled: []
-        repos_disabled: []
+        repos_enabled: false
 
     - role: lit.rhel.baseline
       vars:
