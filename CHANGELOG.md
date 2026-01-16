@@ -1,3 +1,9 @@
+## [1.8.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.7.0...v1.8.0) (2026-01-16)
+
+### Features
+
+* workstation roles added ([#37](https://github.com/lightning-it/ansible-collection-rhel/issues/37)) ([95cf8b8](https://github.com/lightning-it/ansible-collection-rhel/commit/95cf8b81a60fe5a9cb8b0cc3df7090b487b6d41e))
+
 ## [1.7.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.6.0...v1.7.0) (2026-01-14)
 
 ### Features
