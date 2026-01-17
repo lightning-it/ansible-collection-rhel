@@ -1,3 +1,9 @@
+## [1.9.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.8.0...v1.9.0) (2026-01-17)
+
+### Features
+
+* add initial update option for automatic updates role ([#38](https://github.com/lightning-it/ansible-collection-rhel/issues/38)) ([d81bb13](https://github.com/lightning-it/ansible-collection-rhel/commit/d81bb133a5191e771cb61f3dd5960ca2ae0330f0))
+
 ## [1.8.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.7.0...v1.8.0) (2026-01-16)
 
 ### Features
