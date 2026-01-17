@@ -15,6 +15,7 @@ it runs `dnf -y update` every Sunday at 06:00 and writes output to
 - `automatic_updates_log_file` (string, default: `"/var/log/dnf-auto-weekly.log"`): Log destination for stdout/stderr.
 - `automatic_updates_command` (string, default: `"dnf -y update"`): Command to run (switch to `yum` if preferred).
 - `automatic_updates_cron_name` (string, default: `"Weekly automatic updates"`): Cron entry name.
+- `automatic_updates_initial_update` (bool, default: `true`): Run an initial `dnf update -y` when the role executes.
 
 ## Example
 
