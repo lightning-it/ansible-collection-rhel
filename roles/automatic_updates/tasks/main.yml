@@ -7,6 +7,15 @@
     automatic_updates_job: "{{ automatic_updates_command }} >{{ automatic_updates_log_file }} 2>&1"
   changed_when: false
 
+- name: Run initial system update (dnf)  # noqa package-latest
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+    update_cache: true
+  when:
+    - automatic_updates_enabled | bool
+    - automatic_updates_initial_update | default(true) | bool
+
 - name: Manage automatic updates cron entry
   ansible.builtin.cron:
     name: "{{ automatic_updates_cron_name }}"
