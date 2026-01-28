@@ -243,6 +243,7 @@ bash scripts/devtools-molecule.sh
 - For Vagrant/RHEL, real services, etc.
 - Scenario names end with `_heavy`, e.g.:
   - `selinux_rhel9_heavy`
+  - `firewalld_rhel9_heavy`
 
 - Heavy scenarios are **not** run by default in pre-commit or the light CI job.
 

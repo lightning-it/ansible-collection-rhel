@@ -12,8 +12,6 @@ DOCKER_ARGS=(
   -w /workspace
   -e HOME="${CONTAINER_HOME}"
   -v "$HOST_HOME_CACHE":"${CONTAINER_HOME}"
-  -e ANSIBLE_CONFIG=/workspace/ansible.cfg
-  -e ANSIBLE_COLLECTIONS_PATH="/workspace/collections:${CONTAINER_HOME}/.ansible/collections:/usr/share/ansible/collections"
 )
 
 DOCKER_SOCKET=""
