@@ -1,3 +1,9 @@
+## [1.9.2](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.1...v1.9.2) (2026-02-03)
+
+### Bug Fixes
+
+* update license and formatting in galaxy.yml ([#46](https://github.com/lightning-it/ansible-collection-rhel/issues/46)) ([fd7c481](https://github.com/lightning-it/ansible-collection-rhel/commit/fd7c481adfaa6e02f1e4a44373b378aa095de4c3))
+
 ## [1.9.1](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.0...v1.9.1) (2026-02-03)
 
 ### Bug Fixes
