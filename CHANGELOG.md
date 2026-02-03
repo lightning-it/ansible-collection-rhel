@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.0...v1.9.1) (2026-02-03)
+
+### Bug Fixes
+
+* add requirements.yml for Ansible collections ([#44](https://github.com/lightning-it/ansible-collection-rhel/issues/44)) ([3f99f48](https://github.com/lightning-it/ansible-collection-rhel/commit/3f99f48ef7c4ce1bf85edb4bea4cdbb4fd40a21a))
+* add requirements.yml for Ansible collections ([#45](https://github.com/lightning-it/ansible-collection-rhel/issues/45)) ([a999f3c](https://github.com/lightning-it/ansible-collection-rhel/commit/a999f3cc442670db6802153d92291a2053704dcd))
+
 ## [1.9.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.8.0...v1.9.0) (2026-01-17)
 
 ### Features
