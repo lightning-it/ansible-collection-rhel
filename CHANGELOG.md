@@ -1,3 +1,9 @@
+## [1.9.3](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.2...v1.9.3) (2026-02-21)
+
+### Bug Fixes
+
+* update regex managers for Ansible Galaxy collection dependencies in renovate.json ([#49](https://github.com/lightning-it/ansible-collection-rhel/issues/49)) ([cd9e462](https://github.com/lightning-it/ansible-collection-rhel/commit/cd9e462ff942404a85b14913ae474dd69d705f4b))
+
 ## [1.9.2](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.1...v1.9.2) (2026-02-03)
 
 ### Bug Fixes
