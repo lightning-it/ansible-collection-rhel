@@ -21,7 +21,7 @@ tags:
   - automation
 dependencies:
   ansible.posix: '*'
-  community.general: '>=10.6.0'
+  community.general: '>=10.7.7'
   community.docker: '*'
 build_ignore:
   - node_modules
