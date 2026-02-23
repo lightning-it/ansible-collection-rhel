@@ -1,3 +1,9 @@
+## [1.9.4](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.3...v1.9.4) (2026-02-23)
+
+### Bug Fixes
+
+* update repository identity management and dependency rules … ([#56](https://github.com/lightning-it/ansible-collection-rhel/issues/56)) ([549152c](https://github.com/lightning-it/ansible-collection-rhel/commit/549152caf7bcc683df300107aa2c24901b711954))
+
 ## [1.9.3](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.2...v1.9.3) (2026-02-21)
 
 ### Bug Fixes

@@ -1,7 +1,7 @@
 ---
 namespace: lit
 name: rhel
-version: 1.9.3
+version: 1.9.4
 readme: README.md
 description: RHEL-focused collection for OS baseline, hardening, user/package management,
   and day-2 operational tasks.
