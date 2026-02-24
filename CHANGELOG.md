@@ -1,3 +1,9 @@
+## [1.9.7](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.6...v1.9.7) (2026-02-24)
+
+### Bug Fixes
+
+* sync shared assets from lightning-it/shared-assets ([#63](https://github.com/lightning-it/ansible-collection-rhel/issues/63)) ([e89eed5](https://github.com/lightning-it/ansible-collection-rhel/commit/e89eed5aae3adb55abfa4beb230c3b9753237a4b))
+
 ## [1.9.6](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.5...v1.9.6) (2026-02-24)
 
 ### Bug Fixes
