@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE="quay.io/l-it/ee-wunder-devtools-ubi9:v1.6.0"
+IMAGE="quay.io/l-it/ee-wunder-devtools-ubi9:v1.6.1"
 CONTAINER_HOME="${CONTAINER_HOME:-/tmp/wunder}"
 HOST_HOME_CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/wunder-devtools-ee/home"
 
@@ -86,4 +86,4 @@ docker run --rm \
   ${VAGRANT_SSH_PORT:+-e VAGRANT_SSH_PORT} \
   ${VAGRANT_SSH_USER:+-e VAGRANT_SSH_USER} \
   ${VAGRANT_SSH_KEY:+-e VAGRANT_SSH_KEY} \
-  "$IMAGE" env -u ANSIBLE_COLLECTIONS_PATHS "$@"
+  "$IMAGE" "$@"
