@@ -1,3 +1,9 @@
+## [1.9.6](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.5...v1.9.6) (2026-02-24)
+
+### Bug Fixes
+
+* pin collection general ([#61](https://github.com/lightning-it/ansible-collection-rhel/issues/61)) ([33fc883](https://github.com/lightning-it/ansible-collection-rhel/commit/33fc8837989bb57b15e15258bbd7ac041e52019f))
+
 ## [1.9.5](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.4...v1.9.5) (2026-02-23)
 
 ### Bug Fixes
