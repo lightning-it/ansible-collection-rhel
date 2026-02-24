@@ -25,10 +25,10 @@
   ],
   "packageRules": [
     {
-      "description": "Keep community.general below 12 for linux_system_roles compatibility",
+      "description": "Keep community.general on 11.x for linux_system_roles compatibility",
       "matchDepNames": ["community.general"],
       "matchDatasources": ["galaxy-collection"],
-      "allowedVersions": "<12.0.0"
+      "allowedVersions": "/^11\\./"
     }
   ]
 }
