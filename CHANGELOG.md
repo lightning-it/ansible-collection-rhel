@@ -1,3 +1,9 @@
+## [1.10.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.7...v1.10.0) (2026-03-12)
+
+### Features
+
+* add support for additional RHSM-managed repositories and update example host name ([#68](https://github.com/lightning-it/ansible-collection-rhel/issues/68)) ([4fb350a](https://github.com/lightning-it/ansible-collection-rhel/commit/4fb350a19f02e910519cb9dfd9fc4b6a9bafbd5c))
+
 ## [1.9.7](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.9.6...v1.9.7) (2026-02-24)
 
 ### Bug Fixes
