@@ -7,7 +7,7 @@ Enable/prepare repository sources (CodeReady, EPEL, proxies).
 
 ## Example (Workstations)
 ```yaml
-- hosts: workstations
+- hosts: workbenches
   become: true
   roles:
     - role: lit.rhel.repos

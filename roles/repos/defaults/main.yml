@@ -15,6 +15,9 @@ repos_proxy_apply_to_rhsm: false
 repos_enable_codeready: false
 repos_codeready_repo: "codeready-builder-for-rhel-9-x86_64-rpms"
 
+# Additional RHSM-managed repositories (optional)
+repos_rhsm_repositories: []
+
 # EPEL (optional) - explicit enablement here
 repos_enable_epel: false
 repos_epel_method: "rpm_url"   # rpm_url | package
