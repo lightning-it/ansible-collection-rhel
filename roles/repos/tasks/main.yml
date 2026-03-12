@@ -28,6 +28,14 @@
     - repos_proxy_apply_to_rhsm | bool
     - repos_proxy_url | length > 0
 
+- name: Check if subscription-manager is present (for RHSM repo enablement)
+  ansible.builtin.command: "command -v subscription-manager"
+  register: _sm_present
+  changed_when: false
+  failed_when: false
+  when:
+    - repos_enable_codeready | bool or repos_rhsm_repositories | length > 0
+
 # Custom repositories (optional)
 - name: Configure custom repositories
   ansible.builtin.yum_repository:
@@ -47,13 +55,23 @@
   no_log: "{{ repos_no_log }}"
   when: repos_custom | length > 0
 
-# CodeReady Builder (optional, best-effort)
-- name: Check if subscription-manager is present (for CodeReady enablement)
-  ansible.builtin.command: "command -v subscription-manager"
-  register: _sm_present
-  changed_when: false
-  failed_when: false
-  when: repos_enable_codeready | bool
+- name: Fail when RHSM repos are requested but subscription-manager is unavailable
+  ansible.builtin.fail:
+    msg: >-
+      repos_rhsm_repositories was provided, but subscription-manager is not available on this host.
+  when:
+    - repos_rhsm_repositories | length > 0
+    - _sm_present.rc != 0
+
+- name: Enable requested RHSM repositories
+  community.general.rhsm_repository:
+    name: "{{ item }}"
+    state: enabled
+  loop: "{{ repos_rhsm_repositories }}"
+  no_log: "{{ repos_no_log }}"
+  when:
+    - repos_rhsm_repositories | length > 0
+    - _sm_present.rc == 0
 
 - name: Enable CodeReady Builder repo (best-effort)
   community.general.rhsm_repository:

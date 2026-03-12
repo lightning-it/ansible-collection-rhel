@@ -10,6 +10,10 @@ argument_specs:
       repos_proxy_apply_to_rhsm: {type: bool, default: false}
       repos_enable_codeready: {type: bool, default: false}
       repos_codeready_repo: {type: str, default: "codeready-builder-for-rhel-9-x86_64-rpms"}
+      repos_rhsm_repositories:
+        type: list
+        elements: str
+        default: []
       repos_enable_epel: {type: bool, default: false}
       repos_epel_method: {type: str, default: "rpm_url"}
       repos_epel_rpm_url: {type: str, default: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm"}
