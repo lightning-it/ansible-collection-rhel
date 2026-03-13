@@ -1,0 +1,10 @@
+---
+- name: Configure Visual Studio Code yum repository
+  ansible.builtin.yum_repository:
+    name: "{{ vscode_repo_name }}"
+    description: "{{ vscode_repo_description }}"
+    baseurl: "{{ vscode_repo_baseurl }}"
+    enabled: "{{ vscode_repo_enabled | bool }}"
+    gpgcheck: "{{ vscode_repo_gpgcheck | bool }}"
+    gpgkey: "{{ vscode_repo_gpgkey }}"
+    state: present

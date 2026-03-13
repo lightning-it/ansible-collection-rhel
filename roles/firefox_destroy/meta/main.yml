@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  role_name: firefox_destroy
+  namespace: lit
+  author: Lightning IT
+  description: Remove Firefox-managed state on RHEL 9 using the shared Firefox role.
+  company: Lightning IT
+  license: GPL-2.0-only
+  min_ansible_version: "2.18"
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+  galaxy_tags:
+    - rhel
+    - firefox
+    - browser
+    - workstation
+dependencies: []

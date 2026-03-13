@@ -1,0 +1,83 @@
+---
+argument_specs:
+  main:
+    short_description: Install developer packages, pip packages, and optional CLI tools on RHEL.
+    options:
+      developer_tools_enabled:
+        type: bool
+        default: true
+      developer_tools_packages_present:
+        type: list
+        elements: str
+      developer_tools_pip_executable:
+        type: str
+        default: pip3
+      developer_tools_pip_packages_present:
+        type: list
+        elements: str
+      developer_tools_github_cli_enabled:
+        type: bool
+        default: false
+      developer_tools_github_cli_package_name:
+        type: str
+        default: gh
+      developer_tools_github_cli_repo_name:
+        type: str
+        default: gh-cli
+      developer_tools_github_cli_repo_description:
+        type: str
+        default: packages for the GitHub CLI
+      developer_tools_github_cli_repo_baseurl:
+        type: str
+        default: https://cli.github.com/packages/rpm
+      developer_tools_github_cli_repo_gpgcheck:
+        type: bool
+        default: true
+      developer_tools_github_cli_repo_gpgkey:
+        type: str
+        default: >-
+          https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x23F3D4EA75716059
+      developer_tools_argocd_cli_enabled:
+        type: bool
+        default: false
+      developer_tools_argocd_cli_version:
+        type: str
+        default: v3.3.3
+      developer_tools_argocd_cli_url:
+        type: str
+        default: >-
+          https://github.com/argoproj/argo-cd/releases/download/{{
+          developer_tools_argocd_cli_version }}/argocd-linux-amd64
+      developer_tools_argocd_cli_dest:
+        type: str
+        default: /usr/local/bin/argocd
+      developer_tools_oc_cli_enabled:
+        type: bool
+        default: false
+      developer_tools_oc_cli_version:
+        type: str
+        default: 4.18.24
+      developer_tools_oc_cli_archive_url:
+        type: str
+        default: >-
+          https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{{
+          developer_tools_oc_cli_version
+          }}/openshift-client-linux-amd64-rhel9-{{
+          developer_tools_oc_cli_version }}.tar.gz
+      developer_tools_oc_cli_archive_path:
+        type: str
+        default: >-
+          /var/tmp/openshift-client-linux-amd64-rhel9-{{
+          developer_tools_oc_cli_version }}.tar.gz
+      developer_tools_oc_cli_extract_dir:
+        type: str
+        default: "/var/tmp/openshift-client-{{ developer_tools_oc_cli_version }}"
+      developer_tools_oc_cli_dest:
+        type: str
+        default: /usr/local/bin/oc
+      developer_tools_kubectl_cli_enabled:
+        type: bool
+        default: false
+      developer_tools_kubectl_cli_dest:
+        type: str
+        default: /usr/local/bin/kubectl
