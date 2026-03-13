@@ -1,0 +1,39 @@
+---
+- name: Skip when disabled
+  ansible.builtin.meta: end_host
+  when: not (vscode_destroy_enabled | bool)
+
+- name: Load shared VS Code state
+  ansible.builtin.include_role:
+    name: lit.rhel.vscode
+    tasks_from: main.yml
+
+- name: Ensure VS Code destroy inputs are valid
+  ansible.builtin.assert:
+    that:
+      - not (vscode_remove_extensions | bool) or vscode_user | trim | length > 0
+      - not (vscode_remove_extensions | bool) or _vscode_user_home_effective | trim | length > 0
+    fail_msg: >-
+      Removing VS Code extensions requires vscode_user and a resolvable user home.
+  changed_when: false
+
+- name: Remove requested VS Code extensions
+  ansible.builtin.include_role:
+    name: lit.rhel.vscode
+    tasks_from: extensions_absent.yml
+  when:
+    - vscode_remove_extensions | bool
+    - _vscode_code_path | trim | length > 0
+    - (vscode_extensions_remove | default([], true) | length) > 0
+
+- name: Remove VS Code package
+  ansible.builtin.package:
+    name: "{{ vscode_package_name }}"
+    state: absent
+  when: vscode_remove_package | bool
+
+- name: Remove VS Code repository
+  ansible.builtin.include_role:
+    name: lit.rhel.vscode
+    tasks_from: repo_absent.yml
+  when: vscode_remove_repo | bool

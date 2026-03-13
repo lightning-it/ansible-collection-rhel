@@ -1,0 +1,8 @@
+---
+argument_specs:
+  main:
+    short_description: Remove Visual Studio Code managed state on RHEL 9.
+    options:
+      vscode_destroy_enabled:
+        type: bool
+        default: true

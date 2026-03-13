@@ -1,0 +1,16 @@
+---
+- name: Ensure VS Code user settings directory exists
+  ansible.builtin.file:
+    path: "{{ _vscode_settings_dir_effective }}"
+    state: directory
+    owner: "{{ vscode_user }}"
+    group: "{{ _vscode_user_gid_effective | default(vscode_user, true) }}"
+    mode: "0755"
+
+- name: Render VS Code user settings file
+  ansible.builtin.copy:
+    dest: "{{ _vscode_settings_dir_effective }}/settings.json"
+    content: "{{ vscode_user_settings | to_nice_json }}\n"
+    owner: "{{ vscode_user }}"
+    group: "{{ _vscode_user_gid_effective | default(vscode_user, true) }}"
+    mode: "0644"

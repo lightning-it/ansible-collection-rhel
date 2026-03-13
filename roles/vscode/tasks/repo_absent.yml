@@ -1,0 +1,5 @@
+---
+- name: Remove Visual Studio Code yum repository
+  ansible.builtin.yum_repository:
+    name: "{{ vscode_repo_name }}"
+    state: absent

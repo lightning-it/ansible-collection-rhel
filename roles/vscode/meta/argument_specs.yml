@@ -1,0 +1,60 @@
+---
+argument_specs:
+  main:
+    short_description: Shared VS Code defaults, discovery, and helper tasks for RHEL 9.
+    options:
+      vscode_user:
+        type: str
+        default: ""
+      vscode_user_home:
+        type: str
+        default: ""
+      vscode_package_name:
+        type: str
+        default: code
+      vscode_repo_enabled:
+        type: bool
+        default: true
+      vscode_repo_name:
+        type: str
+        default: code
+      vscode_repo_description:
+        type: str
+        default: Visual Studio Code
+      vscode_repo_baseurl:
+        type: str
+        default: https://packages.microsoft.com/yumrepos/vscode
+      vscode_repo_gpgkey:
+        type: str
+        default: https://packages.microsoft.com/keys/microsoft.asc
+      vscode_repo_gpgcheck:
+        type: bool
+        default: true
+      vscode_extensions_default:
+        type: list
+        elements: str
+      vscode_extensions_extra:
+        type: list
+        elements: str
+      vscode_extensions_remove:
+        type: list
+        elements: str
+      vscode_extensions_file:
+        type: str
+        default: ""
+      vscode_vsix_files:
+        type: list
+      vscode_manage_user_settings:
+        type: bool
+        default: false
+      vscode_user_settings:
+        type: dict
+      vscode_remove_extensions:
+        type: bool
+        default: false
+      vscode_remove_package:
+        type: bool
+        default: false
+      vscode_remove_repo:
+        type: bool
+        default: false
