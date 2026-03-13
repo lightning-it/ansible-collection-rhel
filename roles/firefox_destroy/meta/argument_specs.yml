@@ -1,0 +1,8 @@
+---
+argument_specs:
+  main:
+    short_description: Remove Firefox-managed state on RHEL using the shared lit.rhel.firefox role.
+    options:
+      firefox_destroy_enabled:
+        type: bool
+        default: true
