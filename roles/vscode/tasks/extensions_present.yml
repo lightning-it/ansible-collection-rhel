@@ -86,6 +86,7 @@
   loop_control:
     label: "{{ item }}"
   when: item | lower not in _vscode_installed_extensions
+  changed_when: true
 
 - name: Copy local VSIX files to managed host
   ansible.builtin.copy:
@@ -120,3 +121,4 @@
   loop_control:
     label: "{{ item.id }}"
   when: item.id | lower not in _vscode_installed_extensions
+  changed_when: true

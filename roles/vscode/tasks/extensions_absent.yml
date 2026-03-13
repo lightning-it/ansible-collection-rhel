@@ -47,3 +47,4 @@
   loop_control:
     label: "{{ item }}"
   when: item | lower in _vscode_installed_extensions
+  changed_when: true
