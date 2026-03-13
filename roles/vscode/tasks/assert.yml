@@ -7,6 +7,7 @@
       - vscode_repo_description | trim | length > 0
       - vscode_repo_baseurl | trim | length > 0
       - vscode_repo_gpgkey | trim | length > 0
+      - vscode_users is sequence
       - vscode_extensions_default is sequence
       - vscode_extensions_extra is sequence
       - vscode_extensions_remove is sequence

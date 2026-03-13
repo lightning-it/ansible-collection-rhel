@@ -12,24 +12,16 @@
 - name: Ensure VS Code config inputs are valid
   ansible.builtin.assert:
     that:
-      - vscode_user | trim | length > 0
-      - _vscode_user_home_effective | trim | length > 0
+      - (_vscode_users_effective | default([], true) | length) > 0
       - _vscode_code_path | trim | length > 0
     fail_msg: >-
-      lit.rhel.vscode_config requires vscode_user, a resolvable user home, and
-      an installed code CLI. Run lit.rhel.vscode_deploy first.
+      lit.rhel.vscode_config requires at least one target user and an installed
+      code CLI. Set vscode_users and run lit.rhel.vscode_deploy first.
   changed_when: false
 
-- name: Ensure requested VS Code extensions are present
-  ansible.builtin.include_role:
-    name: lit.rhel.vscode
-    tasks_from: extensions_present.yml
-  when:
-    - (_vscode_extensions_effective | default([], true) | length) > 0
-      or (vscode_vsix_files | default([], true) | length) > 0
-
-- name: Ensure VS Code user settings are managed
-  ansible.builtin.include_role:
-    name: lit.rhel.vscode
-    tasks_from: user_settings.yml
-  when: vscode_manage_user_settings | bool
+- name: Configure VS Code for each target user
+  ansible.builtin.include_tasks: configure_user.yml
+  loop: "{{ _vscode_users_effective }}"
+  loop_control:
+    loop_var: _vscode_target_user
+    label: "{{ _vscode_target_user }}"

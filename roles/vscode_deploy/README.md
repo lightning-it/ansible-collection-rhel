@@ -22,6 +22,4 @@ This role does not manage user extensions or user settings. Use
   become: true
   roles:
     - role: lit.rhel.vscode_deploy
-      vars:
-        vscode_user: devuser
 ```

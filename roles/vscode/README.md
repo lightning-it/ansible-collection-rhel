@@ -33,7 +33,7 @@ platform engineering, and general developer workstation productivity on RHEL.
 ## Common variables
 
 ```yaml
-vscode_user: ""
+vscode_users: []
 vscode_user_home: ""
 vscode_package_name: code
 
@@ -70,6 +70,9 @@ The shared role builds the effective extension list in this order:
 3. entries read from `vscode_extensions_file`
 4. duplicate removal
 5. subtraction of `vscode_extensions_remove`
+
+Use `vscode_users` to manage multiple local users with the same extension and
+settings baseline.
 
 File-based extension lists are read on the controller and should contain one
 extension ID per line. Empty lines and comment lines starting with `#` are

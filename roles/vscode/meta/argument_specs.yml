@@ -1,11 +1,12 @@
 ---
 argument_specs:
   main:
-    short_description: Shared VS Code defaults, discovery, and helper tasks for RHEL 9.
+    short_description: >-
+      Shared VS Code defaults, discovery, and helper tasks for RHEL 9.
     options:
-      vscode_user:
-        type: str
-        default: ""
+      vscode_users:
+        type: list
+        elements: str
       vscode_user_home:
         type: str
         default: ""

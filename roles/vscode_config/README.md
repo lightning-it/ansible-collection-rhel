@@ -13,6 +13,7 @@ This role:
 - supports default, extra, and file-based extension IDs
 - supports optional `.vsix` installation from controller-local files
 - optionally manages `~/.config/Code/User/settings.json`
+- can apply the same baseline to multiple users with `vscode_users`
 
 This role does not install the VS Code package or repository. Use
 `lit.rhel.vscode_deploy` for package state.
@@ -68,7 +69,9 @@ When `vscode_manage_user_settings: true`, the role writes
   roles:
     - role: lit.rhel.vscode_config
       vars:
-        vscode_user: devuser
+        vscode_users:
+          - rene
+          - dirk
         vscode_extensions_extra:
           - tamasfe.even-better-toml
 ```
@@ -79,7 +82,8 @@ When `vscode_manage_user_settings: true`, the role writes
   roles:
     - role: lit.rhel.vscode_config
       vars:
-        vscode_user: devuser
+        vscode_users:
+          - devuser
         vscode_extensions_file: files/vscode/extensions.txt
 ```
 
@@ -89,7 +93,8 @@ When `vscode_manage_user_settings: true`, the role writes
   roles:
     - role: lit.rhel.vscode_config
       vars:
-        vscode_user: devuser
+        vscode_users:
+          - devuser
         vscode_manage_user_settings: true
         vscode_user_settings:
           editor.formatOnSave: true

@@ -7,10 +7,25 @@
     group: "{{ item.group }}"
     mode: "{{ item.mode }}"
   loop:
+    - path: "{{ _vscode_user_home_effective }}/.config"
+      group: "{{ _vscode_user_gid_effective | default(vscode_user, true) }}"
+      mode: "0755"
     - path: "{{ _vscode_user_data_dir_effective }}"
       group: "{{ _vscode_user_gid_effective | default(vscode_user, true) }}"
       mode: "0755"
+    - path: "{{ _vscode_settings_dir_effective }}"
+      group: "{{ _vscode_user_gid_effective | default(vscode_user, true) }}"
+      mode: "0755"
+    - path: "{{ _vscode_user_home_effective }}/.vscode"
+      group: "{{ _vscode_user_gid_effective | default(vscode_user, true) }}"
+      mode: "0755"
     - path: "{{ _vscode_extensions_dir_effective }}"
+      group: "{{ _vscode_user_gid_effective | default(vscode_user, true) }}"
+      mode: "0755"
+    - path: "{{ _vscode_user_home_effective }}/.cache"
+      group: "{{ _vscode_user_gid_effective | default(vscode_user, true) }}"
+      mode: "0755"
+    - path: "{{ _vscode_user_home_effective }}/.cache/lit-rhel-vscode"
       group: "{{ _vscode_user_gid_effective | default(vscode_user, true) }}"
       mode: "0755"
     - path: "{{ _vscode_vsix_tmp_dir_effective }}"
@@ -33,6 +48,8 @@
   environment:
     HOME: "{{ _vscode_user_home_effective }}"
     USER: "{{ vscode_user }}"
+    XDG_CONFIG_HOME: "{{ _vscode_user_home_effective }}/.config"
+    XDG_CACHE_HOME: "{{ _vscode_user_home_effective }}/.cache"
   register: _vscode_installed_extensions_cmd
   changed_when: false
 
@@ -63,6 +80,8 @@
   environment:
     HOME: "{{ _vscode_user_home_effective }}"
     USER: "{{ vscode_user }}"
+    XDG_CONFIG_HOME: "{{ _vscode_user_home_effective }}/.config"
+    XDG_CACHE_HOME: "{{ _vscode_user_home_effective }}/.cache"
   loop: "{{ _vscode_extensions_effective }}"
   loop_control:
     label: "{{ item }}"
@@ -95,6 +114,8 @@
   environment:
     HOME: "{{ _vscode_user_home_effective }}"
     USER: "{{ vscode_user }}"
+    XDG_CONFIG_HOME: "{{ _vscode_user_home_effective }}/.config"
+    XDG_CACHE_HOME: "{{ _vscode_user_home_effective }}/.cache"
   loop: "{{ vscode_vsix_files }}"
   loop_control:
     label: "{{ item.id }}"

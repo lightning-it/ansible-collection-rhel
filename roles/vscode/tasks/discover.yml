@@ -12,6 +12,7 @@
 - name: Initialize shared VS Code facts
   ansible.builtin.set_fact:
     _vscode_code_path: "{{ _vscode_code_cmd.stdout | trim }}"
+    _vscode_users_effective: []
     _vscode_user_home_effective: "{{ vscode_user_home | default('', true) }}"
     _vscode_user_gid_effective: ""
     _vscode_extensions_from_file: []
@@ -23,11 +24,23 @@
     _vscode_vsix_tmp_dir_effective: ""
   changed_when: false
 
+- name: Build effective VS Code user list
+  ansible.builtin.set_fact:
+    _vscode_users_effective: >-
+      {{
+        (vscode_users | default([], true))
+        | map('trim')
+        | reject('equalto', '')
+        | unique
+        | list
+      }}
+  changed_when: false
+
 - name: Query VS Code target user account
   ansible.builtin.getent:
     database: passwd
-    key: "{{ vscode_user }}"
-  when: vscode_user | trim | length > 0
+    key: "{{ vscode_user | default('', true) }}"
+  when: (vscode_user | default('', true) | trim | length) > 0
 
 - name: Set effective VS Code user facts
   ansible.builtin.set_fact:
@@ -36,22 +49,24 @@
         vscode_user_home
         if vscode_user_home | trim | length > 0
         else (
-          getent_passwd[vscode_user][4]
-          if vscode_user | trim | length > 0
+          getent_passwd[vscode_user | default('', true)][4]
+          if (vscode_user | default('', true) | trim | length) > 0
           else ''
         )
       }}
     _vscode_user_gid_effective: >-
       {{
         ''
-        if vscode_user | trim | length == 0
+        if (vscode_user | default('', true) | trim | length) == 0
         else (
-          getent_passwd[vscode_user][2]
+          getent_passwd[vscode_user | default('', true)][2]
         )
       }}
   changed_when: false
   when:
-    - (vscode_user | trim | length > 0) or (vscode_user_home | trim | length > 0)
+    - >-
+      (vscode_user | default('', true) | trim | length > 0)
+      or (vscode_user_home | trim | length > 0)
 
 - name: Read VS Code extension list from controller file
   ansible.builtin.set_fact:
@@ -94,9 +109,13 @@
 
 - name: Build effective VS Code user paths
   ansible.builtin.set_fact:
-    _vscode_settings_dir_effective: "{{ _vscode_user_home_effective }}/.config/Code/User"
-    _vscode_user_data_dir_effective: "{{ _vscode_user_home_effective }}/.config/Code"
-    _vscode_extensions_dir_effective: "{{ _vscode_user_home_effective }}/.vscode/extensions"
-    _vscode_vsix_tmp_dir_effective: "{{ _vscode_user_home_effective }}/.cache/lit-rhel-vscode/vsix"
+    _vscode_settings_dir_effective: >-
+      {{ _vscode_user_home_effective }}/.config/Code/User
+    _vscode_user_data_dir_effective: >-
+      {{ _vscode_user_home_effective }}/.config/Code
+    _vscode_extensions_dir_effective: >-
+      {{ _vscode_user_home_effective }}/.vscode/extensions
+    _vscode_vsix_tmp_dir_effective: >-
+      {{ _vscode_user_home_effective }}/.cache/lit-rhel-vscode/vsix
   changed_when: false
   when: _vscode_user_home_effective | trim | length > 0
