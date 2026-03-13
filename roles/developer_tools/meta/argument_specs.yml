@@ -15,6 +15,28 @@ argument_specs:
       developer_tools_pip_packages_present:
         type: list
         elements: str
+      developer_tools_github_cli_enabled:
+        type: bool
+        default: false
+      developer_tools_github_cli_package_name:
+        type: str
+        default: gh
+      developer_tools_github_cli_repo_name:
+        type: str
+        default: gh-cli
+      developer_tools_github_cli_repo_description:
+        type: str
+        default: packages for the GitHub CLI
+      developer_tools_github_cli_repo_baseurl:
+        type: str
+        default: https://cli.github.com/packages/rpm
+      developer_tools_github_cli_repo_gpgcheck:
+        type: bool
+        default: true
+      developer_tools_github_cli_repo_gpgkey:
+        type: str
+        default: >-
+          https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x23F3D4EA75716059
       developer_tools_argocd_cli_enabled:
         type: bool
         default: false

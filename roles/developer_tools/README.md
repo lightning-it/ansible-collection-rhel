@@ -3,13 +3,29 @@
 
 Install developer-oriented packages, Python packages, and optional CLI binaries on RHEL.
 
-## Role Variables
+## Requirements
+
+- RHEL / EL 9 host
+- `become: true` for package and repository management
+- Run `gh auth login --git-protocol ssh` manually after provisioning if GitHub access is needed
+
+## Variables
+
+See `defaults/main.yml` for the full interface. Key inputs:
 
 ```yaml
 developer_tools_enabled: true
 developer_tools_packages_present: []
 developer_tools_pip_executable: pip3
 developer_tools_pip_packages_present: []
+
+developer_tools_github_cli_enabled: false
+developer_tools_github_cli_package_name: gh
+developer_tools_github_cli_repo_name: gh-cli
+developer_tools_github_cli_repo_description: packages for the GitHub CLI
+developer_tools_github_cli_repo_baseurl: https://cli.github.com/packages/rpm
+developer_tools_github_cli_repo_gpgcheck: true
+developer_tools_github_cli_repo_gpgkey: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x23F3D4EA75716059
 
 developer_tools_argocd_cli_enabled: false
 developer_tools_argocd_cli_version: v3.3.3
@@ -26,3 +42,30 @@ developer_tools_oc_cli_dest: /usr/local/bin/oc
 developer_tools_kubectl_cli_enabled: false
 developer_tools_kubectl_cli_dest: /usr/local/bin/kubectl
 ```
+
+- When `developer_tools_github_cli_enabled` is true, the role configures the official GitHub CLI RPM repository and installs `gh`.
+
+## Dependencies
+
+None.
+
+## Example Playbook
+
+```yaml
+- hosts: workbenches
+  become: true
+  roles:
+    - role: lit.rhel.developer_tools
+      vars:
+        developer_tools_packages_present:
+          - git
+          - podman
+```
+
+## License
+
+MIT
+
+## Author
+
+Lightning IT

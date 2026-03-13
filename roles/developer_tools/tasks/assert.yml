@@ -3,6 +3,11 @@
   ansible.builtin.assert:
     that:
       - developer_tools_pip_executable | trim | length > 0
+      - developer_tools_github_cli_package_name | trim | length > 0
+      - not developer_tools_github_cli_enabled | bool or developer_tools_github_cli_repo_name | trim | length > 0
+      - not developer_tools_github_cli_enabled | bool or developer_tools_github_cli_repo_description | trim | length > 0
+      - not developer_tools_github_cli_enabled | bool or developer_tools_github_cli_repo_baseurl | trim | length > 0
+      - not developer_tools_github_cli_enabled | bool or developer_tools_github_cli_repo_gpgkey | trim | length > 0
       - developer_tools_argocd_cli_dest | trim | length > 0
       - developer_tools_oc_cli_archive_path | trim | length > 0
       - developer_tools_oc_cli_extract_dir | trim | length > 0

@@ -5,6 +5,15 @@ developer_tools_packages_present: []
 developer_tools_pip_executable: pip3
 developer_tools_pip_packages_present: []
 
+developer_tools_github_cli_enabled: false
+developer_tools_github_cli_package_name: gh
+developer_tools_github_cli_repo_name: gh-cli
+developer_tools_github_cli_repo_description: packages for the GitHub CLI
+developer_tools_github_cli_repo_baseurl: https://cli.github.com/packages/rpm
+developer_tools_github_cli_repo_gpgcheck: true
+developer_tools_github_cli_repo_gpgkey: >-
+  https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x23F3D4EA75716059
+
 developer_tools_argocd_cli_enabled: false
 developer_tools_argocd_cli_version: v3.3.3
 developer_tools_argocd_cli_url: >-

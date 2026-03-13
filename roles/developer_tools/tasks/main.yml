@@ -20,6 +20,23 @@
     executable: "{{ developer_tools_pip_executable }}"
   when: (developer_tools_pip_packages_present | default([], true) | length) > 0
 
+- name: Configure GitHub CLI yum repository when enabled
+  ansible.builtin.yum_repository:
+    name: "{{ developer_tools_github_cli_repo_name }}"
+    description: "{{ developer_tools_github_cli_repo_description }}"
+    baseurl: "{{ developer_tools_github_cli_repo_baseurl }}"
+    enabled: true
+    gpgcheck: "{{ developer_tools_github_cli_repo_gpgcheck | bool }}"
+    gpgkey: "{{ developer_tools_github_cli_repo_gpgkey }}"
+    state: present
+  when: developer_tools_github_cli_enabled | bool
+
+- name: Ensure GitHub CLI is installed when enabled
+  ansible.builtin.package:
+    name: "{{ developer_tools_github_cli_package_name }}"
+    state: present
+  when: developer_tools_github_cli_enabled | bool
+
 - name: Ensure Argo CD CLI is installed when enabled
   ansible.builtin.get_url:
     url: "{{ developer_tools_argocd_cli_url }}"
