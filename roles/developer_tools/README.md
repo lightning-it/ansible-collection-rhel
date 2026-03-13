@@ -27,9 +27,6 @@ developer_tools_github_cli_repo_baseurl: https://cli.github.com/packages/rpm
 developer_tools_github_cli_repo_gpgcheck: true
 developer_tools_github_cli_repo_gpgkey: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x23F3D4EA75716059
 
-developer_tools_helm_enabled: false
-developer_tools_helm_package_name: helm
-
 developer_tools_argocd_cli_enabled: false
 developer_tools_argocd_cli_version: v3.3.3
 developer_tools_argocd_cli_url: "https://github.com/argoproj/argo-cd/releases/download/{{ developer_tools_argocd_cli_version }}/argocd-linux-amd64"
@@ -47,7 +44,6 @@ developer_tools_kubectl_cli_dest: /usr/local/bin/kubectl
 ```
 
 - When `developer_tools_github_cli_enabled` is true, the role configures the official GitHub CLI RPM repository and installs `gh`.
-- When `developer_tools_helm_enabled` is true, the role installs the Helm package defined by `developer_tools_helm_package_name`.
 
 ## Dependencies
 

@@ -14,9 +14,6 @@ developer_tools_github_cli_repo_gpgcheck: true
 developer_tools_github_cli_repo_gpgkey: >-
   https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x23F3D4EA75716059
 
-developer_tools_helm_enabled: false
-developer_tools_helm_package_name: helm
-
 developer_tools_argocd_cli_enabled: false
 developer_tools_argocd_cli_version: v3.3.3
 developer_tools_argocd_cli_url: >-

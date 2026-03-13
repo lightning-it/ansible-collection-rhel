@@ -4,7 +4,6 @@
     that:
       - developer_tools_pip_executable | trim | length > 0
       - developer_tools_github_cli_package_name | trim | length > 0
-      - developer_tools_helm_package_name | trim | length > 0
       - not developer_tools_github_cli_enabled | bool or developer_tools_github_cli_repo_name | trim | length > 0
       - not developer_tools_github_cli_enabled | bool or developer_tools_github_cli_repo_description | trim | length > 0
       - not developer_tools_github_cli_enabled | bool or developer_tools_github_cli_repo_baseurl | trim | length > 0
