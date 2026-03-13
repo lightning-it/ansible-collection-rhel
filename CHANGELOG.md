@@ -1,3 +1,9 @@
+## [1.12.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.11.0...v1.12.0) (2026-03-13)
+
+### Features
+
+* extra tools added ([#72](https://github.com/lightning-it/ansible-collection-rhel/issues/72)) ([6fad0c2](https://github.com/lightning-it/ansible-collection-rhel/commit/6fad0c20898ef565a3b1d1b7b9c7b9a7d4df4429))
+
 ## [1.11.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.10.0...v1.11.0) (2026-03-13)
 
 ### Features
