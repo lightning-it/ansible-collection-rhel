@@ -37,6 +37,12 @@ argument_specs:
         type: str
         default: >-
           https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x23F3D4EA75716059
+      developer_tools_helm_enabled:
+        type: bool
+        default: false
+      developer_tools_helm_package_name:
+        type: str
+        default: helm
       developer_tools_argocd_cli_enabled:
         type: bool
         default: false

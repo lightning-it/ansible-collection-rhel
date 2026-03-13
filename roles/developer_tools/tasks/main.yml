@@ -37,6 +37,12 @@
     state: present
   when: developer_tools_github_cli_enabled | bool
 
+- name: Ensure Helm CLI is installed when enabled
+  ansible.builtin.package:
+    name: "{{ developer_tools_helm_package_name }}"
+    state: present
+  when: developer_tools_helm_enabled | bool
+
 - name: Ensure Argo CD CLI is installed when enabled
   ansible.builtin.get_url:
     url: "{{ developer_tools_argocd_cli_url }}"
