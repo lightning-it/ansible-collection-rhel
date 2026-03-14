@@ -44,6 +44,13 @@
     mode: "0755"
   when: developer_tools_argocd_cli_enabled | bool
 
+- name: Ensure Terragrunt CLI is installed when enabled
+  ansible.builtin.get_url:
+    url: "{{ developer_tools_terragrunt_url }}"
+    dest: "{{ developer_tools_terragrunt_dest }}"
+    mode: "0755"
+  when: developer_tools_terragrunt_enabled | bool
+
 - name: Ensure OpenShift CLI archive is downloaded when enabled
   ansible.builtin.get_url:
     url: "{{ developer_tools_oc_cli_archive_url }}"

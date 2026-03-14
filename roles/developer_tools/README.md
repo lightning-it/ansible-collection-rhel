@@ -32,6 +32,12 @@ developer_tools_argocd_cli_version: v3.3.3
 developer_tools_argocd_cli_url: "https://github.com/argoproj/argo-cd/releases/download/{{ developer_tools_argocd_cli_version }}/argocd-linux-amd64"
 developer_tools_argocd_cli_dest: /usr/local/bin/argocd
 
+developer_tools_terragrunt_enabled: false
+developer_tools_terragrunt_version: v0.93.8
+developer_tools_terragrunt_arch: "{{ 'arm64' if ansible_architecture in ['aarch64', 'arm64'] else 'amd64' }}"
+developer_tools_terragrunt_url: "https://github.com/gruntwork-io/terragrunt/releases/download/{{ developer_tools_terragrunt_version }}/terragrunt_linux_{{ developer_tools_terragrunt_arch }}"
+developer_tools_terragrunt_dest: /usr/local/bin/terragrunt
+
 developer_tools_oc_cli_enabled: false
 developer_tools_oc_cli_version: 4.18.24
 developer_tools_oc_cli_archive_url: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{{ developer_tools_oc_cli_version }}/openshift-client-linux-amd64-rhel9-{{ developer_tools_oc_cli_version }}.tar.gz"
@@ -44,6 +50,7 @@ developer_tools_kubectl_cli_dest: /usr/local/bin/kubectl
 ```
 
 - When `developer_tools_github_cli_enabled` is true, the role configures the official GitHub CLI RPM repository and installs `gh`.
+- When `developer_tools_terragrunt_enabled` is true, the role downloads the Terragrunt standalone binary from the official GitHub release assets.
 
 ## Dependencies
 

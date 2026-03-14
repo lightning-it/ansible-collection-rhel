@@ -21,6 +21,18 @@ developer_tools_argocd_cli_url: >-
   developer_tools_argocd_cli_version }}/argocd-linux-amd64
 developer_tools_argocd_cli_dest: /usr/local/bin/argocd
 
+developer_tools_terragrunt_enabled: false
+developer_tools_terragrunt_version: v0.93.8
+developer_tools_terragrunt_arch: >-
+  {{ 'arm64'
+     if (ansible_architecture | default('x86_64')) in ['aarch64', 'arm64']
+     else 'amd64' }}
+developer_tools_terragrunt_url: >-
+  https://github.com/gruntwork-io/terragrunt/releases/download/{{
+  developer_tools_terragrunt_version }}/terragrunt_linux_{{
+  developer_tools_terragrunt_arch }}
+developer_tools_terragrunt_dest: /usr/local/bin/terragrunt
+
 developer_tools_oc_cli_enabled: false
 developer_tools_oc_cli_version: 4.18.24
 developer_tools_oc_cli_archive_url: >-
