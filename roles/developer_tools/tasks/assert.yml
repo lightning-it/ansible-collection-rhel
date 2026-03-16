@@ -55,5 +55,27 @@
           | list
           | length
         ) == (developer_tools_ssh_agent_identity_files | length)
+      - not developer_tools_ssh_private_keys_enabled | bool or developer_tools_ssh_private_keys is sequence
+      - not developer_tools_ssh_private_keys_enabled | bool or developer_tools_ssh_private_keys is not string
+      - >-
+        not developer_tools_ssh_private_keys_enabled | bool
+        or (developer_tools_ssh_private_keys | length) > 0
+      - >-
+        not developer_tools_ssh_private_keys_enabled | bool
+        or developer_tools_ssh_private_keys_path | trim | length > 0
+      - >-
+        not developer_tools_ssh_private_keys_enabled | bool
+        or developer_tools_ssh_private_keys_type in ['rsa', 'dsa', 'rsa1', 'ecdsa', 'ed25519']
+      - >-
+        not developer_tools_ssh_private_keys_enabled | bool
+        or developer_tools_ssh_private_keys_vault_addr | trim | length > 0
+      - >-
+        not developer_tools_ssh_private_keys_enabled | bool
+        or developer_tools_ssh_private_keys_vault_kv_mount | trim | length > 0
+      - >-
+        not developer_tools_ssh_private_keys_enabled | bool
+        or developer_tools_ssh_private_keys_vault_auth_ok | bool
+      - developer_tools_ssh_private_keys_known_hosts_entries is sequence
+      - developer_tools_ssh_private_keys_known_hosts_entries is not string
   changed_when: false
   when: developer_tools_enabled | bool

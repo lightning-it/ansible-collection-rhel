@@ -93,3 +93,7 @@
 - name: Configure persistent ssh-agent for developer users
   ansible.builtin.import_tasks: ssh_agent.yml
   when: developer_tools_ssh_agent_enabled | bool
+
+- name: Configure Vault-backed SSH private keys for developer users
+  ansible.builtin.import_tasks: ssh_private_keys.yml
+  when: developer_tools_ssh_private_keys_enabled | bool

@@ -61,6 +61,22 @@ developer_tools_ssh_agent_shell_init_files:
   - .bashrc
 developer_tools_ssh_agent_manage_ssh_config: true
 developer_tools_ssh_agent_add_keys_to_agent: true
+
+developer_tools_ssh_private_keys_enabled: false
+developer_tools_ssh_private_keys:
+  - user: rene
+    vault_kv_path: "{{ inventory_hostname }}/developer_tools/ssh_keys/rene"
+developer_tools_ssh_private_keys_no_log: true
+developer_tools_ssh_private_keys_path: .ssh/id_ed25519
+developer_tools_ssh_private_keys_type: ed25519
+developer_tools_ssh_private_keys_manage_public_keys: true
+developer_tools_ssh_private_keys_known_hosts_entries: []
+developer_tools_ssh_private_keys_vault_addr: https://vault.example.com:8200
+developer_tools_ssh_private_keys_vault_validate_certs: true
+developer_tools_ssh_private_keys_vault_kv_mount: stage-2c
+developer_tools_ssh_private_keys_vault_token: "{{ lookup('ansible.builtin.env', 'VAULT_TOKEN') }}"
+developer_tools_ssh_private_keys_vault_role_id: ""
+developer_tools_ssh_private_keys_vault_secret_id: ""
 ```
 
 - When `developer_tools_github_cli_enabled` is true, the role configures the official GitHub CLI RPM repository and installs `gh`.
@@ -68,6 +84,9 @@ developer_tools_ssh_agent_add_keys_to_agent: true
 - When `developer_tools_ssh_agent_enabled` is true, the role configures a persistent `systemd --user` `ssh-agent`
   service, exports `SSH_AUTH_SOCK` in the selected shell init files, and adds an `~/.ssh/config` block that can
   auto-add the configured identity files to the agent on first SSH use.
+- When `developer_tools_ssh_private_keys_enabled` is true, the role reads per-user SSH keys from Vault KV v2, generates
+  a dedicated key locally on the control node when the secret is absent, stores it back into Vault, and writes the
+  private key to `~/.ssh/id_ed25519` with mode `0600`. Secret-bearing tasks use `no_log: true`.
 
 ## Dependencies
 
@@ -87,6 +106,13 @@ None.
         developer_tools_ssh_agent_enabled: true
         developer_tools_ssh_agent_users:
           - ops-admin
+        developer_tools_ssh_private_keys_enabled: true
+        developer_tools_ssh_private_keys_vault_addr: https://vault.example.com:8200
+        developer_tools_ssh_private_keys_vault_kv_mount: stage-2c
+        developer_tools_ssh_private_keys_vault_token: "{{ lookup('ansible.builtin.env', 'VAULT_TOKEN') }}"
+        developer_tools_ssh_private_keys:
+          - user: ops-admin
+            vault_kv_path: "{{ inventory_hostname }}/developer_tools/ssh_keys/ops-admin"
 ```
 
 ## License

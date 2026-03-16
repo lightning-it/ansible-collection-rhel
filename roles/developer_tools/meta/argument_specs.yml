@@ -137,3 +137,62 @@ argument_specs:
       developer_tools_ssh_agent_add_keys_to_agent:
         type: bool
         default: true
+      developer_tools_ssh_private_keys_enabled:
+        type: bool
+        default: false
+      developer_tools_ssh_private_keys:
+        type: list
+        elements: dict
+      developer_tools_ssh_private_keys_no_log:
+        type: bool
+        default: true
+      developer_tools_ssh_private_keys_path:
+        type: str
+        default: .ssh/id_ed25519
+      developer_tools_ssh_private_keys_type:
+        type: str
+        default: ed25519
+      developer_tools_ssh_private_keys_manage_public_keys:
+        type: bool
+        default: true
+      developer_tools_ssh_private_keys_known_hosts_entries:
+        type: list
+        elements: dict
+      developer_tools_ssh_private_keys_vault_addr:
+        type: str
+        default: ""
+      developer_tools_ssh_private_keys_vault_validate_certs:
+        type: bool
+        default: false
+      developer_tools_ssh_private_keys_vault_kv_mount:
+        type: str
+        default: ""
+      developer_tools_ssh_private_keys_vault_token:
+        type: str
+        default: ""
+      developer_tools_ssh_private_keys_vault_role_id:
+        type: str
+        default: ""
+      developer_tools_ssh_private_keys_vault_secret_id:
+        type: str
+        default: ""
+      developer_tools_ssh_private_keys_vault_use_token:
+        type: bool
+        default: "{{ (developer_tools_ssh_private_keys_vault_token | string | trim | length) > 0 }}"
+      developer_tools_ssh_private_keys_vault_auth_method:
+        type: str
+        default: >-
+          {{ 'token' if (developer_tools_ssh_private_keys_vault_use_token | bool) else 'approle' }}
+      developer_tools_ssh_private_keys_vault_auth_ok:
+        type: bool
+        default: >-
+          {{
+            (developer_tools_ssh_private_keys_vault_token | string | trim | length > 0)
+            or (
+              (developer_tools_ssh_private_keys_vault_role_id | string | trim | length > 0)
+              and (developer_tools_ssh_private_keys_vault_secret_id | string | trim | length > 0)
+            )
+          }}
+      developer_tools_ssh_private_keys_vault_path_prefix:
+        type: str
+        default: "{{ inventory_hostname }}/developer_tools/ssh_keys"
