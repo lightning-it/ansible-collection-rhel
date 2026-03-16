@@ -48,3 +48,17 @@ developer_tools_oc_cli_dest: /usr/local/bin/oc
 
 developer_tools_kubectl_cli_enabled: false
 developer_tools_kubectl_cli_dest: /usr/local/bin/kubectl
+
+developer_tools_ssh_agent_enabled: false
+developer_tools_ssh_agent_users: []
+developer_tools_ssh_agent_identity_files:
+  - ~/.ssh/id_ed25519
+developer_tools_ssh_agent_package_name: openssh-clients
+developer_tools_ssh_agent_service_name: ssh-agent.service
+developer_tools_ssh_agent_socket: "%t/ssh-agent.socket"
+developer_tools_ssh_agent_manage_shell_init: true
+developer_tools_ssh_agent_shell_init_files:
+  - .bash_profile
+  - .bashrc
+developer_tools_ssh_agent_manage_ssh_config: true
+developer_tools_ssh_agent_add_keys_to_agent: true

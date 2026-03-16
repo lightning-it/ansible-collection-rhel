@@ -47,10 +47,27 @@ developer_tools_oc_cli_dest: /usr/local/bin/oc
 
 developer_tools_kubectl_cli_enabled: false
 developer_tools_kubectl_cli_dest: /usr/local/bin/kubectl
+
+developer_tools_ssh_agent_enabled: false
+developer_tools_ssh_agent_users: []
+developer_tools_ssh_agent_identity_files:
+  - ~/.ssh/id_ed25519
+developer_tools_ssh_agent_package_name: openssh-clients
+developer_tools_ssh_agent_service_name: ssh-agent.service
+developer_tools_ssh_agent_socket: "%t/ssh-agent.socket"
+developer_tools_ssh_agent_manage_shell_init: true
+developer_tools_ssh_agent_shell_init_files:
+  - .bash_profile
+  - .bashrc
+developer_tools_ssh_agent_manage_ssh_config: true
+developer_tools_ssh_agent_add_keys_to_agent: true
 ```
 
 - When `developer_tools_github_cli_enabled` is true, the role configures the official GitHub CLI RPM repository and installs `gh`.
 - When `developer_tools_terragrunt_enabled` is true, the role downloads the Terragrunt standalone binary from the official GitHub release assets.
+- When `developer_tools_ssh_agent_enabled` is true, the role configures a persistent `systemd --user` `ssh-agent`
+  service, exports `SSH_AUTH_SOCK` in the selected shell init files, and adds an `~/.ssh/config` block that can
+  auto-add the configured identity files to the agent on first SSH use.
 
 ## Dependencies
 
@@ -67,6 +84,9 @@ None.
         developer_tools_packages_present:
           - git
           - podman
+        developer_tools_ssh_agent_enabled: true
+        developer_tools_ssh_agent_users:
+          - ops-admin
 ```
 
 ## License
