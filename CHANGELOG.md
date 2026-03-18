@@ -1,3 +1,9 @@
+## [1.13.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.12.0...v1.13.0) (2026-03-18)
+
+### Features
+
+* terragrunt added ([#74](https://github.com/lightning-it/ansible-collection-rhel/issues/74)) ([81ce87e](https://github.com/lightning-it/ansible-collection-rhel/commit/81ce87ed8af82e00fb40379675e1660e713bd754))
+
 ## [1.12.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.11.0...v1.12.0) (2026-03-13)
 
 ### Features
