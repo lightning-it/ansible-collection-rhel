@@ -55,6 +55,7 @@
     cmd: "loginctl enable-linger {{ item.item.name }}"
   loop: "{{ developer_tools_ssh_agent_linger_stats.results }}"
   when: not (item.stat.exists | default(false))
+  changed_when: not (item.stat.exists | default(false))
   loop_control:
     label: "{{ item.item.name }}"
 

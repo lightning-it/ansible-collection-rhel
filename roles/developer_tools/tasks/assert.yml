@@ -33,8 +33,12 @@
           | list
           | length
         ) == (developer_tools_ssh_agent_users | length)
-      - not developer_tools_ssh_agent_manage_shell_init | bool or developer_tools_ssh_agent_shell_init_files is sequence
-      - not developer_tools_ssh_agent_manage_shell_init | bool or developer_tools_ssh_agent_shell_init_files is not string
+      - >-
+        not developer_tools_ssh_agent_manage_shell_init | bool
+        or developer_tools_ssh_agent_shell_init_files is sequence
+      - >-
+        not developer_tools_ssh_agent_manage_shell_init | bool
+        or developer_tools_ssh_agent_shell_init_files is not string
       - >-
         not developer_tools_ssh_agent_manage_shell_init | bool
         or (
@@ -44,8 +48,12 @@
           | list
           | length
         ) == (developer_tools_ssh_agent_shell_init_files | length)
-      - not developer_tools_ssh_agent_manage_ssh_config | bool or developer_tools_ssh_agent_identity_files is sequence
-      - not developer_tools_ssh_agent_manage_ssh_config | bool or developer_tools_ssh_agent_identity_files is not string
+      - >-
+        not developer_tools_ssh_agent_manage_ssh_config | bool
+        or developer_tools_ssh_agent_identity_files is sequence
+      - >-
+        not developer_tools_ssh_agent_manage_ssh_config | bool
+        or developer_tools_ssh_agent_identity_files is not string
       - >-
         not developer_tools_ssh_agent_manage_ssh_config | bool
         or (
