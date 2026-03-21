@@ -285,6 +285,7 @@
           developer_tools_ssh_private_key_effective_secret.private_key
           | string
           | regex_replace('\r', '')
+          | replace('\\n', '\n')
           | regex_replace('\n+$', '')
         ) ~ '\n'
       }}
@@ -302,6 +303,7 @@
           developer_tools_ssh_private_key_effective_secret.public_key
           | string
           | regex_replace('\r', '')
+          | replace('\\n', '\n')
           | regex_replace('\n+$', '')
         ) ~ '\n'
       }}
