@@ -2,5 +2,5 @@
 collections:
   - name: ansible.posix
   - name: community.general
-    version: "11.4.5"
+    version: "11.4.7"
   - name: community.docker
