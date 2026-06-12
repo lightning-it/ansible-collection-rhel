@@ -1,5 +1,5 @@
 ---
-- name: Converge SELinux role on RHEL 9 (Vagrant)
+- name: Converge SELinux role on RHEL-compatible Vagrant host
   hosts: rhel_selinux_hosts
   become: true
   vars:
@@ -11,7 +11,7 @@
     ansible_port: >-
       {{ lookup('env', 'VAGRANT_SSH_PORT') | default('55222', true) }}
     ansible_ssh_private_key_file: >-
-      /workspace/vagrant/rhel9/.vagrant/machines/default/qemu/private_key
+      /workspace/vagrant/rhel/.vagrant/machines/default/qemu/private_key
     ansible_ssh_common_args: >-
       -o StrictHostKeyChecking=no
       -o UserKnownHostsFile=/dev/null

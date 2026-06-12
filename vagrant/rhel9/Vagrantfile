@@ -1,31 +1,3 @@
-Vagrant.configure("2") do |config|
-  # Rocky Linux 9 generic box (x86_64); adjust if you use a different box/provider
-  #
-  # Wähle die, die zu deinem Provider passt.
-  config.vm.box = "generic/rocky9"
-  config.vm.hostname = "rocky9-vagrant"
+ENV["RHEL_MAJOR_VERSION"] ||= "9"
 
-  # Simple private network with a stable hostname/address for Ansible
-  config.vm.network "private_network", type: "dhcp"
-
-  # Explicit SSH port forward with auto-correct to avoid host conflicts
-  host_ssh_port = ENV.fetch("VAGRANT_SSH_PORT", "55222")
-  config.vm.network "forwarded_port",
-                    guest: 22,
-                    host: host_ssh_port,
-                    host_ip: "127.0.0.1",
-                    id: "ssh",
-                    auto_correct: true
-
-  # Provider tuning example (VirtualBox, Parallels, etc.)
-  config.vm.provider "virtualbox" do |vb|
-    vb.memory = 4096
-    vb.cpus   = 2
-  end
-
-  # QEMU provider: try to honor the forwarded SSH port
-  config.vm.provider "qemu" do |q|
-    q.ssh_port = host_ssh_port if q.respond_to?(:ssh_port=)
-  end
-
-end
+load File.expand_path("../rhel/Vagrantfile", __dir__)

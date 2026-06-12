@@ -44,7 +44,8 @@ This repository is designed to be used together with:
 - `pre-commit` for local linting,
 - the shared `wunder-devtools-ee` container for consistent tooling,
 - Molecule scenarios for role-level testing (e.g. `selinux_rhel9_heavy` via
-  Vagrant-backed RHEL 9 instances).
+  Vagrant-backed RHEL-compatible instances, defaulting to RHEL major version 10
+  and selectable with `RHEL_MAJOR_VERSION=9`).
 
 Each role is expected to provide:
 
