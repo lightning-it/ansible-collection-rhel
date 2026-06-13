@@ -1,0 +1,7 @@
+---
+description: "lit.rhel RHEL 9-compatible Incus container profile"
+config:
+  cloud-init.user-data: |
+    @@CLOUD_INIT_USER_DATA@@
+  security.nesting: "true"
+devices: {}

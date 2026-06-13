@@ -1,0 +1,59 @@
+---
+- name: Prepare controller for xrdp verification
+  hosts: localhost
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Check whether xfreerdp is already installed
+      ansible.builtin.command:
+        argv:
+          - bash
+          - -lc
+          - command -v xfreerdp || command -v xfreerdp3
+      register: xrdp_molecule_xfreerdp_present
+      changed_when: false
+      failed_when: false
+
+    - name: Install FreeRDP client on RedHat-family controller
+      ansible.builtin.package:
+        name: freerdp
+        state: present
+      register: xrdp_molecule_freerdp_install
+      failed_when: false
+      when:
+        - xrdp_molecule_xfreerdp_present.rc != 0
+        - ansible_os_family == "RedHat"
+
+    - name: Verify xfreerdp is available on controller
+      ansible.builtin.command:
+        argv:
+          - bash
+          - -lc
+          - command -v xfreerdp || command -v xfreerdp3
+      register: xrdp_molecule_xfreerdp_available
+      changed_when: false
+      failed_when: xrdp_molecule_xfreerdp_available.rc != 0
+
+- name: Prepare xrdp target VM
+  hosts: all
+  become: true
+  gather_facts: false
+  vars:
+    xrdp_molecule_test_user: xrdptest
+    xrdp_molecule_password_file: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/xrdp-password"
+    xrdp_molecule_test_password: >-
+      {{ lookup('ansible.builtin.password', xrdp_molecule_password_file ~ ' length=24 chars=ascii_letters,digits') }}
+  tasks:
+    - name: Wait for cloud-init to finish
+      ansible.builtin.command: cloud-init status --wait
+      register: xrdp_molecule_cloud_init
+      changed_when: false
+
+    - name: Create dedicated xrdp test user
+      ansible.builtin.user:
+        name: "{{ xrdp_molecule_test_user }}"
+        shell: /bin/bash
+        create_home: true
+        password: "{{ xrdp_molecule_test_password | password_hash('sha512') }}"
+        update_password: always
+      no_log: true

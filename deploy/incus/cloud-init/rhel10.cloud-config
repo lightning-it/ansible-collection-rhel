@@ -1,0 +1,24 @@
+#cloud-config
+users:
+  - default
+  - name: "@@SSH_USER@@"
+    groups:
+      - wheel
+    shell: /bin/bash
+    sudo:
+      - "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: true
+    ssh_authorized_keys:
+      - "@@SSH_PUBLIC_KEY@@"
+
+package_update: false
+packages:
+  - cloud-init
+  - openssh-server
+  - python3
+  - sudo
+  - dnf-plugins-core
+  - policycoreutils-python-utils
+
+runcmd:
+  - [sh, -lc, "systemctl enable --now sshd 2>/dev/null || true"]

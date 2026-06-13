@@ -1,0 +1,14 @@
+---
+- name: Converge xrdp on RHEL 9 Incus VM
+  hosts: all
+  become: true
+  vars:
+    xrdp_install_desktop: true
+    xrdp_desktop: gnome
+    xrdp_firewalld_manage: true
+    xrdp_firewalld_zone: public
+    xrdp_selinux_manage: true
+    xrdp_listen_address: "0.0.0.0"
+    xrdp_listen_port: 3389
+  roles:
+    - role: lit.rhel.xrdp

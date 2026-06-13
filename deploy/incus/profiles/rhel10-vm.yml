@@ -1,0 +1,8 @@
+---
+description: "lit.rhel RHEL 10-compatible Incus VM profile"
+config:
+  cloud-init.user-data: |
+    @@CLOUD_INIT_USER_DATA@@
+  limits.cpu: "2"
+  limits.memory: "4GiB"
+devices: {}
