@@ -419,7 +419,51 @@ For each new or changed role, and for any newly added scenario:
    4. `.ansible/`
    5. `dist/`, `build/`
 
-## 10. Role README Standard
+## 10. Local Deployment Harnesses
+
+This repository may include local system-level deployment harnesses under paths such as `deploy/`, `vagrant/`,
+or helper scripts under `scripts/`.
+
+### 10.1 Incus Workflow Validation (Mandatory)
+
+When changing the Incus workflow under `deploy/incus/`, related helper scripts, or GitHub Actions workflows that
+exercise Incus/RHEL testing, you MUST validate through the repo devtools container path before finalizing:
+
+1. Run devtools-backed YAML lint for changed Incus profile/workflow/pre-commit files:
+
+```bash
+bash scripts/wunder-devtools-ee.sh yamllint deploy/incus/profiles .github/workflows/incus-rhel-protected.yml .pre-commit-config.yaml
+```
+
+2. Run devtools-backed Ansible lint for the repository:
+
+```bash
+ANSIBLE_CORE_VERSION=2.15.13 ANSIBLE_LINT_VERSION=6.22.2 bash scripts/devtools-ansible-lint.sh
+```
+
+3. Run shell syntax checks inside the devtools container for changed shell scripts:
+
+```bash
+bash scripts/wunder-devtools-ee.sh bash -lc 'bash -n deploy/incus/scripts/create.sh deploy/incus/scripts/destroy.sh deploy/incus/scripts/inventory.sh scripts/devtools-incus-selinux-heavy.sh scripts/devtools-molecule-rdp-rhel9-heavy.sh'
+```
+
+4. If Incus is available locally, run a create/inventory/Ansible/destroy smoke test for the affected version and mode.
+   If Incus is not available, state that clearly and provide the exact command the user should run manually.
+5. Cloud-init templates SHOULD use a non-`.yml` extension (for example `.cloud-config`) when they need
+   `#cloud-config` as the first line, because generic YAML/Ansible linters require `---` document starts.
+
+### 10.2 CI Security Boundary For RHEL Images
+
+1. Public pull-request CI MUST NOT require Red Hat credentials, private RHEL images, subscription-manager
+   credentials, or GitHub secrets.
+2. Real RHEL 9/RHEL 10 Incus VM testing MUST be isolated in protected workflow paths only.
+3. Protected RHEL CI MUST run only on trusted events such as `push` to `main`, `push` to `release/**`,
+   `workflow_dispatch`, or scheduled jobs.
+4. Do NOT use `pull_request_target` for workflows that check out and execute repository code with access to secrets.
+5. Protected Incus/RHEL workflows SHOULD assume preloaded private local image aliases such as `local:rhel9-ci`
+   and `local:rhel10-ci`; do not upload, cache, publish, or log private image material.
+
+## 11. Role README Standard
 
 Each role `README.md` MUST use these section headers in this order:
 
@@ -432,7 +476,7 @@ Each role `README.md` MUST use these section headers in this order:
 
 Variables section SHOULD point to `defaults/main.yml` and highlight key inputs.
 
-## 11. Definition of Done
+## 12. Definition of Done
 
 Before finalizing, confirm all items below:
 
@@ -441,7 +485,9 @@ Before finalizing, confirm all items below:
 3. Molecule light scenarios pass (`scripts/devtools-molecule.sh` or scoped equivalent).
 4. Documentation is updated for changed role interfaces.
 5. No CI, workflow, Renovate, or semantic-release config changes were made unless requested.
-6. Role prechecks are action-scoped and role-scoped:
+6. Incus/deployment harness changes have passed the devtools-container checks in section 10.1, or any skipped
+   check has a concrete environment reason and a manual command for the user.
+7. Role prechecks are action-scoped and role-scoped:
    1. no cross-role raw var assertions in `assert.yml`
    2. no duplicate copy-paste assert blocks
    3. required foreign inputs mapped in `defaults/main.yml` with role prefix
