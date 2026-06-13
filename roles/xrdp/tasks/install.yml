@@ -1,0 +1,68 @@
+---
+- name: Gather installed packages for xrdp precheck
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Set xrdp installed flag
+  ansible.builtin.set_fact:
+    _xrdp_installed: "{{ xrdp_service_name in ansible_facts.packages }}"
+  changed_when: false
+
+- name: Verify xrdp packages are available in enabled repositories
+  ansible.builtin.command:
+    argv: "{{ ['dnf', '-q', 'list', '--available'] + xrdp_packages }}"
+  register: _xrdp_repo_check
+  changed_when: false
+  failed_when: false
+  when: not _xrdp_installed
+
+- name: Fail with repository guidance when xrdp packages are unavailable
+  ansible.builtin.fail:
+    msg: |
+      XRDP packages are not available in currently enabled repositories.
+      This role does not enable EPEL, CodeReady Builder, CRB, or internal mirrors.
+
+      Fix:
+      - Enable the required repositories with lit.rhel.repos or your local mirror policy.
+      - Then rerun this role.
+
+      Debug:
+      - dnf repolist
+      - dnf list --available {{ xrdp_packages | join(' ') }}
+  when:
+    - xrdp_fail_if_unavailable | bool
+    - not _xrdp_installed
+    - _xrdp_repo_check is defined
+    - _xrdp_repo_check.rc != 0
+
+- name: Install required xrdp packages
+  ansible.builtin.package:
+    name: "{{ xrdp_packages }}"
+    state: present
+  no_log: "{{ xrdp_no_log }}"
+
+- name: Install optional xrdp packages
+  ansible.builtin.package:
+    name: "{{ xrdp_optional_packages }}"
+    state: present
+  failed_when: false
+  no_log: "{{ xrdp_no_log }}"
+  when: (xrdp_optional_packages | default([], true) | length) > 0
+
+- name: Determine effective xrdp desktop mode
+  ansible.builtin.set_fact:
+    _xrdp_desktop_effective: >-
+      {{
+        xrdp_desktop
+        if xrdp_desktop != 'auto'
+        else 'gnome'
+      }}
+  changed_when: false
+
+- name: Install graphical session packages when managed
+  ansible.builtin.package:
+    name: "{{ xrdp_desktop_packages[_xrdp_desktop_effective] }}"
+    state: present
+  when:
+    - xrdp_install_desktop | bool
+    - _xrdp_desktop_effective in xrdp_desktop_packages

@@ -1,0 +1,61 @@
+---
+- name: Check xrdp TLS certificate exists
+  ansible.builtin.stat:
+    path: "{{ xrdp_tls_cert_path }}"
+  register: _xrdp_cert
+  when: xrdp_tls_enable | bool
+
+- name: Generate self-signed certificate for xrdp
+  ansible.builtin.command:
+    argv:
+      - openssl
+      - req
+      - -x509
+      - -nodes
+      - -newkey
+      - rsa:2048
+      - -keyout
+      - "{{ xrdp_tls_key_path }}"
+      - -out
+      - "{{ xrdp_tls_cert_path }}"
+      - -days
+      - "{{ xrdp_tls_days | string }}"
+      - -subj
+      - "{{ xrdp_tls_subject }}"
+  args:
+    creates: "{{ xrdp_tls_cert_path }}"
+  when:
+    - xrdp_tls_enable | bool
+    - xrdp_tls_generate_self_signed | bool
+    - _xrdp_cert is defined
+    - not _xrdp_cert.stat.exists
+  notify: Restart xrdp
+
+- name: Ensure permissions on xrdp TLS key
+  ansible.builtin.file:
+    path: "{{ xrdp_tls_key_path }}"
+    owner: root
+    group: root
+    mode: "0600"
+  when:
+    - xrdp_tls_enable | bool
+    - xrdp_tls_key_path | length > 0
+  notify: Restart xrdp
+
+- name: Configure xrdp.ini
+  ansible.builtin.template:
+    src: xrdp.ini.j2
+    dest: /etc/xrdp/xrdp.ini
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart xrdp
+
+- name: Configure xrdp session startup
+  ansible.builtin.template:
+    src: startwm.sh.j2
+    dest: /etc/xrdp/startwm.sh
+    owner: root
+    group: root
+    mode: "0755"
+  notify: Restart xrdp

@@ -1,0 +1,54 @@
+---
+- name: Ensure SELinux Python tooling is present for xrdp port management
+  ansible.builtin.package:
+    name: policycoreutils-python-utils
+    state: present
+
+- name: Check SELinux port label for xrdp
+  ansible.builtin.command:
+    argv:
+      - bash
+      - -lc
+      - >-
+        semanage port -l |
+        awk -v setype='{{ xrdp_selinux_type | default(xrdp_selinux_port_type) }}'
+        -v proto='{{ xrdp_selinux_proto | default(xrdp_selinux_port_proto) }}'
+        -v port='{{ xrdp_listen_port }}'
+        '$1 == setype && $2 == proto && $0 ~ ("(^|[, -])" port "($|[, -])") { found = 1 }
+        END { exit found ? 0 : 1 }'
+  register: xrdp_selinux_port_check
+  changed_when: false
+  failed_when: false
+
+- name: Add SELinux port label for xrdp
+  ansible.builtin.command:
+    argv:
+      - semanage
+      - port
+      - -a
+      - -t
+      - "{{ xrdp_selinux_type | default(xrdp_selinux_port_type) }}"
+      - -p
+      - "{{ xrdp_selinux_proto | default(xrdp_selinux_port_proto) }}"
+      - "{{ xrdp_listen_port | string }}"
+  register: xrdp_selinux_port_add
+  changed_when: xrdp_selinux_port_add.rc == 0
+  failed_when: false
+  when: xrdp_selinux_port_check.rc != 0
+
+- name: Modify SELinux port label for xrdp when the port already exists
+  ansible.builtin.command:
+    argv:
+      - semanage
+      - port
+      - -m
+      - -t
+      - "{{ xrdp_selinux_type | default(xrdp_selinux_port_type) }}"
+      - -p
+      - "{{ xrdp_selinux_proto | default(xrdp_selinux_port_proto) }}"
+      - "{{ xrdp_listen_port | string }}"
+  changed_when: true
+  when:
+    - xrdp_selinux_port_check.rc != 0
+    - xrdp_selinux_port_add is defined
+    - xrdp_selinux_port_add.rc != 0

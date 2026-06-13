@@ -1,0 +1,22 @@
+---
+xrdp_packages:
+  - xrdp
+  - xorgxrdp
+  - policycoreutils-python-utils
+  - openssl
+
+xrdp_optional_packages:
+  - xrdp-selinux
+  - pulseaudio-module-xrdp
+
+xrdp_desktop_packages:
+  gnome:
+    - "@Server with GUI"
+  xfce:
+    - "@Xfce"
+
+xrdp_service_name: xrdp
+xrdp_sesman_service_name: xrdp-sesman
+xrdp_firewalld_package_name: firewalld
+xrdp_selinux_port_type: ms-wbt-server
+xrdp_selinux_port_proto: tcp

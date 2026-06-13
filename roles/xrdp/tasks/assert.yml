@@ -1,0 +1,25 @@
+---
+- name: Ensure xrdp role inputs are valid
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == "RedHat"
+      - ansible_distribution_major_version in ["9", "10"]
+      - xrdp_listen_address | trim | length > 0
+      - xrdp_listen_port | int >= 1
+      - xrdp_listen_port | int <= 65535
+      - xrdp_firewalld_state in ["enabled", "disabled"]
+      - xrdp_firewalld_zone | trim | length > 0
+      - xrdp_desktop in ["auto", "gnome", "xfce", "custom"]
+      - xrdp_security_layer in ["tls", "rdp", "negotiate"]
+      - xrdp_log_level in ["CORE", "ERROR", "WARNING", "INFO", "DEBUG", "TRACE"]
+      - not xrdp_tls_enable | bool or xrdp_tls_cert_path | trim | length > 0
+      - not xrdp_tls_enable | bool or xrdp_tls_key_path | trim | length > 0
+      - xrdp_tls_days | int > 0
+      - xrdp_selinux_proto in ["tcp", "udp"]
+      - xrdp_selinux_type | trim | length > 0
+    fail_msg: >-
+      lit.rhel.xrdp supports only RedHat-family RHEL major versions 9 and 10.
+      Validate xrdp_* inputs, especially port, firewall state, desktop mode,
+      TLS paths, and SELinux settings.
+  changed_when: false
+  when: xrdp_enabled | bool

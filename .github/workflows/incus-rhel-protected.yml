@@ -73,3 +73,28 @@ jobs:
             "${{ github.run_attempt }}")"
 
           deploy/incus/scripts/destroy.sh --name "${INCUS_INSTANCE_NAME}"
+
+  xrdp-incus:
+    name: XRDP RHEL ${{ matrix.rhel_major_version }} Incus VM
+    runs-on:
+      - self-hosted
+      - incus
+      - rhel-ci
+    environment:
+      name: rhel-ci
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        rhel_major_version: ["9", "10"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Run XRDP Incus Molecule scenario
+        env:
+          INCUS_RHEL9_IMAGE: ${{ vars.INCUS_RHEL9_IMAGE || 'local:rhel9-ci' }}
+          INCUS_RHEL10_IMAGE: ${{ vars.INCUS_RHEL10_IMAGE || 'local:rhel10-ci' }}
+        run: |
+          bash scripts/devtools-molecule.sh "xrdp-rhel${{ matrix.rhel_major_version }}"
