@@ -1,3 +1,9 @@
+## [1.15.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.14.0...v1.15.0) (2026-06-14)
+
+### Features
+
+* Add new roles for cloud image and virtual guest configuration ([#90](https://github.com/lightning-it/ansible-collection-rhel/issues/90)) ([51bd2d8](https://github.com/lightning-it/ansible-collection-rhel/commit/51bd2d80895cc62b299a69f22b826e8363bf6125))
+
 ## [1.14.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.13.1...v1.14.0) (2026-06-13)
 
 ### Features
