@@ -1,0 +1,65 @@
+---
+- name: Assert cloud image configuration
+  ansible.builtin.assert:
+    that:
+      - cloud_image_enabled is boolean
+      - cloud_image_source_path is string
+      - cloud_image_download_url is string
+      - cloud_image_download_headers is mapping
+      - cloud_image_download_validate_certs is boolean
+      - cloud_image_download_force is boolean
+      - cloud_image_download_timeout | int > 0
+      - cloud_image_download_dest | trim | length > 0
+      - cloud_image_work_dir | trim | length > 0
+      - cloud_image_output_dir | trim | length > 0
+      - cloud_image_output_name | trim | length > 0
+      - cloud_image_output_qcow2 | trim | length > 0
+      - cloud_image_mode | trim | length > 0
+      - cloud_image_expected_format | trim | length > 0
+      - cloud_image_min_size_bytes | int >= 0
+      - cloud_image_checksum is string
+      - cloud_image_force_rebuild is boolean
+      - cloud_image_resize_enabled is boolean
+      - cloud_image_resize_size | trim | length > 0
+      - cloud_image_customize_enabled is boolean
+      - cloud_image_customize_packages is sequence
+      - cloud_image_customize_packages is not string
+      - cloud_image_customize_ssh_user | trim | length > 0
+      - cloud_image_customize_ssh_authorized_keys is sequence
+      - cloud_image_customize_ssh_authorized_keys is not string
+      - cloud_image_customize_run_commands is sequence
+      - cloud_image_customize_run_commands is not string
+      - cloud_image_customize_firstboot_commands is sequence
+      - cloud_image_customize_firstboot_commands is not string
+      - cloud_image_customize_clean_rhsm is boolean
+      - cloud_image_customize_scrub_machine_id is boolean
+      - cloud_image_customize_truncate_logs is boolean
+      - cloud_image_customize_selinux_relabel is boolean
+      - cloud_image_incus_metadata_enabled is boolean
+      - cloud_image_incus_metadata_dir | trim | length > 0
+      - cloud_image_incus_metadata_tarball | trim | length > 0
+      - cloud_image_incus_architecture | trim | length > 0
+      - cloud_image_incus_os | trim | length > 0
+      - cloud_image_incus_release | string | trim | length > 0
+      - cloud_image_incus_description | trim | length > 0
+      - cloud_image_incus_creation_date | int >= 0
+    fail_msg: "Invalid configuration for lit.rhel.cloud_image."
+    quiet: true
+
+- name: Assert exactly one cloud image source
+  ansible.builtin.assert:
+    that:
+      - (cloud_image_source_path | trim | length > 0) != (cloud_image_download_url | trim | length > 0)
+    fail_msg: "Configure exactly one of cloud_image_source_path or cloud_image_download_url."
+    quiet: true
+  when: cloud_image_enabled | bool
+
+- name: Assert source and output are different paths
+  ansible.builtin.assert:
+    that:
+      - cloud_image_source_path != cloud_image_output_qcow2
+    fail_msg: "cloud_image_source_path and cloud_image_output_qcow2 must not be the same file."
+    quiet: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_source_path | trim | length > 0

@@ -1,0 +1,426 @@
+---
+- name: Prechecks
+  ansible.builtin.import_tasks: assert.yml
+  tags: always
+
+- name: Skip cloud image role when disabled
+  ansible.builtin.debug:
+    msg: "Cloud image artifact build skipped because cloud_image_enabled=false."
+  changed_when: false
+  when: not cloud_image_enabled | bool
+  tags: always
+
+- name: Ensure cloud image artifact directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ cloud_image_work_dir }}"
+    - "{{ cloud_image_output_dir }}"
+  when: cloud_image_enabled | bool
+
+- name: Build required command list
+  ansible.builtin.set_fact:
+    cloud_image_required_commands: >-
+      {{
+        ['qemu-img', 'cp']
+        + (['virt-customize'] if cloud_image_customize_enabled | bool else [])
+        + (['tar'] if cloud_image_incus_metadata_enabled | bool else [])
+      }}
+  when: cloud_image_enabled | bool
+
+- name: Check required artifact build commands
+  ansible.builtin.command:
+    argv:
+      - /bin/sh
+      - -c
+      - "command -v {{ item }}"
+  changed_when: false
+  loop: "{{ cloud_image_required_commands }}"
+  when: cloud_image_enabled | bool
+
+- name: Check configured local source image
+  ansible.builtin.stat:
+    path: "{{ cloud_image_source_path }}"
+    checksum_algorithm: sha256
+  register: cloud_image_source_stat
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_source_path | trim | length > 0
+
+- name: Assert configured local source image exists
+  ansible.builtin.assert:
+    that:
+      - cloud_image_source_stat.stat.exists
+      - cloud_image_source_stat.stat.isreg
+    fail_msg: "cloud_image_source_path does not point to an existing regular file."
+    quiet: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_source_path | trim | length > 0
+
+- name: Assert configured local source image checksum
+  ansible.builtin.assert:
+    that:
+      - cloud_image_source_stat.stat.checksum == (cloud_image_checksum | regex_replace('^sha256:', ''))
+    fail_msg: "cloud_image_source_path checksum does not match cloud_image_checksum."
+    quiet: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_source_path | trim | length > 0
+    - cloud_image_checksum | trim | length > 0
+
+- name: Download source cloud image
+  ansible.builtin.get_url:
+    url: "{{ cloud_image_download_url }}"
+    dest: "{{ cloud_image_download_dest }}"
+    headers: "{{ cloud_image_download_headers }}"
+    checksum: >-
+      {{
+        cloud_image_checksum if ':' in cloud_image_checksum
+        else 'sha256:' ~ cloud_image_checksum
+      }}
+    validate_certs: "{{ cloud_image_download_validate_certs }}"
+    force: "{{ cloud_image_download_force }}"
+    timeout: "{{ cloud_image_download_timeout }}"
+    mode: "0600"
+  no_log: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_download_url | trim | length > 0
+    - cloud_image_checksum | trim | length > 0
+
+- name: Download source cloud image without checksum
+  ansible.builtin.get_url:
+    url: "{{ cloud_image_download_url }}"
+    dest: "{{ cloud_image_download_dest }}"
+    headers: "{{ cloud_image_download_headers }}"
+    validate_certs: "{{ cloud_image_download_validate_certs }}"
+    force: "{{ cloud_image_download_force }}"
+    timeout: "{{ cloud_image_download_timeout }}"
+    mode: "0600"
+  no_log: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_download_url | trim | length > 0
+    - cloud_image_checksum | trim | length == 0
+
+- name: Set effective source cloud image path
+  ansible.builtin.set_fact:
+    cloud_image_source_effective: >-
+      {{
+        cloud_image_source_path
+        if cloud_image_source_path | trim | length > 0
+        else cloud_image_download_dest
+      }}
+  when: cloud_image_enabled | bool
+
+- name: Inspect source image
+  ansible.builtin.command:
+    argv:
+      - qemu-img
+      - info
+      - --output=json
+      - "{{ cloud_image_source_effective }}"
+  register: cloud_image_source_qemu_info_raw
+  changed_when: false
+  when: cloud_image_enabled | bool
+
+- name: Parse source image information
+  ansible.builtin.set_fact:
+    cloud_image_source_qemu_info: "{{ cloud_image_source_qemu_info_raw.stdout | from_json }}"
+  when: cloud_image_enabled | bool
+
+- name: Assert source image properties
+  ansible.builtin.assert:
+    that:
+      - cloud_image_source_qemu_info.format == cloud_image_expected_format
+      - cloud_image_source_qemu_info['virtual-size'] | int >= cloud_image_min_size_bytes | int
+    fail_msg: "Source image did not pass qemu-img validation."
+    quiet: true
+  when: cloud_image_enabled | bool
+
+- name: Inspect existing output image
+  ansible.builtin.stat:
+    path: "{{ cloud_image_output_qcow2 }}"
+  register: cloud_image_output_stat
+  when: cloud_image_enabled | bool
+
+- name: Decide whether to rebuild output image
+  ansible.builtin.set_fact:
+    cloud_image_rebuild_needed: "{{ cloud_image_force_rebuild | bool or not cloud_image_output_stat.stat.exists }}"
+  when: cloud_image_enabled | bool
+
+- name: Copy source image to output artifact
+  ansible.builtin.command:
+    argv:
+      - cp
+      - --sparse=always
+      - "{{ cloud_image_source_effective }}"
+      - "{{ cloud_image_output_qcow2 }}"
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+
+- name: Resize output image for hypervisor compatibility
+  ansible.builtin.command:
+    argv:
+      - qemu-img
+      - resize
+      - "{{ cloud_image_output_qcow2 }}"
+      - "{{ cloud_image_resize_size }}"
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_resize_enabled | bool
+
+- name: Install packages into output image
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --install
+      - "{{ cloud_image_customize_packages | join(',') }}"
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+    - cloud_image_customize_packages | length > 0
+
+- name: Configure hostname in output image
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --hostname
+      - "{{ cloud_image_customize_hostname }}"
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+    - cloud_image_customize_hostname | trim | length > 0
+
+- name: Configure timezone in output image
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --timezone
+      - "{{ cloud_image_customize_timezone }}"
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+    - cloud_image_customize_timezone | trim | length > 0
+
+- name: Inject SSH authorized keys into output image
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --ssh-inject
+      - "{{ cloud_image_customize_ssh_user }}:string:{{ item }}"
+  changed_when: true
+  loop: "{{ cloud_image_customize_ssh_authorized_keys }}"
+  no_log: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+
+- name: Run customization commands in output image
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --run-command
+      - "{{ item }}"
+  changed_when: true
+  loop: "{{ cloud_image_customize_run_commands }}"
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+
+- name: Configure first boot commands in output image
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --firstboot-command
+      - "{{ item }}"
+  changed_when: true
+  loop: "{{ cloud_image_customize_firstboot_commands }}"
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+
+- name: Remove RHSM identity from output image
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --run-command
+      - >-
+        subscription-manager clean || true;
+        rm -f /etc/pki/consumer/cert.pem /etc/pki/consumer/key.pem /etc/pki/entitlement/*.pem || true
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+    - cloud_image_customize_clean_rhsm | bool
+
+- name: Scrub machine-id from output image
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --run-command
+      - "truncate -s 0 /etc/machine-id || true; rm -f /var/lib/dbus/machine-id || true"
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+    - cloud_image_customize_scrub_machine_id | bool
+
+- name: Truncate logs from output image
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --run-command
+      - "find /var/log -type f -exec truncate -s 0 {} +"
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+    - cloud_image_customize_truncate_logs | bool
+
+- name: Relabel SELinux contexts in output image
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --selinux-relabel
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+    - cloud_image_customize_selinux_relabel | bool
+
+- name: Inspect output image
+  ansible.builtin.command:
+    argv:
+      - qemu-img
+      - info
+      - --output=json
+      - "{{ cloud_image_output_qcow2 }}"
+  register: cloud_image_qemu_info_raw
+  changed_when: false
+  when: cloud_image_enabled | bool
+
+- name: Parse output image information
+  ansible.builtin.set_fact:
+    cloud_image_qemu_info: "{{ cloud_image_qemu_info_raw.stdout | from_json }}"
+  when: cloud_image_enabled | bool
+
+- name: Assert output image properties
+  ansible.builtin.assert:
+    that:
+      - cloud_image_qemu_info.format == cloud_image_expected_format
+      - cloud_image_qemu_info['virtual-size'] | int >= cloud_image_min_size_bytes | int
+    fail_msg: "Output image did not pass qemu-img validation."
+    quiet: true
+  when: cloud_image_enabled | bool
+
+- name: Set output image ownership and mode
+  ansible.builtin.file:
+    path: "{{ cloud_image_output_qcow2 }}"
+    owner: "{{ cloud_image_owner if cloud_image_owner | trim | length > 0 else omit }}"
+    group: "{{ cloud_image_group if cloud_image_group | trim | length > 0 else omit }}"
+    mode: "{{ cloud_image_mode }}"
+  when: cloud_image_enabled | bool
+
+- name: Ensure Incus metadata directory exists
+  ansible.builtin.file:
+    path: "{{ cloud_image_incus_metadata_dir }}"
+    state: directory
+    mode: "0755"
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_incus_metadata_enabled | bool
+
+- name: Render Incus metadata
+  ansible.builtin.template:
+    src: metadata.yaml.j2
+    dest: "{{ cloud_image_incus_metadata_dir }}/metadata.yaml"
+    mode: "0644"
+  register: cloud_image_incus_metadata_file
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_incus_metadata_enabled | bool
+
+- name: Inspect Incus metadata tarball
+  ansible.builtin.stat:
+    path: "{{ cloud_image_incus_metadata_tarball }}"
+  register: cloud_image_incus_metadata_tarball_stat
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_incus_metadata_enabled | bool
+
+- name: Create Incus metadata tarball
+  ansible.builtin.command:
+    argv:
+      - tar
+      - -C
+      - "{{ cloud_image_incus_metadata_dir }}"
+      - -cJf
+      - "{{ cloud_image_incus_metadata_tarball }}"
+      - metadata.yaml
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_incus_metadata_enabled | bool
+    - cloud_image_incus_metadata_file.changed or not cloud_image_incus_metadata_tarball_stat.stat.exists
+
+- name: Publish cloud image artifact facts
+  ansible.builtin.set_fact:
+    cloud_image_result:
+      output_qcow2: "{{ cloud_image_output_qcow2 }}"
+      output_format: "{{ cloud_image_qemu_info.format }}"
+      output_virtual_size: "{{ cloud_image_qemu_info['virtual-size'] }}"
+      incus_metadata_dir: "{{ cloud_image_incus_metadata_dir if cloud_image_incus_metadata_enabled | bool else '' }}"
+      incus_metadata_tarball: >-
+        {{
+          cloud_image_incus_metadata_tarball
+          if cloud_image_incus_metadata_enabled | bool
+          else ''
+        }}
+  when: cloud_image_enabled | bool
+
+- name: Publish cloud image artifact stats
+  ansible.builtin.set_stats:
+    data:
+      cloud_image_result: "{{ cloud_image_result }}"
+  when: cloud_image_enabled | bool

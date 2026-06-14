@@ -14,9 +14,19 @@ Planned and initial roles include:
 - `lit.rhel.selinux`  
   Manage SELinux policy and mode (enforcing/permissive/disabled) in an
   idempotent way, using `ansible.posix.selinux`.
-- `lit.rhel.automatic_updates`  
+- `lit.rhel.automatic_updates`
   Schedule weekly OS updates via cron (dnf/yum) with configurable timing and
   logging.
+- `lit.rhel.rhsm`
+  Register or unregister RHEL systems with RHSM or Satellite.
+- `lit.rhel.repos`
+  Enable RHEL repository sources such as RHSM-managed repositories, CodeReady,
+  custom repos, and EPEL policy.
+- `lit.rhel.cloud_image`
+  Build reusable unregistered RHEL qcow2 cloud image artifacts for later
+  hypervisor import.
+- `lit.rhel.virtual_guest`
+  Configure reusable RHEL virtual machine guest baseline packages and services.
 
 Further roles (baseline, users, patching, etc.) will be added over time.
 

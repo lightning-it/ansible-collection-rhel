@@ -1,0 +1,42 @@
+---
+- name: Prechecks
+  ansible.builtin.import_tasks: assert.yml
+  tags: always
+
+- name: Load OS-specific virtual guest defaults
+  ansible.builtin.include_vars:
+    file: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+  when: virtual_guest_enabled | bool
+  tags: always
+
+- name: Skip virtual guest role when disabled
+  ansible.builtin.debug:
+    msg: "Virtual guest baseline skipped because virtual_guest_enabled=false."
+  changed_when: false
+  when: not virtual_guest_enabled | bool
+  tags: always
+
+- name: Ensure virtual guest packages are installed
+  ansible.builtin.package:
+    name: "{{ virtual_guest_packages }}"
+    state: present
+  when:
+    - virtual_guest_enabled | bool
+    - virtual_guest_manage_packages | bool
+    - virtual_guest_packages | length > 0
+  tags:
+    - packages
+    - virtual_guest
+
+- name: Ensure qemu guest agent is enabled and running
+  ansible.builtin.systemd:
+    name: "{{ virtual_guest_qemu_guest_agent_service }}"
+    enabled: true
+    state: started
+  when:
+    - virtual_guest_enabled | bool
+    - virtual_guest_manage_qemu_guest_agent | bool
+    - "'qemu-guest-agent' in virtual_guest_packages"
+  tags:
+    - qemu_guest_agent
+    - virtual_guest

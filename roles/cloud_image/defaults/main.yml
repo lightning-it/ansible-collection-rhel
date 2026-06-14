@@ -1,0 +1,49 @@
+---
+cloud_image_enabled: true
+
+# Exactly one source must be configured: either an existing qcow2 path or a download URL.
+cloud_image_source_path: ""
+cloud_image_download_url: ""
+cloud_image_download_headers: {}
+cloud_image_download_validate_certs: true
+cloud_image_download_force: false
+cloud_image_download_timeout: 1800
+cloud_image_download_dest: "{{ cloud_image_work_dir }}/source.qcow2"
+
+cloud_image_work_dir: /srv/rhel-cloud-image
+cloud_image_output_dir: /srv/incus/images
+cloud_image_output_name: rhel-10-cloud.qcow2
+cloud_image_output_qcow2: "{{ cloud_image_output_dir }}/{{ cloud_image_output_name }}"
+cloud_image_owner: ""
+cloud_image_group: ""
+cloud_image_mode: "0644"
+
+cloud_image_expected_format: qcow2
+cloud_image_min_size_bytes: 1073741824
+cloud_image_checksum: ""
+cloud_image_force_rebuild: false
+
+cloud_image_resize_enabled: true
+cloud_image_resize_size: +1G
+
+cloud_image_customize_enabled: true
+cloud_image_customize_hostname: ""
+cloud_image_customize_timezone: ""
+cloud_image_customize_packages: []
+cloud_image_customize_ssh_user: cloud-user
+cloud_image_customize_ssh_authorized_keys: []
+cloud_image_customize_run_commands: []
+cloud_image_customize_firstboot_commands: []
+cloud_image_customize_clean_rhsm: true
+cloud_image_customize_scrub_machine_id: true
+cloud_image_customize_truncate_logs: true
+cloud_image_customize_selinux_relabel: false
+
+cloud_image_incus_metadata_enabled: true
+cloud_image_incus_metadata_dir: "{{ cloud_image_work_dir }}/incus-metadata"
+cloud_image_incus_metadata_tarball: "{{ cloud_image_work_dir }}/metadata.tar.xz"
+cloud_image_incus_architecture: x86_64
+cloud_image_incus_os: RHEL
+cloud_image_incus_release: "10"
+cloud_image_incus_description: RHEL 10 cloud image
+cloud_image_incus_creation_date: 0

@@ -1,0 +1,5 @@
+---
+virtual_guest_packages_default:
+  - cloud-utils-growpart
+  - python3
+  - qemu-guest-agent

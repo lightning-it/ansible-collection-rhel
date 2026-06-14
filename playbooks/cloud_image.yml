@@ -1,0 +1,8 @@
+---
+- name: Build RHEL cloud image artifact
+  hosts: "{{ cloud_image_target | default('localhost') }}"
+  become: true
+  gather_facts: false
+
+  roles:
+    - role: lit.rhel.cloud_image

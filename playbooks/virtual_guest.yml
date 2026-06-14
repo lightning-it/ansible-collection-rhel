@@ -1,0 +1,7 @@
+---
+- name: Configure RHEL virtual guests
+  hosts: "{{ virtual_guest_target | default('all') }}"
+  become: true
+  gather_facts: true
+  roles:
+    - role: lit.rhel.virtual_guest
