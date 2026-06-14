@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2086,SC2154
 set -eo pipefail
 
 # Run all non-*heavy Molecule scenarios for the current collection
@@ -89,24 +90,7 @@ bash scripts/wunder-devtools-ee.sh bash -c '
   export ANSIBLE_COLLECTIONS_PATH="${COLLECTIONS_DIR}:/usr/share/ansible/collections"
 
   # -------------------------------------------------------------
-  # 2) Install declared dependencies into the SAME per-run dir
-  # -------------------------------------------------------------
-  dep_specs=()
-  if [ -f /workspace/galaxy.yml ]; then
-    while IFS= read -r dep_spec; do
-      dep_specs+=("$dep_spec")
-    done < <(bash /workspace/scripts/devtools-galaxy.sh dependencies /workspace/galaxy.yml || true)
-  fi
-
-  for dep_spec in "${dep_specs[@]}"; do
-    if [ -n "$dep_spec" ]; then
-      echo "Installing dependency ${dep_spec} into ${COLLECTIONS_DIR}..."
-      ansible-galaxy collection install "$dep_spec" -p "${COLLECTIONS_DIR}" --force
-    fi
-  done
-
-  # -------------------------------------------------------------
-  # 3) Configure Ansible env for Molecule
+  # 2) Configure Ansible env for Molecule
   # -------------------------------------------------------------
   if [ -f /workspace/ansible.cfg ]; then
     export ANSIBLE_CONFIG=/workspace/ansible.cfg
@@ -116,7 +100,7 @@ bash scripts/wunder-devtools-ee.sh bash -c '
   export DOCKER_HOST="${DOCKER_HOST:-unix:///var/run/docker.sock}"
 
   # -------------------------------------------------------------
-  # 4) Discover scenarios
+  # 3) Discover scenarios
   # -------------------------------------------------------------
   scenarios=()
 
@@ -124,7 +108,7 @@ bash scripts/wunder-devtools-ee.sh bash -c '
     if [ -d "molecule/$scenario_filter" ] && [ -f "molecule/$scenario_filter/molecule.yml" ]; then
       scenarios+=("$scenario_filter")
     else
-      echo "ERROR: Requested scenario ${scenario_filter} not found under molecule/." >&2
+      echo "ERROR: Requested scenario '${scenario_filter}' not found under molecule/." >&2
       exit 1
     fi
   else
@@ -133,11 +117,7 @@ bash scripts/wunder-devtools-ee.sh bash -c '
         scen="${dir##*/}"
         case "$scen" in
           *_heavy)
-            echo "Skipping heavy scenario ${scen} in devtools-molecule.sh (run manually via dedicated script)."
-            ;;
-          xrdp-rhel9|xrdp-rhel10)
-            echo "Skipping Incus VM scenario ${scen} in unfiltered devtools-molecule.sh."
-            echo "Run explicitly with scripts/devtools-molecule.sh ${scen}."
+            echo "Skipping heavy scenario '\''${scen}'\'' in devtools-molecule.sh (run manually via dedicated script)."
             ;;
           *)
             scenarios+=("$scen")
