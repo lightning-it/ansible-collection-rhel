@@ -39,6 +39,13 @@ cloud_image_customize_scrub_machine_id: true
 cloud_image_customize_truncate_logs: true
 cloud_image_customize_selinux_relabel: false
 
+cloud_image_incus_vm_cloud_init_enabled: false
+cloud_image_incus_vm_cloud_init_datasources:
+  - LXD
+  - NoCloud
+  - ConfigDrive
+  - None
+
 cloud_image_incus_metadata_enabled: true
 cloud_image_incus_metadata_dir: "{{ cloud_image_work_dir }}/incus-metadata"
 cloud_image_incus_metadata_tarball: "{{ cloud_image_work_dir }}/metadata.tar.xz"
@@ -46,4 +53,4 @@ cloud_image_incus_architecture: x86_64
 cloud_image_incus_os: RHEL
 cloud_image_incus_release: "10"
 cloud_image_incus_description: RHEL 10 cloud image
-cloud_image_incus_creation_date: 0
+cloud_image_incus_creation_date: "{{ lookup('ansible.builtin.pipe', 'date +%s') }}"

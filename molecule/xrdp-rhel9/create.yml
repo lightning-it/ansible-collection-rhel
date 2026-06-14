@@ -11,8 +11,10 @@
         lookup('env', 'INCUS_INSTANCE_NAME')
         | default('lit-xrdp-rhel9-' ~ lookup('pipe', 'date +%Y%m%d%H%M%S'), true)
       }}
+    xrdp_molecule_project_directory: >-
+      {{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | default(playbook_dir ~ '/../..', true) }}
     xrdp_molecule_inventory_file: >-
-      {{ molecule_project_directory }}/deploy/incus/generated/{{ xrdp_molecule_instance_name }}.ini
+      {{ xrdp_molecule_project_directory }}/deploy/incus/generated/{{ xrdp_molecule_instance_name }}.ini
     xrdp_molecule_instance_config: "{{ lookup('env', 'MOLECULE_INSTANCE_CONFIG') }}"
     xrdp_molecule_name_file: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/incus-instance-name"
   tasks:
@@ -25,7 +27,7 @@
     - name: Create xrdp Incus VM
       ansible.builtin.command:
         argv:
-          - "{{ molecule_project_directory }}/deploy/incus/scripts/create.sh"
+          - "{{ xrdp_molecule_project_directory }}/deploy/incus/scripts/create.sh"
           - --version
           - "{{ xrdp_molecule_rhel_major_version }}"
           - --mode

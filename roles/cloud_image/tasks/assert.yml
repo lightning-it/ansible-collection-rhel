@@ -35,6 +35,9 @@
       - cloud_image_customize_scrub_machine_id is boolean
       - cloud_image_customize_truncate_logs is boolean
       - cloud_image_customize_selinux_relabel is boolean
+      - cloud_image_incus_vm_cloud_init_enabled is boolean
+      - cloud_image_incus_vm_cloud_init_datasources is sequence
+      - cloud_image_incus_vm_cloud_init_datasources is not string
       - cloud_image_incus_metadata_enabled is boolean
       - cloud_image_incus_metadata_dir | trim | length > 0
       - cloud_image_incus_metadata_tarball | trim | length > 0

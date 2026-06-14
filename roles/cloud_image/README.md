@@ -41,6 +41,11 @@ as `qemu-img`, `guestfs-tools`, and `libguestfs`.
 - `cloud_image_customize_run_commands`: optional commands to run inside the
   image.
 - `cloud_image_customize_firstboot_commands`: optional first boot commands.
+- `cloud_image_incus_vm_cloud_init_enabled`: prepare the image for Incus VM
+  cloud-init usage. This enables a datasource list suitable for Incus and wires
+  `cloud-init.target` into `multi-user.target`. Default: `false`.
+- `cloud_image_incus_vm_cloud_init_datasources`: datasource list written when
+  `cloud_image_incus_vm_cloud_init_enabled` is `true`.
 - `cloud_image_customize_clean_rhsm`: remove RHSM identity material from the
   image. Default: `true`.
 - `cloud_image_incus_metadata_enabled`: create a metadata directory and tarball
