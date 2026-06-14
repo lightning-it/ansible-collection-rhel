@@ -3,6 +3,8 @@
   hosts: localhost
   gather_facts: false
   vars:
+    xrdp_molecule_project_directory: >-
+      {{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | default(playbook_dir ~ '/../..', true) }}
     xrdp_molecule_instance_config: "{{ lookup('env', 'MOLECULE_INSTANCE_CONFIG') }}"
     xrdp_molecule_name_file: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/incus-instance-name"
   tasks:
@@ -20,7 +22,7 @@
     - name: Destroy configured xrdp Incus VMs
       ansible.builtin.command:
         argv:
-          - "{{ molecule_project_directory }}/deploy/incus/scripts/destroy.sh"
+          - "{{ xrdp_molecule_project_directory }}/deploy/incus/scripts/destroy.sh"
           - --name
           - "{{ item.instance }}"
       loop: "{{ xrdp_molecule_instances | default([]) }}"
@@ -29,7 +31,7 @@
     - name: Destroy fallback xrdp Incus VM
       ansible.builtin.command:
         argv:
-          - "{{ molecule_project_directory }}/deploy/incus/scripts/destroy.sh"
+          - "{{ xrdp_molecule_project_directory }}/deploy/incus/scripts/destroy.sh"
           - --name
           - "{{ xrdp_molecule_fallback_instance_name }}"
       changed_when: true

@@ -268,6 +268,41 @@
     - cloud_image_rebuild_needed | bool
     - cloud_image_customize_enabled | bool
 
+- name: Configure cloud-init datasource list for Incus VMs
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --write
+      - >-
+        /etc/cloud/cloud.cfg.d/99-incus-datasource.cfg:datasource_list:
+        {{ cloud_image_incus_vm_cloud_init_datasources | to_json }}
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+    - cloud_image_incus_vm_cloud_init_enabled | bool
+
+- name: Ensure cloud-init target starts for Incus VMs
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --run-command
+      - >-
+        mkdir -p /etc/systemd/system/multi-user.target.wants;
+        ln -sfn /usr/lib/systemd/system/cloud-init.target
+        /etc/systemd/system/multi-user.target.wants/cloud-init.target
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+    - cloud_image_incus_vm_cloud_init_enabled | bool
+
 - name: Remove RHSM identity from output image
   ansible.builtin.command:
     argv:
