@@ -1,3 +1,9 @@
+## [1.16.2](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.16.1...v1.16.2) (2026-06-14)
+
+### Bug Fixes
+
+* update dependency community.general to v11.4.9 ([#96](https://github.com/lightning-it/ansible-collection-rhel/issues/96)) ([46adcad](https://github.com/lightning-it/ansible-collection-rhel/commit/46adcade85392b1cd20b5813b5aabba745245bc1))
+
 ## [1.16.1](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.16.0...v1.16.1) (2026-06-14)
 
 ### Bug Fixes
