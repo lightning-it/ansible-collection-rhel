@@ -1,3 +1,9 @@
+## [1.16.1](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.16.0...v1.16.1) (2026-06-14)
+
+### Bug Fixes
+
+* **cloud_image:** support Incus VM cloud-init readiness ([#94](https://github.com/lightning-it/ansible-collection-rhel/issues/94)) ([a93a061](https://github.com/lightning-it/ansible-collection-rhel/commit/a93a061210d548bea1178c800962371112f4e982))
+
 ## [1.16.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.15.0...v1.16.0) (2026-06-14)
 
 ### Features
