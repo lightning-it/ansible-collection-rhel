@@ -28,6 +28,21 @@
     - packages
     - virtual_guest
 
+- name: Ensure qemu guest agent packages are installed
+  ansible.builtin.package:
+    name: "{{ virtual_guest_qemu_guest_agent_packages }}"
+    state: present
+  when:
+    - virtual_guest_enabled | bool
+    - virtual_guest_manage_packages | bool
+    - virtual_guest_manage_qemu_guest_agent | bool
+    - virtual_guest_qemu_guest_agent_packages | length > 0
+    - ansible_virtualization_type | lower in virtual_guest_qemu_guest_agent_virtualization_types
+  tags:
+    - packages
+    - qemu_guest_agent
+    - virtual_guest
+
 - name: Ensure qemu guest agent is enabled and running
   ansible.builtin.systemd:
     name: "{{ virtual_guest_qemu_guest_agent_service }}"
@@ -36,7 +51,35 @@
   when:
     - virtual_guest_enabled | bool
     - virtual_guest_manage_qemu_guest_agent | bool
-    - "'qemu-guest-agent' in virtual_guest_packages"
+    - ansible_virtualization_type | lower in virtual_guest_qemu_guest_agent_virtualization_types
   tags:
     - qemu_guest_agent
+    - virtual_guest
+
+- name: Ensure VMware guest agent packages are installed
+  ansible.builtin.package:
+    name: "{{ virtual_guest_vmware_guest_agent_packages }}"
+    state: present
+  when:
+    - virtual_guest_enabled | bool
+    - virtual_guest_manage_packages | bool
+    - virtual_guest_manage_vmware_guest_agent | bool
+    - virtual_guest_vmware_guest_agent_packages | length > 0
+    - ansible_virtualization_type | lower in virtual_guest_vmware_guest_agent_virtualization_types
+  tags:
+    - packages
+    - vmware_guest_agent
+    - virtual_guest
+
+- name: Ensure VMware guest agent is enabled and running
+  ansible.builtin.systemd:
+    name: "{{ virtual_guest_vmware_guest_agent_service }}"
+    enabled: true
+    state: started
+  when:
+    - virtual_guest_enabled | bool
+    - virtual_guest_manage_vmware_guest_agent | bool
+    - ansible_virtualization_type | lower in virtual_guest_vmware_guest_agent_virtualization_types
+  tags:
+    - vmware_guest_agent
     - virtual_guest

@@ -19,9 +19,19 @@
       - virtual_guest_supported_majors is not string
       - virtual_guest_manage_packages is boolean
       - virtual_guest_manage_qemu_guest_agent is boolean
+      - virtual_guest_manage_vmware_guest_agent is boolean
       - virtual_guest_packages is sequence
       - virtual_guest_packages is not string
+      - virtual_guest_qemu_guest_agent_packages is sequence
+      - virtual_guest_qemu_guest_agent_packages is not string
       - virtual_guest_qemu_guest_agent_service | default('', true) | trim | length > 0
+      - virtual_guest_qemu_guest_agent_virtualization_types is sequence
+      - virtual_guest_qemu_guest_agent_virtualization_types is not string
+      - virtual_guest_vmware_guest_agent_packages is sequence
+      - virtual_guest_vmware_guest_agent_packages is not string
+      - virtual_guest_vmware_guest_agent_service | default('', true) | trim | length > 0
+      - virtual_guest_vmware_guest_agent_virtualization_types is sequence
+      - virtual_guest_vmware_guest_agent_virtualization_types is not string
     fail_msg: "Invalid configuration for lit.rhel.virtual_guest."
     quiet: true
   when: virtual_guest_enabled | bool

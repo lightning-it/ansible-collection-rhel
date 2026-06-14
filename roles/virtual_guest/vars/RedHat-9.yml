@@ -2,4 +2,9 @@
 virtual_guest_packages_default:
   - cloud-utils-growpart
   - python3
+
+virtual_guest_qemu_guest_agent_packages_default:
   - qemu-guest-agent
+
+virtual_guest_vmware_guest_agent_packages_default:
+  - open-vm-tools
