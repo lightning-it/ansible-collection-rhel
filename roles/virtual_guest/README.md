@@ -10,7 +10,7 @@ required.
 ## Scope
 
 - Install VM guest baseline packages.
-- Enable and start `qemu-guest-agent`.
+- Enable and start the matching guest agent for the detected virtualization type.
 - Keep guest behavior reusable across future VM workloads.
 
 ## Variables
@@ -18,8 +18,14 @@ required.
 - `virtual_guest_enabled`: enable or skip the role. Default: `true`.
 - `virtual_guest_packages`: packages to install. Defaults are OS-specific.
 - `virtual_guest_manage_packages`: install `virtual_guest_packages`. Default: `true`.
-- `virtual_guest_manage_qemu_guest_agent`: enable/start guest agent. Default: `true`.
-- `virtual_guest_qemu_guest_agent_service`: guest agent service name.
+- `virtual_guest_manage_qemu_guest_agent`: install and enable/start QEMU guest agent on QEMU/KVM guests. Default: `true`.
+- `virtual_guest_qemu_guest_agent_packages`: QEMU guest agent packages.
+- `virtual_guest_qemu_guest_agent_service`: QEMU guest agent service name.
+- `virtual_guest_qemu_guest_agent_virtualization_types`: virtualization types treated as QEMU/KVM guests.
+- `virtual_guest_manage_vmware_guest_agent`: install and enable/start VMware guest agent on VMware guests. Default: `true`.
+- `virtual_guest_vmware_guest_agent_packages`: VMware guest agent packages.
+- `virtual_guest_vmware_guest_agent_service`: VMware guest agent service name.
+- `virtual_guest_vmware_guest_agent_virtualization_types`: virtualization types treated as VMware guests.
 
 ## Example
 

@@ -8,4 +8,14 @@ virtual_guest_manage_packages: true
 virtual_guest_packages: "{{ virtual_guest_packages_default | default([]) }}"
 
 virtual_guest_manage_qemu_guest_agent: true
+virtual_guest_qemu_guest_agent_packages: "{{ virtual_guest_qemu_guest_agent_packages_default | default([]) }}"
 virtual_guest_qemu_guest_agent_service: qemu-guest-agent
+virtual_guest_qemu_guest_agent_virtualization_types:
+  - kvm
+  - qemu
+
+virtual_guest_manage_vmware_guest_agent: true
+virtual_guest_vmware_guest_agent_packages: "{{ virtual_guest_vmware_guest_agent_packages_default | default([]) }}"
+virtual_guest_vmware_guest_agent_service: vmtoolsd
+virtual_guest_vmware_guest_agent_virtualization_types:
+  - vmware
