@@ -29,7 +29,11 @@
     - repos_proxy_url | length > 0
 
 - name: Check if subscription-manager is present (for RHSM repo enablement)
-  ansible.builtin.command: "command -v subscription-manager"
+  ansible.builtin.command:
+    argv:
+      - /bin/sh
+      - -c
+      - command -v subscription-manager
   register: _sm_present
   changed_when: false
   failed_when: false

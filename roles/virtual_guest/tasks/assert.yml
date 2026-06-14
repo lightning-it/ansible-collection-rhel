@@ -1,0 +1,27 @@
+---
+- name: Assert supported operating system
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == 'RedHat'
+      - ansible_distribution == 'RedHat'
+      - (ansible_distribution_major_version | string) in virtual_guest_supported_majors
+    fail_msg: >-
+      lit.rhel.virtual_guest supports Red Hat Enterprise Linux
+      {{ virtual_guest_supported_majors | join('/') }} only.
+    quiet: true
+  when: virtual_guest_enabled | bool
+
+- name: Assert virtual guest configuration
+  ansible.builtin.assert:
+    that:
+      - virtual_guest_enabled is boolean
+      - virtual_guest_supported_majors is sequence
+      - virtual_guest_supported_majors is not string
+      - virtual_guest_manage_packages is boolean
+      - virtual_guest_manage_qemu_guest_agent is boolean
+      - virtual_guest_packages is sequence
+      - virtual_guest_packages is not string
+      - virtual_guest_qemu_guest_agent_service | default('', true) | trim | length > 0
+    fail_msg: "Invalid configuration for lit.rhel.virtual_guest."
+    quiet: true
+  when: virtual_guest_enabled | bool

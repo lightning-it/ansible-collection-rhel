@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  role_name: cloud_image
+  author: Lightning IT
+  description: Build reusable RHEL qcow2 cloud image artifacts.
+  license: MIT
+  min_ansible_version: "2.18"
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+        - "10"
+dependencies: []

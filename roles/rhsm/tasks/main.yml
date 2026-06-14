@@ -1,8 +1,10 @@
 ---
-- name: Gather installed packages (subscription-manager check)
+- name: Gather installed packages for RHSM present state
   ansible.builtin.package_facts:
     manager: auto
-  when: rhsm_method in ['rhsm', 'satellite']
+  when:
+    - rhsm_method in ['rhsm', 'satellite']
+    - rhsm_state == 'present'
 
 - name: Ensure subscription-manager is present
   ansible.builtin.package:
@@ -10,7 +12,19 @@
     state: present
   when:
     - rhsm_method in ['rhsm', 'satellite']
+    - rhsm_state == 'present'
     - "'subscription-manager' not in ansible_facts.packages"
+
+- name: Check if subscription-manager is available
+  ansible.builtin.command:
+    argv:
+      - /bin/sh
+      - -c
+      - command -v subscription-manager
+  register: rhsm_subscription_manager_cmd
+  changed_when: false
+  failed_when: rhsm_subscription_manager_cmd.rc != 0
+  when: rhsm_method in ['rhsm', 'satellite']
 
 - name: Configure Satellite/RHSM endpoints when provided
   community.general.ini_file:
@@ -30,65 +44,152 @@
       value: "{{ rhsm_baseurl }}"
   when:
     - rhsm_method == 'satellite'
+    - rhsm_state == 'present'
     - item.value | default('') | length > 0
 
-- name: Check current registration status
-  ansible.builtin.command: subscription-manager status
-  register: rhsm_status
+- name: Check current RHSM identity
+  ansible.builtin.command:
+    cmd: subscription-manager identity
+  register: rhsm_identity
   changed_when: false
   failed_when: false
   when: rhsm_method in ['rhsm', 'satellite']
 
 - name: Set fact registration state
   ansible.builtin.set_fact:
-    rhsm_registered: "{{ rhsm_status.rc == 0 }}"
+    rhsm_registered: "{{ rhsm_identity.rc == 0 }}"
+  changed_when: false
   when: rhsm_method in ['rhsm', 'satellite']
 
-- name: Compute auto-attach flag
-  ansible.builtin.set_fact:
-    rhsm_attach_flag: >-
-      {{ '--auto-attach'
-         if rhsm_auto_attach | bool
-         else '--no-auto-attach' }}
-  when: rhsm_method in ['rhsm', 'satellite']
-
-- name: Register using activation key
-  ansible.builtin.command: >-
-    subscription-manager register
-    --org {{ rhsm_org }}
-    --activationkey {{ rhsm_activation_key }}
-  register: rhsm_register
-  changed_when: rhsm_register.rc == 0
+- name: Ensure RHSM registration is absent
   when:
     - rhsm_method in ['rhsm', 'satellite']
-    - not rhsm_registered | default(false)
-    - rhsm_org | length > 0
-    - rhsm_activation_key | length > 0
+    - rhsm_state == 'absent'
+  block:
+    - name: Check for stale RHSM consumer certificate
+      ansible.builtin.stat:
+        path: /etc/pki/consumer/cert.pem
+      register: rhsm_consumer_cert
 
-- name: Register using username/password
-  ansible.builtin.command: >-
-    subscription-manager register
-    --username {{ rhsm_username }}
-    --password {{ rhsm_password }}
-    {{ rhsm_attach_flag }}
-  register: rhsm_register_pw
-  changed_when: rhsm_register_pw.rc == 0
-  no_log: true
+    - name: Find stale RHSM entitlement certificates
+      ansible.builtin.find:
+        paths: /etc/pki/entitlement
+        patterns: "*.pem"
+        file_type: file
+      register: rhsm_entitlement_certs
+      failed_when: false
+
+    - name: Compute RHSM cleanup requirement
+      ansible.builtin.set_fact:
+        rhsm_cleanup_needed: >-
+          {{
+            (rhsm_registered | default(false) | bool)
+            or (rhsm_consumer_cert.stat.exists | default(false))
+            or ((rhsm_entitlement_certs.files | default([])) | length > 0)
+          }}
+      changed_when: false
+
+    - name: Unregister host from RHSM
+      ansible.builtin.command:
+        cmd: subscription-manager unregister
+      changed_when: true
+      when: rhsm_registered | default(false) | bool
+
+    - name: Clean local RHSM identity and entitlement material
+      ansible.builtin.command:
+        cmd: subscription-manager clean
+      changed_when: true
+      when:
+        - rhsm_clean_on_absent | bool
+        - rhsm_cleanup_needed | bool
+
+- name: Ensure RHSM registration is present
   when:
     - rhsm_method in ['rhsm', 'satellite']
-    - not rhsm_registered | default(false)
-    - rhsm_username | length > 0
-    - rhsm_password | length > 0
+    - rhsm_state == 'present'
+  block:
+    - name: Validate RHSM credentials when registration is needed
+      ansible.builtin.assert:
+        that:
+          - >-
+            (rhsm_org | length > 0 and rhsm_activation_key | length > 0)
+            or (rhsm_username | length > 0 and rhsm_password | length > 0)
+        fail_msg: >-
+          RHSM registration requires either rhsm_org plus rhsm_activation_key,
+          or rhsm_username plus rhsm_password.
+        quiet: true
+      when:
+        - (not rhsm_registered | default(false) | bool) or (rhsm_force_register | bool)
+      no_log: true
 
-- name: Ensure auto-attach is applied when already registered
-  ansible.builtin.command: subscription-manager attach --auto
-  register: rhsm_attach
-  changed_when: "'Installed Product Current' in rhsm_attach.stdout"
-  failed_when: false
-  when:
-    - rhsm_method in ['rhsm', 'satellite']
-    - rhsm_registered | default(false)
-    - rhsm_auto_attach | bool
+    - name: Unregister existing RHSM identity when force registration is requested
+      ansible.builtin.command:
+        cmd: subscription-manager unregister
+      changed_when: true
+      when:
+        - rhsm_registered | default(false) | bool
+        - rhsm_force_register | bool
+
+    - name: Clean existing RHSM identity after force unregister
+      ansible.builtin.command:
+        cmd: subscription-manager clean
+      changed_when: true
+      when:
+        - rhsm_registered | default(false) | bool
+        - rhsm_force_register | bool
+
+    - name: Register using activation key
+      ansible.builtin.command:
+        argv:
+          - subscription-manager
+          - register
+          - --org
+          - "{{ rhsm_org }}"
+          - --activationkey
+          - "{{ rhsm_activation_key }}"
+      register: rhsm_register
+      changed_when: rhsm_register.rc == 0
+      no_log: true
+      when:
+        - (not rhsm_registered | default(false) | bool) or (rhsm_force_register | bool)
+        - rhsm_org | length > 0
+        - rhsm_activation_key | length > 0
+
+    - name: Register using username/password
+      ansible.builtin.command:
+        argv:
+          - subscription-manager
+          - register
+          - --username
+          - "{{ rhsm_username }}"
+          - --password
+          - "{{ rhsm_password }}"
+          - "{{ '--auto-attach' if (rhsm_auto_attach | bool) else '--no-auto-attach' }}"
+      register: rhsm_register_pw
+      changed_when: rhsm_register_pw.rc == 0
+      no_log: true
+      when:
+        - (not rhsm_registered | default(false) | bool) or (rhsm_force_register | bool)
+        - rhsm_org | length == 0 or rhsm_activation_key | length == 0
+        - rhsm_username | length > 0
+        - rhsm_password | length > 0
+
+    - name: Check current registration status
+      ansible.builtin.command:
+        cmd: subscription-manager status
+      register: rhsm_status
+      changed_when: false
+      failed_when: false
+
+    - name: Ensure auto-attach is applied when already registered
+      ansible.builtin.command:
+        cmd: subscription-manager attach --auto
+      register: rhsm_attach
+      changed_when: "'Installed Product Current' in rhsm_attach.stdout"
+      failed_when: false
+      when:
+        - rhsm_registered | default(false) | bool
+        - rhsm_auto_attach | bool
 
 - name: Skip RHSM tasks when method is none
   ansible.builtin.debug:
