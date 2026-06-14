@@ -1,27 +1,35 @@
 ---
 argument_specs:
   main:
-    short_description: Install and configure XRDP server on RHEL (without enabling repos).
+    short_description: Install and configure XRDP server on RHEL 9 and RHEL 10 without enabling repos.
     options:
       xrdp_enabled: {type: bool, default: true}
       xrdp_fail_if_unavailable: {type: bool, default: true}
       xrdp_listen_address: {type: str, default: "0.0.0.0"}
       xrdp_listen_port: {type: int, default: 3389}
+      xrdp_service_manage: {type: bool, default: true}
+      xrdp_service_enabled: {type: bool, default: true}
+      xrdp_service_state: {type: str, default: started, choices: [started, stopped, reloaded, restarted]}
+      xrdp_config_manage: {type: bool, default: true}
       xrdp_firewalld_manage: {type: bool, default: true}
-      xrdp_firewalld_zone: {type: str, default: "admin"}
-      xrdp_firewalld_state: {type: str, default: "enabled"}
+      xrdp_firewalld_zone: {type: str, default: "public"}
+      xrdp_firewalld_state: {type: str, default: "enabled", choices: [enabled, disabled]}
       xrdp_selinux_manage: {type: bool, default: true}
       xrdp_selinux_type: {type: str, default: "ms-wbt-server"}
       xrdp_selinux_proto: {type: str, default: "tcp"}
-      xrdp_desktop: {type: str, default: "auto"}
+      xrdp_desktop: {type: str, default: "auto", choices: [auto, gnome, xfce, custom]}
       xrdp_install_desktop: {type: bool, default: false}
       xrdp_custom_startwm: {type: str, default: ""}
+      xrdp_security_layer: {type: str, default: "negotiate", choices: [tls, rdp, negotiate]}
+      xrdp_ssl_protocols: {type: str, default: "TLSv1.2, TLSv1.3"}
+      xrdp_allow_multimon: {type: bool, default: true}
+      xrdp_log_file: {type: str, default: "/var/log/xrdp.log"}
+      xrdp_log_level: {type: str, default: "INFO", choices: [CORE, ERROR, WARNING, INFO, DEBUG, TRACE]}
+      xrdp_enable_syslog: {type: bool, default: true}
       xrdp_tls_enable: {type: bool, default: true}
       xrdp_tls_cert_path: {type: str, default: "/etc/xrdp/cert.pem"}
       xrdp_tls_key_path: {type: str, default: "/etc/xrdp/key.pem"}
       xrdp_tls_generate_self_signed: {type: bool, default: true}
       xrdp_tls_subject: {type: str, default: "/CN={{ inventory_hostname }}"}
       xrdp_tls_days: {type: int, default: 825}
-      xrdp_packages: {type: list, elements: str}
-      xrdp_optional_packages: {type: list, elements: str}
       xrdp_no_log: {type: bool, default: false}

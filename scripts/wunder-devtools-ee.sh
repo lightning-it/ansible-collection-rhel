@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE="quay.io/l-it/ee-wunder-devtools-ubi9:v1.8.2"
+IMAGE="${WUNDER_DEVTOOLS_IMAGE:-quay.io/l-it/ee-wunder-devtools-ubi9:v1.8.3}"
+WUNDER_DEVTOOLS_LOCAL_CONTEXT="${WUNDER_DEVTOOLS_LOCAL_CONTEXT:-}"
+WUNDER_DEVTOOLS_LOCAL_IMAGE="${WUNDER_DEVTOOLS_LOCAL_IMAGE:-local/ee-wunder-devtools-ubi9:dev}"
 CONTAINER_HOME="${CONTAINER_HOME:-/tmp/wunder}"
 HOST_HOME_CACHE_ROOT="${XDG_CACHE_HOME:-$HOME/.cache}/wunder-devtools-ee/v2/home"
 HOST_HOME_CACHE_SCOPE="host-uid-$(id -u)"
@@ -50,6 +52,36 @@ podman_usable() {
   podman info >/dev/null 2>&1
 }
 
+image_exists() {
+  "$CONTAINER_BIN" image inspect "$1" >/dev/null 2>&1
+}
+
+build_local_image() {
+  local context="$1"
+  local dockerfile="${context}/Dockerfile"
+
+  if [ ! -f "$dockerfile" ]; then
+    fail_or_skip "WUNDER_DEVTOOLS_LOCAL_CONTEXT does not contain a Dockerfile: ${context}"
+  fi
+
+  "$CONTAINER_BIN" build \
+    -t "$WUNDER_DEVTOOLS_LOCAL_IMAGE" \
+    -f "$dockerfile" \
+    "$context"
+}
+
+realpath_portable() {
+  local path="$1"
+  if command -v python3 >/dev/null 2>&1; then
+    python3 - <<PY
+import os
+print(os.path.realpath("${path}"))
+PY
+    return
+  fi
+  printf '%s\n' "$path"
+}
+
 CONTAINER_BIN="${WUNDER_CONTAINER_ENGINE:-}"
 if [ -z "$CONTAINER_BIN" ]; then
   if docker_usable; then
@@ -67,6 +99,13 @@ case "$CONTAINER_BIN" in
     fail_or_skip "unsupported engine '$CONTAINER_BIN' (use podman|docker)"
     ;;
 esac
+
+if [ -n "$WUNDER_DEVTOOLS_LOCAL_CONTEXT" ]; then
+  IMAGE="$WUNDER_DEVTOOLS_LOCAL_IMAGE"
+  if [ "${WUNDER_DEVTOOLS_LOCAL_BUILD:-auto}" = "1" ] || ! image_exists "$IMAGE"; then
+    build_local_image "$WUNDER_DEVTOOLS_LOCAL_CONTEXT"
+  fi
+fi
 
 if [ "$CONTAINER_BIN" = "podman" ] && [ "$(uname -s)" = "Linux" ]; then
   WORKSPACE_MOUNT="${WORKSPACE_MOUNT}:Z"
@@ -99,15 +138,7 @@ elif [ -S /var/run/docker.sock ]; then
 fi
 
 if [ -n "$DOCKER_SOCKET" ]; then
-  DOCKER_SOCKET_REAL="$DOCKER_SOCKET"
-  if command -v python3 >/dev/null 2>&1; then
-    DOCKER_SOCKET_REAL="$(
-      python3 - <<PY
-import os
-print(os.path.realpath("${DOCKER_SOCKET}"))
-PY
-    )"
-  fi
+  DOCKER_SOCKET_REAL="$(realpath_portable "$DOCKER_SOCKET")"
 
   DOCKER_ARGS+=(-v "$DOCKER_SOCKET_REAL":/var/run/docker.sock)
   DOCKER_ARGS+=(-e DOCKER_HOST=unix:///var/run/docker.sock)
@@ -141,6 +172,30 @@ elif [ "${PODMAN_ROOTLESS}" = "1" ]; then
   DOCKER_ARGS+=(--user 0:0)
 fi
 
+INCUS_CONFIG_DIR="${INCUS_CONFIG_DIR:-$HOME/.config/incus}"
+if [ -d "$INCUS_CONFIG_DIR" ]; then
+  DOCKER_ARGS+=(-v "${INCUS_CONFIG_DIR}:${CONTAINER_HOME}/.config/incus:ro")
+fi
+
+INCUS_SOCKET_HOST="${INCUS_SOCKET:-}"
+if [[ "$INCUS_SOCKET_HOST" == unix://* ]]; then
+  INCUS_SOCKET_HOST="${INCUS_SOCKET_HOST#unix://}"
+fi
+if [ -z "$INCUS_SOCKET_HOST" ]; then
+  if [ -S /run/incus/unix.socket ]; then
+    INCUS_SOCKET_HOST="/run/incus/unix.socket"
+  elif [ -S /var/lib/incus/unix.socket ]; then
+    INCUS_SOCKET_HOST="/var/lib/incus/unix.socket"
+  elif [ -S "$HOME/.config/incus/unix.socket" ]; then
+    INCUS_SOCKET_HOST="$HOME/.config/incus/unix.socket"
+  fi
+fi
+if [ -n "$INCUS_SOCKET_HOST" ] && [ -S "$INCUS_SOCKET_HOST" ]; then
+  INCUS_SOCKET_REAL="$(realpath_portable "$INCUS_SOCKET_HOST")"
+  DOCKER_ARGS+=(-v "$INCUS_SOCKET_REAL":/var/lib/incus/unix.socket)
+  DOCKER_ARGS+=(-e INCUS_SOCKET=/var/lib/incus/unix.socket)
+fi
+
 if [ "$(uname -s)" = "Linux" ]; then
   DOCKER_ARGS+=(--add-host=host.docker.internal:host-gateway)
 fi
@@ -151,7 +206,8 @@ if [ "$CONTAINER_BIN" = "docker" ]; then
   else
     sanitize_docker_host_env
     if [ -z "${DOCKER_HOST:-}" ] && [ -S "/run/user/$(id -u)/podman/podman.sock" ]; then
-      export DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock"
+      podman_socket="/run/user/$(id -u)/podman/podman.sock"
+      export DOCKER_HOST="unix://${podman_socket}"
     fi
   fi
 fi
@@ -168,6 +224,16 @@ fi
   ${COLLECTION_NAME:+-e COLLECTION_NAME} \
   ${EXAMPLE_PLAYBOOK:+-e EXAMPLE_PLAYBOOK} \
   ${MOLECULE_NO_LOG:+-e MOLECULE_NO_LOG} \
+  ${INCUS_DIR:+-e INCUS_DIR} \
+  ${INCUS_MODE:+-e INCUS_MODE} \
+  ${INCUS_REMOTE:+-e INCUS_REMOTE} \
+  ${INCUS_RHEL_MAJOR_VERSION:+-e INCUS_RHEL_MAJOR_VERSION} \
+  ${INCUS_RHEL9_IMAGE:+-e INCUS_RHEL9_IMAGE} \
+  ${INCUS_RHEL10_IMAGE:+-e INCUS_RHEL10_IMAGE} \
+  ${INCUS_INSTANCE_NAME:+-e INCUS_INSTANCE_NAME} \
+  ${INCUS_SSH_PRIVATE_KEY:+-e INCUS_SSH_PRIVATE_KEY} \
+  ${INCUS_SSH_PUBLIC_KEY:+-e INCUS_SSH_PUBLIC_KEY} \
+  ${INCUS_SSH_PUBLIC_KEY_FILE:+-e INCUS_SSH_PUBLIC_KEY_FILE} \
   ${VAGRANT_SSH_HOST:+-e VAGRANT_SSH_HOST} \
   ${VAGRANT_SSH_PORT:+-e VAGRANT_SSH_PORT} \
   ${VAGRANT_SSH_USER:+-e VAGRANT_SSH_USER} \

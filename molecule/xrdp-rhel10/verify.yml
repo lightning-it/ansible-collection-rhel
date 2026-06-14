@@ -1,0 +1,125 @@
+---
+- name: Verify xrdp service on RHEL 10 VM
+  hosts: all
+  become: true
+  gather_facts: false
+  vars:
+    xrdp_molecule_port: 3389
+  tasks:
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+
+    - name: Assert xrdp service is enabled and active
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['xrdp.service'].status == 'enabled'
+          - ansible_facts.services['xrdp.service'].state == 'running'
+        fail_msg: "xrdp.service is not enabled and running."
+
+    - name: Check xrdp is listening on TCP port
+      ansible.builtin.command:
+        argv:
+          - bash
+          - -lc
+          - "ss -ltnp | grep -E '[:.]{{ xrdp_molecule_port }}[[:space:]]'"
+      register: xrdp_molecule_listener
+      changed_when: false
+
+    - name: Read firewalld public zone ports
+      ansible.builtin.command: firewall-cmd --zone=public --list-ports
+      register: xrdp_molecule_firewalld_ports
+      changed_when: false
+
+    - name: Assert xrdp firewall port is open
+      ansible.builtin.assert:
+        that:
+          - "'{{ xrdp_molecule_port }}/tcp' in xrdp_molecule_firewalld_ports.stdout.split()"
+        fail_msg: "firewalld public zone does not include {{ xrdp_molecule_port }}/tcp."
+
+- name: Verify xrdp with a real FreeRDP authentication attempt
+  hosts: localhost
+  gather_facts: false
+  vars:
+    xrdp_molecule_target: "{{ groups['all'] | first }}"
+    xrdp_molecule_rdp_host: "{{ hostvars[xrdp_molecule_target].ansible_host }}"
+    xrdp_molecule_port: 3389
+    xrdp_molecule_test_user: xrdptest
+    xrdp_molecule_password_file: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/xrdp-password"
+    xrdp_molecule_rdp_log: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/xfreerdp.log"
+  tasks:
+    - name: Ensure generated RDP password file exists
+      ansible.builtin.stat:
+        path: "{{ xrdp_molecule_password_file }}"
+      register: xrdp_molecule_password_stat
+
+    - name: Fail when generated RDP password file is missing
+      ansible.builtin.fail:
+        msg: >-
+          Missing {{ xrdp_molecule_password_file }}. Run molecule prepare before verify so the dedicated RDP
+          test user is created with the generated password.
+      when: not xrdp_molecule_password_stat.stat.exists
+
+    - name: Run FreeRDP authentication check
+      ansible.builtin.shell: |
+        set -euo pipefail
+        freerdp_bin="$(command -v xfreerdp || command -v xfreerdp3)"
+        help_output="$("${freerdp_bin}" /help 2>&1 || true)"
+
+        if printf '%s\n' "${help_output}" | grep -q '/auth-only'; then
+          timeout 45 "${freerdp_bin}" \
+            /cert:ignore \
+            "/v:${RDP_HOST}:${RDP_PORT}" \
+            "/u:${RDP_USER}" \
+            "/p:${RDP_PASSWORD}" \
+            /auth-only > "${RDP_LOG}" 2>&1
+          exit $?
+        fi
+
+        set +e
+        timeout 45 "${freerdp_bin}" \
+          /cert:ignore \
+          "/v:${RDP_HOST}:${RDP_PORT}" \
+          "/u:${RDP_USER}" \
+          "/p:${RDP_PASSWORD}" \
+          +auto-reconnect \
+          /auto-reconnect-max-retries:0 > "${RDP_LOG}" 2>&1
+        rc=$?
+        set -e
+
+        if [ "${rc}" -eq 124 ] &&
+          ! grep -Eiq 'AUTHENTICATION_FAILED|ERRCONNECT|TLS.*failed|certificate.*failed|NTSTATUS' "${RDP_LOG}"; then
+          exit 0
+        fi
+
+        exit "${rc}"
+      args:
+        executable: /bin/bash
+      environment:
+        RDP_HOST: "{{ xrdp_molecule_rdp_host }}"
+        RDP_PORT: "{{ xrdp_molecule_port | string }}"
+        RDP_USER: "{{ xrdp_molecule_test_user }}"
+        RDP_PASSWORD: "{{ lookup('file', xrdp_molecule_password_file) }}"
+        RDP_LOG: "{{ xrdp_molecule_rdp_log }}"
+      register: xrdp_molecule_rdp_check
+      changed_when: false
+      failed_when: false
+      no_log: true
+
+    - name: Read FreeRDP failure output
+      ansible.builtin.command:
+        argv:
+          - bash
+          - -lc
+          - "tail -n 120 {{ xrdp_molecule_rdp_log | quote }} 2>/dev/null || true"
+      register: xrdp_molecule_rdp_output
+      changed_when: false
+      when: xrdp_molecule_rdp_check.rc != 0
+
+    - name: Assert FreeRDP authentication succeeded
+      ansible.builtin.assert:
+        that:
+          - xrdp_molecule_rdp_check.rc == 0
+        fail_msg: |
+          FreeRDP authentication check failed for {{ xrdp_molecule_rdp_host }}:{{ xrdp_molecule_port }}.
+          Last FreeRDP output:
+          {{ xrdp_molecule_rdp_output.stdout | default('No FreeRDP output captured.') }}

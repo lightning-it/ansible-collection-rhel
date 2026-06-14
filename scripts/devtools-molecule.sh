@@ -124,7 +124,7 @@ bash scripts/wunder-devtools-ee.sh bash -c '
     if [ -d "molecule/$scenario_filter" ] && [ -f "molecule/$scenario_filter/molecule.yml" ]; then
       scenarios+=("$scenario_filter")
     else
-      echo "ERROR: Requested scenario '${scenario_filter}' not found under molecule/." >&2
+      echo "ERROR: Requested scenario ${scenario_filter} not found under molecule/." >&2
       exit 1
     fi
   else
@@ -133,7 +133,11 @@ bash scripts/wunder-devtools-ee.sh bash -c '
         scen="${dir##*/}"
         case "$scen" in
           *_heavy)
-            echo "Skipping heavy scenario '\''${scen}'\'' in devtools-molecule.sh (run manually via dedicated script)."
+            echo "Skipping heavy scenario ${scen} in devtools-molecule.sh (run manually via dedicated script)."
+            ;;
+          xrdp-rhel9|xrdp-rhel10)
+            echo "Skipping Incus VM scenario ${scen} in unfiltered devtools-molecule.sh."
+            echo "Run explicitly with scripts/devtools-molecule.sh ${scen}."
             ;;
           *)
             scenarios+=("$scen")

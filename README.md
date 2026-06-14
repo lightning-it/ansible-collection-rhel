@@ -53,11 +53,43 @@ This repository is designed to be used together with:
 
 - `pre-commit` for local linting,
 - the shared `wunder-devtools-ee` container for consistent tooling,
-- Molecule scenarios for role-level testing (e.g. `selinux_rhel9_heavy` via
-  Vagrant-backed RHEL 9 instances).
+- Molecule scenarios for role-level testing and an Incus-backed local deployment
+  workflow under `deploy/incus/` for RHEL-family VM/container testing. The Incus
+  workflow defaults to RHEL major version 10 and keeps RHEL 9 selectable.
 
 Each role is expected to provide:
 
 - `meta/main.yml` with Galaxy metadata,
 - `defaults/main.yml` with well-documented variables,
 - `README.md` with a clear description and examples.
+
+## Local Incus Testing
+
+Create a default RHEL 10-compatible Incus VM:
+
+```bash
+deploy/incus/scripts/create.sh
+```
+
+Create a RHEL 9-compatible Incus VM:
+
+```bash
+deploy/incus/scripts/create.sh --version 9 --mode vm --name lit-rhel9-vm
+```
+
+Run a playbook against the generated inventory:
+
+```bash
+ansible-playbook -i deploy/incus/generated/lit-rhel10-vm.ini playbooks/selinux.yml
+```
+
+Destroy the VM:
+
+```bash
+deploy/incus/scripts/destroy.sh --name lit-rhel10-vm
+```
+
+Actual RHEL images should be preloaded as private Incus aliases such as
+`local:rhel10-ci` or selected with `INCUS_RHEL10_IMAGE` / `INCUS_RHEL9_IMAGE`.
+The public defaults use RHEL-compatible community images and do not require Red
+Hat credentials.

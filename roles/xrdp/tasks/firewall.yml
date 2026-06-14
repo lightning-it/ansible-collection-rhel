@@ -1,0 +1,57 @@
+---
+- name: Ensure firewalld is installed for xrdp firewall management
+  ansible.builtin.package:
+    name: "{{ xrdp_firewalld_package_name }}"
+    state: present
+
+- name: Ensure firewalld is enabled and running for xrdp firewall management
+  ansible.builtin.service:
+    name: firewalld
+    state: started
+    enabled: true
+
+- name: Read current xrdp firewalld port state
+  ansible.builtin.command:
+    argv:
+      - firewall-cmd
+      - --zone={{ xrdp_firewalld_zone }}
+      - --query-port={{ xrdp_listen_port }}/tcp
+  register: xrdp_firewalld_port_query
+  changed_when: false
+  failed_when: xrdp_firewalld_port_query.rc not in [0, 1]
+
+- name: Enable xrdp firewalld port
+  ansible.builtin.command:
+    argv:
+      - firewall-cmd
+      - --zone={{ xrdp_firewalld_zone }}
+      - --permanent
+      - --add-port={{ xrdp_listen_port }}/tcp
+  register: xrdp_firewalld_port_enable
+  changed_when: xrdp_firewalld_port_enable.rc == 0
+  when:
+    - xrdp_firewalld_state == "enabled"
+    - xrdp_firewalld_port_query.rc == 1
+
+- name: Disable xrdp firewalld port
+  ansible.builtin.command:
+    argv:
+      - firewall-cmd
+      - --zone={{ xrdp_firewalld_zone }}
+      - --permanent
+      - --remove-port={{ xrdp_listen_port }}/tcp
+  register: xrdp_firewalld_port_disable
+  changed_when: xrdp_firewalld_port_disable.rc == 0
+  when:
+    - xrdp_firewalld_state == "disabled"
+    - xrdp_firewalld_port_query.rc == 0
+
+- name: Reload firewalld after xrdp port change
+  ansible.builtin.command:
+    argv:
+      - firewall-cmd
+      - --reload
+  changed_when: true
+  when: >-
+    (xrdp_firewalld_port_enable is defined and xrdp_firewalld_port_enable is changed)
+    or (xrdp_firewalld_port_disable is defined and xrdp_firewalld_port_disable is changed)

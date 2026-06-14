@@ -1,0 +1,50 @@
+RHEL_MAJOR_VERSION = ENV.fetch("RHEL_MAJOR_VERSION", "10").to_i
+
+SUPPORTED_RHEL_MAJOR_VERSIONS = [9, 10].freeze
+
+RHEL_VAGRANT_DEFAULTS = {
+  9 => {
+    box: "generic/rocky9",
+    hostname: "rhel9-vagrant"
+  },
+  10 => {
+    box: "bento/rockylinux-10.1",
+    hostname: "rhel10-vagrant"
+  }
+}.freeze
+
+unless SUPPORTED_RHEL_MAJOR_VERSIONS.include?(RHEL_MAJOR_VERSION)
+  raise "Unsupported RHEL_MAJOR_VERSION=#{RHEL_MAJOR_VERSION}. Supported values: " \
+        "#{SUPPORTED_RHEL_MAJOR_VERSIONS.join(', ')}."
+end
+
+rhel_defaults = RHEL_VAGRANT_DEFAULTS.fetch(RHEL_MAJOR_VERSION)
+
+Vagrant.configure("2") do |config|
+  config.vm.box = ENV.fetch("VAGRANT_BOX", rhel_defaults.fetch(:box))
+  config.vm.hostname = ENV.fetch("VAGRANT_HOSTNAME", rhel_defaults.fetch(:hostname))
+
+  config.vm.network "private_network", type: "dhcp"
+
+  host_ssh_port = ENV.fetch("VAGRANT_SSH_PORT", "55222")
+  config.vm.network "forwarded_port",
+                    guest: 22,
+                    host: host_ssh_port,
+                    host_ip: "127.0.0.1",
+                    id: "ssh",
+                    auto_correct: true
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 4096
+    vb.cpus = 2
+  end
+
+  config.vm.provider "vmware_desktop" do |v|
+    v.vmx["memsize"] = "4096"
+    v.vmx["numvcpus"] = "2"
+  end
+
+  config.vm.provider "qemu" do |q|
+    q.ssh_port = host_ssh_port if q.respond_to?(:ssh_port=)
+  end
+end

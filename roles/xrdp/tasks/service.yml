@@ -1,0 +1,21 @@
+---
+- name: Flush xrdp handlers before service state checks
+  ansible.builtin.meta: flush_handlers
+
+- name: Gather service facts for xrdp
+  ansible.builtin.service_facts:
+
+- name: Ensure xrdp service is managed
+  ansible.builtin.service:
+    name: "{{ xrdp_service_name }}"
+    state: "{{ xrdp_service_state }}"
+    enabled: "{{ xrdp_service_enabled | bool }}"
+
+- name: Ensure xrdp session manager service is managed when present
+  ansible.builtin.service:
+    name: "{{ xrdp_sesman_service_name }}"
+    state: "{{ xrdp_service_state }}"
+    enabled: "{{ xrdp_service_enabled | bool }}"
+  when: >-
+    xrdp_sesman_service_name ~ '.service' in ansible_facts.services
+    or xrdp_sesman_service_name in ansible_facts.services

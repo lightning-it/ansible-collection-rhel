@@ -1,5 +1,5 @@
 ---
-- name: Verify SELinux state on RHEL 9
+- name: Verify SELinux state on RHEL-compatible Vagrant host
   hosts: rhel_selinux_hosts
   become: true
   gather_facts: false

@@ -1,0 +1,100 @@
+# yamllint disable rule:truthy
+---
+name: Protected Incus RHEL CI
+
+on:
+  push:
+    branches:
+      - main
+      - "release/**"
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  rhel-incus:
+    name: RHEL ${{ matrix.rhel_major_version }} Incus ${{ matrix.incus_mode }}
+    runs-on:
+      - self-hosted
+      - incus
+      - rhel-ci
+    environment:
+      name: rhel-ci
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        rhel_major_version: ["9", "10"]
+        incus_mode: ["vm"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Create Incus RHEL test instance
+        env:
+          INCUS_RHEL9_IMAGE: ${{ vars.INCUS_RHEL9_IMAGE || 'local:rhel9-ci' }}
+          INCUS_RHEL10_IMAGE: ${{ vars.INCUS_RHEL10_IMAGE || 'local:rhel10-ci' }}
+        run: |
+          INCUS_INSTANCE_NAME="$(printf 'rhel%s-%s-%s-%s' \
+            "${{ matrix.rhel_major_version }}" \
+            "${{ matrix.incus_mode }}" \
+            "${{ github.run_id }}" \
+            "${{ github.run_attempt }}")"
+          export INCUS_INSTANCE_NAME
+
+          deploy/incus/scripts/create.sh \
+            --version "${{ matrix.rhel_major_version }}" \
+            --mode "${{ matrix.incus_mode }}" \
+            --name "${INCUS_INSTANCE_NAME}"
+
+      - name: Run SELinux playbook
+        run: |
+          INCUS_INSTANCE_NAME="$(printf 'rhel%s-%s-%s-%s' \
+            "${{ matrix.rhel_major_version }}" \
+            "${{ matrix.incus_mode }}" \
+            "${{ github.run_id }}" \
+            "${{ github.run_attempt }}")"
+
+          ansible-playbook \
+            -i "deploy/incus/generated/${INCUS_INSTANCE_NAME}.ini" \
+            playbooks/selinux.yml
+
+      - name: Destroy Incus RHEL test instance
+        if: always()
+        run: |
+          INCUS_INSTANCE_NAME="$(printf 'rhel%s-%s-%s-%s' \
+            "${{ matrix.rhel_major_version }}" \
+            "${{ matrix.incus_mode }}" \
+            "${{ github.run_id }}" \
+            "${{ github.run_attempt }}")"
+
+          deploy/incus/scripts/destroy.sh --name "${INCUS_INSTANCE_NAME}"
+
+  xrdp-incus:
+    name: XRDP RHEL ${{ matrix.rhel_major_version }} Incus VM
+    runs-on:
+      - self-hosted
+      - incus
+      - rhel-ci
+    environment:
+      name: rhel-ci
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        rhel_major_version: ["9", "10"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Run XRDP Incus Molecule scenario
+        env:
+          INCUS_RHEL9_IMAGE: ${{ vars.INCUS_RHEL9_IMAGE || 'local:rhel9-ci' }}
+          INCUS_RHEL10_IMAGE: ${{ vars.INCUS_RHEL10_IMAGE || 'local:rhel10-ci' }}
+        run: |
+          bash scripts/devtools-molecule.sh "xrdp-rhel${{ matrix.rhel_major_version }}"

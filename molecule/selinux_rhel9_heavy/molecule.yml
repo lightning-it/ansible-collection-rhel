@@ -8,7 +8,7 @@ driver:
   name: default
 
 platforms:
-  - name: rhel9_target
+  - name: rhel_target
     groups:
       - rhel_selinux_hosts
 
@@ -19,7 +19,7 @@ provisioner:
     verify: verify.yml
   inventory:
     host_vars:
-      rhel9_target:
+      rhel_target:
         ansible_host: >-
           {{ lookup('env', 'VAGRANT_SSH_HOST')
              | default('host.docker.internal', true) }}
@@ -28,7 +28,7 @@ provisioner:
         ansible_user: >-
           {{ lookup('env', 'VAGRANT_SSH_USER') | default('vagrant', true) }}
         ansible_ssh_private_key_file: >-
-          /workspace/vagrant/rhel9/.vagrant/machines/default/qemu/private_key
+          /workspace/vagrant/rhel/.vagrant/machines/default/qemu/private_key
         ansible_ssh_common_args: >-
           -o StrictHostKeyChecking=no
           -o UserKnownHostsFile=/dev/null

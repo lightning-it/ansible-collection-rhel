@@ -1,3 +1,9 @@
+## [1.14.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.13.1...v1.14.0) (2026-06-13)
+
+### Features
+
+* refactoring rhel 10 incus ([#89](https://github.com/lightning-it/ansible-collection-rhel/issues/89)) ([fdbbc9e](https://github.com/lightning-it/ansible-collection-rhel/commit/fdbbc9ef2e13b6d3a767168716fd0b2119cd2bb0))
+
 ## [1.13.1](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.13.0...v1.13.1) (2026-03-21)
 
 ### Bug Fixes
