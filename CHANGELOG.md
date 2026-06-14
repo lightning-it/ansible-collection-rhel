@@ -1,3 +1,9 @@
+## [1.16.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.15.0...v1.16.0) (2026-06-14)
+
+### Features
+
+* Enhance virtual guest role with VMware support and agent management ([#92](https://github.com/lightning-it/ansible-collection-rhel/issues/92)) ([643817c](https://github.com/lightning-it/ansible-collection-rhel/commit/643817c5e4ce5c61b28532715b812f46fe6003d9))
+
 ## [1.15.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.14.0...v1.15.0) (2026-06-14)
 
 ### Features
