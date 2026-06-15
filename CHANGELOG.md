@@ -1,3 +1,9 @@
+## [1.16.3](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.16.2...v1.16.3) (2026-06-15)
+
+### Bug Fixes
+
+* Update license from GPL to MIT across the repository ([#99](https://github.com/lightning-it/ansible-collection-rhel/issues/99)) ([5e25ed8](https://github.com/lightning-it/ansible-collection-rhel/commit/5e25ed8a19b7a36831c5cac1efd19ad2b6264dcc))
+
 ## [1.16.2](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.16.1...v1.16.2) (2026-06-14)
 
 ### Bug Fixes
