@@ -8,6 +8,5 @@ galaxy_info:
   platforms:
     - name: EL
       versions:
-        - "9"
-        - "10"
+        - all
 dependencies: []

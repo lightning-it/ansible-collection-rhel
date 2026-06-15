@@ -9,7 +9,7 @@ galaxy_info:
   min_ansible_version: "2.15"
   platforms:
     - name: EL
-      versions: ["9", "10"]
+      versions: ["all"]
   galaxy_tags:
     - rhel
     - rhsm
