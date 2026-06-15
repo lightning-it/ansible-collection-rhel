@@ -3,7 +3,7 @@ galaxy_info:
   role_name: virtual_guest
   author: Lightning IT
   description: Configure reusable RHEL virtual machine guest baseline packages and services.
-  license: GPL-3.0-only
+  license: MIT
   min_ansible_version: "2.18"
   platforms:
     - name: EL

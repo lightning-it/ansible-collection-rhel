@@ -70,7 +70,7 @@ and `vars/RedHat-10.yml`.
 
 ## License
 
-GPL-3.0-only
+MIT
 
 ## Author
 

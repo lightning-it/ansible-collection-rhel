@@ -5,7 +5,7 @@ galaxy_info:
   author: Lightning IT
   description: Install and configure XRDP on RHEL 9 and RHEL 10. Does not enable repos; use lit.rhel.repos.
   company: Lightning IT
-  license: GPL-2.0-only
+  license: MIT
   min_ansible_version: "2.15"
   platforms:
     - name: EL

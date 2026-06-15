@@ -5,7 +5,7 @@ galaxy_info:
   author: Lightning IT
   description: Enable/prepare repositories (EPEL, CodeReady, proxies). Service roles install packages.
   company: Lightning IT
-  license: GPL-2.0-only
+  license: MIT
   min_ansible_version: "2.15"
   platforms:
     - name: EL
