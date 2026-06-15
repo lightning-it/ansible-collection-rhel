@@ -104,22 +104,8 @@ bash scripts/wunder-devtools-ee.sh bash -c '
   # -------------------------------------------------------------
   scenarios=()
 
-  has_incus=false
-  if command -v incus >/dev/null 2>&1; then
-    has_incus=true
-  fi
-
-  is_incus_scenario() {
-    local scenario_name="$1"
-    grep -Rqs "deploy/incus/scripts/create.sh" "molecule/${scenario_name}"
-  }
-
   if [ -n "$scenario_filter" ]; then
     if [ -d "molecule/$scenario_filter" ] && [ -f "molecule/$scenario_filter/molecule.yml" ]; then
-      if is_incus_scenario "$scenario_filter" && [ "$has_incus" != "true" ]; then
-        echo "ERROR: Requested scenario '${scenario_filter}' requires Incus, but the incus command is unavailable." >&2
-        exit 1
-      fi
       scenarios+=("$scenario_filter")
     else
       echo "ERROR: Requested scenario '${scenario_filter}' not found under molecule/." >&2
@@ -134,10 +120,6 @@ bash scripts/wunder-devtools-ee.sh bash -c '
             echo "Skipping heavy scenario '\''${scen}'\'' in devtools-molecule.sh (run manually via dedicated script)."
             ;;
           *)
-            if is_incus_scenario "$scen" && [ "$has_incus" != "true" ]; then
-              echo "Skipping Incus scenario '\''${scen}'\'' because the incus command is unavailable."
-              continue
-            fi
             scenarios+=("$scen")
             ;;
         esac
