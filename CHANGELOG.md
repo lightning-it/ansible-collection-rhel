@@ -1,3 +1,9 @@
+## [1.17.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.16.3...v1.17.0) (2026-06-16)
+
+### Features
+
+* add cloud-init and perl to default virtual guest packages for RHEL 9 and 10 ([#103](https://github.com/lightning-it/ansible-collection-rhel/issues/103)) ([7ad464c](https://github.com/lightning-it/ansible-collection-rhel/commit/7ad464cc885088d0d21b749f46a7755b4fbc9f27))
+
 ## [1.16.3](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.16.2...v1.16.3) (2026-06-15)
 
 ### Bug Fixes
