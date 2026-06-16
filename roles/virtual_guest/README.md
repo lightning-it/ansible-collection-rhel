@@ -12,6 +12,9 @@ required.
 - Install VM guest baseline packages.
 - Enable and start the matching guest agent for the detected virtualization type.
 - Keep guest behavior reusable across future VM workloads.
+- Include guest customization helpers used by common hypervisors. For VMware
+  templates, `cloud-init` and `perl` allow vSphere guest customization to set
+  hostname and static network settings.
 
 ## Variables
 
