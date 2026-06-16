@@ -1,6 +1,8 @@
 ---
 virtual_guest_packages_default:
+  - cloud-init
   - cloud-utils-growpart
+  - perl
   - python3
 
 virtual_guest_qemu_guest_agent_packages_default:
