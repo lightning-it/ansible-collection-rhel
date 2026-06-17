@@ -1,4 +1,8 @@
 ---
+- name: Prechecks
+  ansible.builtin.import_tasks: assert.yml
+  tags: always
+
 - name: Install podman toolchain
   ansible.builtin.package:
     name: "{{ podman_packages }}"
@@ -9,3 +13,7 @@
     path: "{{ podman_registries_conf_dir }}"
     state: directory
     mode: "0755"
+
+- name: Configure rootless podman storage
+  ansible.builtin.import_tasks: rootless_storage.yml
+  when: podman_rootless_storage_manage | bool

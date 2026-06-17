@@ -1,0 +1,112 @@
+---
+- name: Ensure rootless podman storage user exists
+  ansible.builtin.user:
+    name: "{{ podman_rootless_storage_user }}"
+    state: present
+    create_home: true
+
+- name: Resolve rootless podman storage user home
+  ansible.builtin.command:
+    argv:
+      - getent
+      - passwd
+      - "{{ podman_rootless_storage_user }}"
+  register: podman_rootless_storage_getent
+  changed_when: false
+
+- name: Record rootless podman storage user facts
+  ansible.builtin.set_fact:
+    podman_rootless_storage_user_uid: "{{ podman_rootless_storage_getent.stdout.split(':')[2] }}"
+    podman_rootless_storage_user_gid: "{{ podman_rootless_storage_getent.stdout.split(':')[3] }}"
+    podman_rootless_storage_user_home: "{{ podman_rootless_storage_getent.stdout.split(':')[5] }}"
+  changed_when: false
+
+- name: Ensure rootless podman storage base path exists
+  ansible.builtin.file:
+    path: "{{ podman_rootless_storage_base_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure rootless podman graphroot exists
+  ansible.builtin.file:
+    path: "{{ podman_rootless_storage_path }}"
+    state: directory
+    owner: "{{ podman_rootless_storage_user }}"
+    group: "{{ podman_rootless_storage_user }}"
+    mode: "0700"
+
+- name: Ensure rootless podman storage config directory exists
+  ansible.builtin.file:
+    path: "{{ podman_rootless_storage_conf_path | dirname }}"
+    state: directory
+    owner: "{{ podman_rootless_storage_user }}"
+    group: "{{ podman_rootless_storage_user }}"
+    mode: "0700"
+
+- name: Configure rootless podman storage
+  ansible.builtin.copy:
+    dest: "{{ podman_rootless_storage_conf_path }}"
+    owner: "{{ podman_rootless_storage_user }}"
+    group: "{{ podman_rootless_storage_user }}"
+    mode: "0600"
+    content: |
+      [storage]
+      driver = "{{ podman_rootless_storage_driver }}"
+      runroot = "/run/user/{{ podman_rootless_storage_user_uid }}/containers"
+      graphroot = "{{ podman_rootless_storage_path }}"
+
+- name: Install SELinux management tools for podman storage
+  ansible.builtin.package:
+    name: policycoreutils-python-utils
+    state: present
+  when:
+    - podman_rootless_storage_selinux_manage | bool
+    - ansible_facts.selinux is defined
+    - ansible_facts.selinux.status | default('disabled') != 'disabled'
+
+- name: Configure SELinux fcontext for rootless podman storage
+  community.general.sefcontext:
+    target: "{{ podman_rootless_storage_base_path }}(/.*)?"
+    setype: "{{ podman_rootless_storage_selinux_type }}"
+    state: present
+  when:
+    - podman_rootless_storage_selinux_manage | bool
+    - ansible_facts.selinux is defined
+    - ansible_facts.selinux.status | default('disabled') != 'disabled'
+
+- name: Restore SELinux context for rootless podman storage
+  ansible.builtin.command:
+    argv:
+      - restorecon
+      - -R
+      - "{{ podman_rootless_storage_base_path }}"
+  register: podman_rootless_storage_restorecon
+  changed_when: podman_rootless_storage_restorecon.stdout | default('') | trim | length > 0
+  when:
+    - podman_rootless_storage_selinux_manage | bool
+    - ansible_facts.selinux is defined
+    - ansible_facts.selinux.status | default('disabled') != 'disabled'
+
+- name: Validate rootless podman graphroot
+  ansible.builtin.command:
+    cmd: >-
+      sudo -iu {{ podman_rootless_storage_user | quote }}
+      podman info --format '{{ "{{" }} .Store.GraphRoot {{ "}}" }}'
+  register: podman_rootless_storage_graphroot_result
+  changed_when: false
+  when: podman_rootless_storage_validate | bool
+
+- name: Assert rootless podman graphroot matches configured storage path
+  ansible.builtin.assert:
+    that:
+      - podman_rootless_storage_graphroot_result.stdout | trim == podman_rootless_storage_path
+    fail_msg: >-
+      Rootless Podman graphroot for user {{ podman_rootless_storage_user }}
+      is {{ podman_rootless_storage_graphroot_result.stdout | trim }}, expected
+      {{ podman_rootless_storage_path }}. If the user already has existing
+      rootless storage, stop containers and reset or migrate that storage before
+      rerunning this role.
+    quiet: true
+  when: podman_rootless_storage_validate | bool

@@ -2,5 +2,30 @@
 podman_packages:
   - podman
   - buildah
+  - fuse-overlayfs
+  - slirp4netns
+  - uidmap
 
 podman_registries_conf_dir: /etc/containers
+
+podman_rootless_storage_manage: "{{ rhel_podman_rootless_storage_manage | default(false, true) }}"
+podman_rootless_storage_user: "{{ rhel_podman_rootless_storage_user | default('', true) }}"
+podman_rootless_storage_base_path: "{{ rhel_podman_rootless_storage_base_path | default('', true) }}"
+podman_rootless_storage_path: "{{ rhel_podman_rootless_storage_path | default('', true) }}"
+podman_rootless_storage_driver: "{{ rhel_podman_rootless_storage_driver | default('overlay', true) }}"
+podman_rootless_storage_conf_path: >-
+  {{
+    rhel_podman_rootless_storage_conf_path
+    | default(
+        (
+          '/home/' ~ podman_rootless_storage_user ~ '/.config/containers/storage.conf'
+          if (podman_rootless_storage_user | default('', true) | trim | length > 0)
+          else ''
+        ),
+        true
+      )
+  }}
+podman_rootless_storage_validate: "{{ rhel_podman_rootless_storage_validate | default(true, true) }}"
+podman_rootless_storage_selinux_manage: "{{ rhel_podman_rootless_storage_selinux_manage | default(true, true) }}"
+podman_rootless_storage_selinux_type: >-
+  {{ rhel_podman_rootless_storage_selinux_type | default('container_file_t', true) }}
