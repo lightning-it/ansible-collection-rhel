@@ -1,3 +1,9 @@
+## [1.17.1](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.17.0...v1.17.1) (2026-06-17)
+
+### Bug Fixes
+
+* podman moved ([#104](https://github.com/lightning-it/ansible-collection-rhel/issues/104)) ([9eb85d3](https://github.com/lightning-it/ansible-collection-rhel/commit/9eb85d3e1d79df09599eb9606ed8d893a5ebeb77))
+
 ## [1.17.0](https://github.com/lightning-it/ansible-collection-rhel/compare/v1.16.3...v1.17.0) (2026-06-16)
 
 ### Features
