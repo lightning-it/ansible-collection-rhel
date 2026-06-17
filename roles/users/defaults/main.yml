@@ -3,6 +3,7 @@
 # Each item supports:
 #   name (required), state (present|absent), uid, gid, groups (list),
 #   shell, home, create_home, update_password, password_lock (bool), remove (bool),
+#   passwordless_sudo (bool), sudoers_name (string),
 #   ssh_keys (list of authorized keys for ~/.ssh/authorized_keys).
 users_accounts: []
 

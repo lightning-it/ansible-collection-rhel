@@ -12,13 +12,6 @@ users:
       - "@@SSH_PUBLIC_KEY@@"
 
 package_update: false
-packages:
-  - cloud-init
-  - openssh-server
-  - python3
-  - sudo
-  - dnf-plugins-core
-  - policycoreutils-python-utils
 
 runcmd:
   - [sh, -lc, "systemctl enable --now sshd 2>/dev/null || true"]

@@ -46,6 +46,11 @@ as `qemu-img`, `guestfs-tools`, and `libguestfs`.
   `cloud-init.target` into `multi-user.target`. Default: `false`.
 - `cloud_image_incus_vm_cloud_init_datasources`: datasource list written when
   `cloud_image_incus_vm_cloud_init_enabled` is `true`.
+- `cloud_image_incus_vm_cloud_init_clean_state`: remove stale cloud-init
+  instance state and seed data when preparing Incus VM images. Default: `true`.
+- `cloud_image_incus_vm_cloud_init_clean_authorized_keys`: remove baked SSH
+  keys for `cloud_image_customize_ssh_user` so Incus user-data owns first-boot
+  SSH access. Default: `true`.
 - `cloud_image_customize_clean_rhsm`: remove RHSM identity material from the
   image. Default: `true`.
 - `cloud_image_incus_metadata_enabled`: create a metadata directory and tarball

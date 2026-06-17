@@ -1,0 +1,37 @@
+---
+- name: Validate podman role inputs
+  ansible.builtin.assert:
+    that:
+      - podman_package_manage is boolean
+      - podman_packages is sequence
+      - podman_packages is not string
+      - podman_registries_conf_dir is string
+      - podman_registries_conf_dir | trim | length > 0
+      - podman_registries_conf_dir.startswith('/')
+      - podman_rootless_storage_manage is boolean
+      - podman_rootless_storage_user is string
+      - podman_rootless_storage_base_path is string
+      - podman_rootless_storage_path is string
+      - podman_rootless_storage_driver in ['overlay']
+      - podman_rootless_storage_conf_path is string
+      - podman_rootless_storage_validate is boolean
+      - podman_rootless_storage_selinux_manage is boolean
+      - podman_rootless_storage_selinux_type is string
+      - podman_rootless_storage_selinux_type | trim | length > 0
+    quiet: true
+
+- name: Validate rootless podman storage inputs
+  ansible.builtin.assert:
+    that:
+      - podman_rootless_storage_user | trim | length > 0
+      - podman_rootless_storage_base_path | trim | length > 0
+      - podman_rootless_storage_base_path.startswith('/')
+      - podman_rootless_storage_path | trim | length > 0
+      - podman_rootless_storage_path.startswith('/')
+      - podman_rootless_storage_conf_path | trim | length > 0
+      - podman_rootless_storage_conf_path.startswith('/')
+    fail_msg: >-
+      Rootless Podman storage management requires absolute paths and a non-empty
+      podman_rootless_storage_user.
+    quiet: true
+  when: podman_rootless_storage_manage | bool

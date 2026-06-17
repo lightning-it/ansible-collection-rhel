@@ -8,5 +8,7 @@ rhsm_password: ""
 rhsm_auto_attach: true
 rhsm_force_register: false
 rhsm_clean_on_absent: true
+rhsm_register_retries: 5
+rhsm_register_delay: 30
 rhsm_server: ""            # e.g. satellite.example.com
 rhsm_baseurl: ""           # e.g. https://satellite/pulp/content
