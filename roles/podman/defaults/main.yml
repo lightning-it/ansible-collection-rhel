@@ -5,7 +5,7 @@ podman_packages:
   - buildah
   - fuse-overlayfs
   - slirp4netns
-  - uidmap
+  - shadow-utils
 
 podman_registries_conf_dir: /etc/containers
 

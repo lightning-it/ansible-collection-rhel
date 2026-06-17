@@ -19,7 +19,7 @@ Important inputs:
   hosts where Podman is already installed and repositories are intentionally
   unavailable.
 - `podman_packages`: package list installed via `ansible.builtin.package`
-  (default: `["podman", "buildah", "fuse-overlayfs", "slirp4netns", "uidmap"]`)
+  (default: `["podman", "buildah", "fuse-overlayfs", "slirp4netns", "shadow-utils"]`)
 - `podman_registries_conf_dir`: directory ensured present for registry
   configuration files (default: `/etc/containers`)
 - `podman_rootless_storage_manage`: enable rootless storage configuration.

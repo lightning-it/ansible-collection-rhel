@@ -149,6 +149,9 @@
           - "{{ rhsm_activation_key }}"
       register: rhsm_register
       changed_when: rhsm_register.rc == 0
+      until: rhsm_register.rc == 0
+      retries: "{{ rhsm_register_retries }}"
+      delay: "{{ rhsm_register_delay }}"
       no_log: true
       when:
         - (not rhsm_registered | default(false) | bool) or (rhsm_force_register | bool)
@@ -167,6 +170,9 @@
           - "{{ '--auto-attach' if (rhsm_auto_attach | bool) else '--no-auto-attach' }}"
       register: rhsm_register_pw
       changed_when: rhsm_register_pw.rc == 0
+      until: rhsm_register_pw.rc == 0
+      retries: "{{ rhsm_register_retries }}"
+      delay: "{{ rhsm_register_delay }}"
       no_log: true
       when:
         - (not rhsm_registered | default(false) | bool) or (rhsm_force_register | bool)
