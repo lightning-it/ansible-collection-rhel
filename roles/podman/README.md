@@ -14,6 +14,10 @@ See `defaults/main.yml`.
 
 Important inputs:
 
+- `podman_package_manage`: install Podman packages with the system package
+  manager (default: `true`). Set this to `false` for prepared or disconnected
+  hosts where Podman is already installed and repositories are intentionally
+  unavailable.
 - `podman_packages`: package list installed via `ansible.builtin.package`
   (default: `["podman", "buildah", "fuse-overlayfs", "slirp4netns", "uidmap"]`)
 - `podman_registries_conf_dir`: directory ensured present for registry
@@ -25,9 +29,13 @@ Important inputs:
 - `podman_rootless_storage_validate`: validate the effective graphroot with
   `podman info`.
 
+When rootless storage management is enabled, the role also prepares
+`/run/user/<uid>` for the configured runtime user. This supports service-style
+Ansible executions where no interactive login created the runtime directory yet.
+
 ## Dependencies
 
-None.
+- `community.general` for SELinux fcontext management.
 
 ## Example Playbook
 

@@ -2,6 +2,7 @@
 - name: Validate podman role inputs
   ansible.builtin.assert:
     that:
+      - podman_package_manage is boolean
       - podman_packages is sequence
       - podman_packages is not string
       - podman_registries_conf_dir is string

@@ -190,12 +190,13 @@ fi
 incus profile create "${profile_name}" >/dev/null
 incus profile edit "${profile_name}" < "${profile_file}"
 
-launch_args=(launch "${image_alias}" "${instance_name}" --profile default --profile "${profile_name}")
 if [ "${mode}" = "vm" ]; then
-  launch_args+=(--vm)
+  incus init "${image_alias}" "${instance_name}" --profile default --profile "${profile_name}" --vm
+  incus config device add "${instance_name}" cloud-init disk source=cloud-init:config
+  incus start "${instance_name}"
+else
+  incus launch "${image_alias}" "${instance_name}" --profile default --profile "${profile_name}"
 fi
-
-incus "${launch_args[@]}"
 
 cat > "${env_file}" <<EOF
 INCUS_INSTANCE_NAME=${instance_name}

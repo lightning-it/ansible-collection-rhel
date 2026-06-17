@@ -21,6 +21,14 @@
     podman_rootless_storage_user_home: "{{ podman_rootless_storage_getent.stdout.split(':')[5] }}"
   changed_when: false
 
+- name: Ensure rootless podman runtime base path exists
+  ansible.builtin.file:
+    path: "/run/user/{{ podman_rootless_storage_user_uid }}"
+    state: directory
+    owner: "{{ podman_rootless_storage_user }}"
+    group: "{{ podman_rootless_storage_user }}"
+    mode: "0700"
+
 - name: Ensure rootless podman storage base path exists
   ansible.builtin.file:
     path: "{{ podman_rootless_storage_base_path }}"

@@ -45,6 +45,8 @@ cloud_image_incus_vm_cloud_init_datasources:
   - NoCloud
   - ConfigDrive
   - None
+cloud_image_incus_vm_cloud_init_clean_state: true
+cloud_image_incus_vm_cloud_init_clean_authorized_keys: true
 
 cloud_image_incus_metadata_enabled: true
 cloud_image_incus_metadata_dir: "{{ cloud_image_work_dir }}/incus-metadata"

@@ -303,6 +303,41 @@
     - cloud_image_customize_enabled | bool
     - cloud_image_incus_vm_cloud_init_enabled | bool
 
+- name: Clean cloud-init state from Incus VM image
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --run-command
+      - >-
+        cloud-init clean --logs --seed -c all || true;
+        rm -rf /var/lib/cloud/instances/* /var/lib/cloud/instance
+        /var/lib/cloud/data/* /var/lib/cloud/seed/*
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+    - cloud_image_incus_vm_cloud_init_enabled | bool
+    - cloud_image_incus_vm_cloud_init_clean_state | bool
+
+- name: Remove baked SSH keys from Incus VM image user
+  ansible.builtin.command:
+    argv:
+      - virt-customize
+      - -a
+      - "{{ cloud_image_output_qcow2 }}"
+      - --run-command
+      - "rm -f /home/{{ cloud_image_customize_ssh_user }}/.ssh/authorized_keys"
+  changed_when: true
+  when:
+    - cloud_image_enabled | bool
+    - cloud_image_rebuild_needed | bool
+    - cloud_image_customize_enabled | bool
+    - cloud_image_incus_vm_cloud_init_enabled | bool
+    - cloud_image_incus_vm_cloud_init_clean_authorized_keys | bool
+
 - name: Remove RHSM identity from output image
   ansible.builtin.command:
     argv:

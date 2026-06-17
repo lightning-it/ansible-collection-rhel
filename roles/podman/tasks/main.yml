@@ -7,6 +7,9 @@
   ansible.builtin.package:
     name: "{{ podman_packages }}"
     state: present
+  when:
+    - podman_package_manage | bool
+    - podman_packages | length > 0
 
 - name: Ensure registries.conf directory exists
   ansible.builtin.file:

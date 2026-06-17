@@ -1,4 +1,5 @@
 ---
+podman_package_manage: "{{ rhel_podman_package_manage | default(true) }}"
 podman_packages:
   - podman
   - buildah
@@ -25,7 +26,7 @@ podman_rootless_storage_conf_path: >-
         true
       )
   }}
-podman_rootless_storage_validate: "{{ rhel_podman_rootless_storage_validate | default(true, true) }}"
-podman_rootless_storage_selinux_manage: "{{ rhel_podman_rootless_storage_selinux_manage | default(true, true) }}"
+podman_rootless_storage_validate: "{{ rhel_podman_rootless_storage_validate | default(true) }}"
+podman_rootless_storage_selinux_manage: "{{ rhel_podman_rootless_storage_selinux_manage | default(true) }}"
 podman_rootless_storage_selinux_type: >-
   {{ rhel_podman_rootless_storage_selinux_type | default('container_file_t', true) }}
