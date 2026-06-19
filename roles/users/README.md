@@ -31,6 +31,12 @@ users_accounts:
 
 Whether to create any groups referenced in `users_accounts` before assignment. Default: `true`.
 
+### `users_accounts_extra`
+
+Additional user definitions appended to `users_accounts`. This is useful for
+environment-specific service accounts, for example a shared deploy user, without
+replacing the global baseline users.
+
 ## Example
 
 ```yaml

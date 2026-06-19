@@ -1,7 +1,7 @@
 ---
 - name: Normalize users_accounts to a list
   ansible.builtin.set_fact:
-    users_accounts_effective: >-
+    users_accounts_base_effective: >-
       {%- set ua = users_accounts | default([]) -%}
       {%- if ua is mapping -%}
         {{ ua | dict2items | map(attribute='value') | list }}
@@ -10,6 +10,28 @@
       {%- else -%}
         []
       {%- endif -%}
+  changed_when: false
+
+- name: Normalize users_accounts_extra to a list
+  ansible.builtin.set_fact:
+    users_accounts_extra_effective: >-
+      {%- set ua = users_accounts_extra | default([]) -%}
+      {%- if ua is mapping -%}
+        {{ ua | dict2items | map(attribute='value') | list }}
+      {%- elif ua is sequence and (ua is not string) -%}
+        {{ ua }}
+      {%- else -%}
+        []
+      {%- endif -%}
+  changed_when: false
+
+- name: Combine base and extra user definitions
+  ansible.builtin.set_fact:
+    users_accounts_effective: >-
+      {{
+        (users_accounts_base_effective | default([]))
+        + (users_accounts_extra_effective | default([]))
+      }}
   changed_when: false
 
 - name: Build group list from user definitions
