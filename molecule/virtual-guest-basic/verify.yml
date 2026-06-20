@@ -1,0 +1,11 @@
+---
+- name: Verify virtual guest syntax coverage
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Assert lit.rhel.virtual_guest coverage stub ran
+      ansible.builtin.assert:
+        that:
+          - virtual_guest_molecule_coverage_mode | default('') == 'syntax_stub'
+        quiet: true

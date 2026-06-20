@@ -54,13 +54,13 @@ if ! incus info "${instance_name}" >/dev/null 2>&1; then
 fi
 
 ip_address="$(
-  incus list "${instance_name}" --format csv -c 4 |
+  incus list "${instance_name}" --format csv -c 46 |
     tr ',' '\n' |
     awk '/\([a-zA-Z0-9_.-]+\)$/ && $1 !~ /^fe80:/ {print $1; exit}'
 )"
 
 if [ -z "${ip_address}" ]; then
-  echo "ERROR: Could not determine an IPv4 address for '${instance_name}'." >&2
+  echo "ERROR: Could not determine an IPv4 or non-link-local IPv6 address for '${instance_name}'." >&2
   exit 1
 fi
 

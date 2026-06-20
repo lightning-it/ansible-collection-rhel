@@ -12,6 +12,10 @@ users:
       - "@@SSH_PUBLIC_KEY@@"
 
 package_update: false
+packages:
+  - openssh-server
+  - python3
+  - sudo
 
 runcmd:
   - [sh, -lc, "systemctl enable --now sshd 2>/dev/null || true"]

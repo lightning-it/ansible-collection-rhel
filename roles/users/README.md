@@ -2,6 +2,10 @@
 
 Manage local users, their groups, and authorized SSH keys on RHEL hosts.
 
+## Requirements
+
+None.
+
 ## Variables
 
 ### `users_accounts`
@@ -22,7 +26,7 @@ users_accounts:
     password_lock: false
     remove: false             # remove home on absent if true
     passwordless_sudo: false  # write /etc/sudoers.d/<name> with NOPASSWD
-    sudoers_name: ops-admin   # optional sudoers file name
+    sudoers_name: ops-admin   # optional sudoers file name; removed when passwordless_sudo is false
     ssh_keys:
       - "ssh-ed25519 AAAA... comment"
 ```
@@ -37,7 +41,11 @@ Additional user definitions appended to `users_accounts`. This is useful for
 environment-specific service accounts, for example a shared deploy user, without
 replacing the global baseline users.
 
-## Example
+## Dependencies
+
+None.
+
+## Example Playbook
 
 ```yaml
 - hosts: all
@@ -58,3 +66,11 @@ replacing the global baseline users.
             state: absent
             remove: true
 ```
+
+## License
+
+MIT
+
+## Author
+
+Lightning IT

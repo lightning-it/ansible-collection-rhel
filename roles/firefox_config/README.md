@@ -1,9 +1,41 @@
+# lit.rhel.firefox_config
+
 ---
 # lit.rhel.firefox_config
 
 Configure Firefox on RHEL 9 using the shared `lit.rhel.firefox` helper role.
 
-## Scope
+## Requirements
+
+None.
+
+## Variables
+
+See `defaults/main.yml`.
+
+## Dependencies
+
+None.
+
+## Example Playbook
+
+```yaml
+- hosts: workstations
+  roles:
+    - role: lit.rhel.firefox_config
+```
+
+## License
+
+MIT
+
+## Author
+
+Lightning IT
+
+## Additional Notes
+
+### Scope
 
 This role:
 
@@ -14,17 +46,9 @@ This role:
 - manages proxy, homepage, DNS over HTTPS, telemetry-related settings, bookmarks,
   and download defaults through the cleanest supported mechanism
 
-## Configuration boundaries
+### Configuration boundaries
 
 - System-wide settings are managed with Firefox enterprise policy
 - Optional per-user settings are managed with `user.js`
 - Bookmark management is policy-driven; the role does not edit per-user bookmark
   SQLite databases
-
-## Example
-
-```yaml
-- hosts: workstations
-  roles:
-    - role: lit.rhel.firefox_config
-```

@@ -1,7 +1,7 @@
 # Incus Local Deployment
 
-This workflow replaces the Vagrant-based local deployment path for VM-backed
-RHEL-family testing.
+This workflow provides the local deployment path for Incus-backed RHEL-family
+testing.
 
 Defaults:
 
@@ -91,7 +91,14 @@ deploy/incus/scripts/inventory.sh --name lit-rhel10-vm > deploy/incus/generated/
 deploy/incus/scripts/destroy.sh --name lit-rhel10-vm
 ```
 
-## Deprecated Vagrant Path
+## Molecule Heavy Tests
 
-The previous Vagrant files remain under `vagrant/` only for backward
-compatibility. New local VM testing should use `deploy/incus/`.
+Heavy Molecule scenarios use Incus targets only. Run the SELinux heavy scenario
+through the helper script:
+
+```bash
+scripts/devtools-incus-selinux-heavy.sh
+```
+
+The helper defaults to `INCUS_MODE=vm`. Use `INCUS_MODE=container` only for
+roles that support containerized system testing.

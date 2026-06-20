@@ -7,14 +7,9 @@ repositories, install application packages, or prepare hosts for a specific
 service. Use it after `lit.rhel.rhsm` and `lit.rhel.repos` when those are
 required.
 
-## Scope
+## Requirements
 
-- Install VM guest baseline packages.
-- Enable and start the matching guest agent for the detected virtualization type.
-- Keep guest behavior reusable across future VM workloads.
-- Include guest customization helpers used by common hypervisors. For VMware
-  templates, `cloud-init` and `perl` allow vSphere guest customization to set
-  hostname and static network settings.
+None.
 
 ## Variables
 
@@ -30,7 +25,11 @@ required.
 - `virtual_guest_vmware_guest_agent_service`: VMware guest agent service name.
 - `virtual_guest_vmware_guest_agent_virtualization_types`: virtualization types treated as VMware guests.
 
-## Example
+## Dependencies
+
+None.
+
+## Example Playbook
 
 ```yaml
 - hosts: rhel_vms
@@ -48,3 +47,22 @@ required.
           - rhel-10-for-x86_64-appstream-rpms
     - role: lit.rhel.virtual_guest
 ```
+
+## License
+
+MIT
+
+## Author
+
+Lightning IT
+
+## Additional Notes
+
+### Scope
+
+- Install VM guest baseline packages.
+- Enable and start the matching guest agent for the detected virtualization type.
+- Keep guest behavior reusable across future VM workloads.
+- Include guest customization helpers used by common hypervisors. For VMware
+  templates, `cloud-init` and `perl` allow vSphere guest customization to set
+  hostname and static network settings.
