@@ -191,6 +191,31 @@ configuration.
 
 Collection repositories may only define repository-specific Renovate overrides, such as:
 
+1. temporary version pins
+2. compatibility constraints
+3. collection-specific package rules
+4. local custom managers that are not reusable
+
+The standard branch and release model is:
+
+1. `develop` is the automated integration branch.
+2. Renovate targets `develop`.
+3. Safe patch, minor, pin, and digest updates may auto-merge into `develop` after required CI passes.
+4. Major updates require manual approval.
+5. `main` is the stable release branch and the only real release branch.
+6. `develop` must not be configured as a `semantic-release` branch unless an explicit pre-release strategy is
+   requested.
+7. Weekly promotion from `develop` to `main` must happen through a pull request.
+8. Weekly promotion may use GitHub auto-merge, but must not bypass required checks.
+9. Do not direct-push from `develop` to `main`.
+10. `semantic-release` must remain main-only for stable releases.
+
+When changing shared Renovate or release documentation and agent instructions, final output MUST:
+
+1. confirm that the `shared-assets` README documents the shared Renovate and release workflow
+2. confirm that `AGENTS.md` contains persistent instructions for future agents/Codex runs
+3. list exactly which `AGENTS.md` files were updated
+4. if no `AGENTS.md` exists, create one in the most appropriate location and state why
 - temporary version pins
 - compatibility constraints
 - collection-specific package rules
