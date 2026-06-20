@@ -3,6 +3,10 @@
 Register or unregister RHEL systems with Red Hat Subscription Management (RHSM)
 or Satellite using activation keys or user credentials.
 
+## Requirements
+
+None.
+
 ## Variables
 
 - `rhsm_state`: desired state (`present` | `absent`). Default: `present`.
@@ -16,7 +20,32 @@ or Satellite using activation keys or user credentials.
 - `rhsm_server`: Satellite hostname when using Satellite (optional).
 - `rhsm_baseurl`: Base URL for content (Satellite) (optional).
 
-## Example (Activation Key)
+## Dependencies
+
+None.
+
+## Example Playbook
+
+```yaml
+---
+- name: Use lit.rhel.rhsm
+  hosts: all
+  become: true
+  roles:
+    - role: lit.rhel.rhsm
+```
+
+## License
+
+MIT
+
+## Author
+
+Lightning IT
+
+## Additional Notes
+
+### Example (Activation Key)
 
 ```yaml
 - hosts: all
@@ -30,7 +59,7 @@ or Satellite using activation keys or user credentials.
         rhsm_activation_key: RHEL9-ACTIVATION
 ```
 
-## Example (Unregister)
+### Example (Unregister)
 
 ```yaml
 - hosts: all
@@ -43,7 +72,7 @@ or Satellite using activation keys or user credentials.
         rhsm_state: absent
 ```
 
-## Example (Satellite)
+### Example (Satellite)
 
 ```yaml
 - hosts: all

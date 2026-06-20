@@ -1,6 +1,6 @@
 ---
-- name: Verify SELinux state on RHEL-compatible Vagrant host
-  hosts: rhel_selinux_hosts
+- name: Verify SELinux state on RHEL-compatible Incus target
+  hosts: all
   become: true
   gather_facts: false
 

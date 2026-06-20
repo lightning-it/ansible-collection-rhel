@@ -1,15 +1,18 @@
 ---
-- name: Create RHEL 10 Incus VM for xrdp
+- name: Create RHEL 10 Incus target for xrdp
   hosts: localhost
   gather_facts: false
   vars:
     xrdp_molecule_rhel_major_version: "10"
-    xrdp_molecule_incus_mode: vm
+    xrdp_molecule_incus_mode: "{{ lookup('env', 'INCUS_MODE') | default('vm', true) }}"
     xrdp_molecule_ssh_user: ansible
     xrdp_molecule_instance_name: >-
       {{
         lookup('env', 'INCUS_INSTANCE_NAME')
-        | default('lit-xrdp-rhel10-' ~ lookup('pipe', 'date +%Y%m%d%H%M%S'), true)
+        | default(
+            'lit-xrdp-rhel10-' ~ xrdp_molecule_incus_mode ~ '-' ~ lookup('pipe', 'date +%Y%m%d%H%M%S'),
+            true
+          )
       }}
     xrdp_molecule_project_directory: >-
       {{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | default(playbook_dir ~ '/../..', true) }}
@@ -18,13 +21,22 @@
     xrdp_molecule_instance_config: "{{ lookup('env', 'MOLECULE_INSTANCE_CONFIG') }}"
     xrdp_molecule_name_file: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/incus-instance-name"
   tasks:
-    - name: Persist xrdp Incus VM name for failure cleanup
+    - name: Resolve xrdp Incus target name
+      ansible.builtin.set_fact:
+        xrdp_molecule_resolved_instance_name: "{{ xrdp_molecule_instance_name }}"
+
+    - name: Resolve xrdp Incus inventory file
+      ansible.builtin.set_fact:
+        xrdp_molecule_resolved_inventory_file: >-
+          {{ xrdp_molecule_project_directory }}/deploy/incus/generated/{{ xrdp_molecule_resolved_instance_name }}.ini
+
+    - name: Persist xrdp Incus target name for failure cleanup
       ansible.builtin.copy:
         dest: "{{ xrdp_molecule_name_file }}"
         mode: "0600"
-        content: "{{ xrdp_molecule_instance_name }}"
+        content: "{{ xrdp_molecule_resolved_instance_name }}"
 
-    - name: Create xrdp Incus VM
+    - name: Create xrdp Incus target
       ansible.builtin.command:
         argv:
           - "{{ xrdp_molecule_project_directory }}/deploy/incus/scripts/create.sh"
@@ -33,17 +45,17 @@
           - --mode
           - "{{ xrdp_molecule_incus_mode }}"
           - --name
-          - "{{ xrdp_molecule_instance_name }}"
+          - "{{ xrdp_molecule_resolved_instance_name }}"
           - --ssh-user
           - "{{ xrdp_molecule_ssh_user }}"
       environment:
-        INCUS_RHEL9_IMAGE: "{{ lookup('env', 'INCUS_RHEL9_IMAGE') | default('local:rhel9-ci', true) }}"
-        INCUS_RHEL10_IMAGE: "{{ lookup('env', 'INCUS_RHEL10_IMAGE') | default('local:rhel10-ci', true) }}"
+        INCUS_RHEL9_IMAGE: "{{ lookup('env', 'INCUS_RHEL9_IMAGE') }}"
+        INCUS_RHEL10_IMAGE: "{{ lookup('env', 'INCUS_RHEL10_IMAGE') }}"
       changed_when: true
 
     - name: Read generated Incus inventory
       ansible.builtin.set_fact:
-        xrdp_molecule_inventory_text: "{{ lookup('file', xrdp_molecule_inventory_file) }}"
+        xrdp_molecule_inventory_text: "{{ lookup('file', xrdp_molecule_resolved_inventory_file) }}"
 
     - name: Set generated Incus connection facts
       ansible.builtin.set_fact:
@@ -56,7 +68,7 @@
             | first
           }}
 
-    - name: Wait for SSH on xrdp Incus VM
+    - name: Wait for SSH on xrdp Incus target
       ansible.builtin.wait_for:
         host: "{{ xrdp_molecule_ansible_host }}"
         port: 22
@@ -69,7 +81,7 @@
         mode: "0600"
         content: |
           ---
-          - instance: {{ xrdp_molecule_instance_name }}
+          - instance: {{ xrdp_molecule_resolved_instance_name }}
             address: {{ xrdp_molecule_ansible_host }}
             user: {{ xrdp_molecule_ssh_user }}
             port: 22

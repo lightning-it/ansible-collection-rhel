@@ -1,9 +1,8 @@
 ---
 - name: Converge rhel.repos
-  hosts: rhel_repos
-  become: false
+  hosts: all
+  become: true
   vars:
-    ansible_user: root
     ansible_python_interpreter: /usr/bin/python3
     repos_custom:
       - id: test-custom

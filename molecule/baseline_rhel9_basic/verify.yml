@@ -1,9 +1,8 @@
 ---
 - name: Verify rhel.baseline
-  hosts: rhel_baseline
-  become: false
+  hosts: all
+  become: true
   vars:
-    ansible_user: root
     ansible_remote_tmp: /tmp/.ansible-tmp
     baseline_packages_present:
       - vim-minimal

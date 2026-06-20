@@ -11,6 +11,10 @@ Typical use cases:
 - Ensure SELinux is not accidentally disabled.
 - Standardise SELinux settings across environments.
 
+## Requirements
+
+None.
+
 ## Variables
 
 All variables are defined in `defaults/main.yml`.
@@ -30,7 +34,32 @@ selinux_manage_config: true
 selinux_fail_if_kernel_disabled: false
 ```
 
-## Behaviour
+## Dependencies
+
+None.
+
+## Example Playbook
+
+```yaml
+---
+- name: Use lit.rhel.selinux
+  hosts: all
+  become: true
+  roles:
+    - role: lit.rhel.selinux
+```
+
+## License
+
+MIT
+
+## Author
+
+Lightning IT
+
+## Additional Notes
+
+### Behaviour
 
 - Uses `ansible.posix.selinux` to set SELinux mode and policy.
 - If SELinux is disabled in the running kernel (`getenforce` → Disabled), the
@@ -40,7 +69,7 @@ selinux_fail_if_kernel_disabled: false
     - **warn** and continue if `selinux_fail_if_kernel_disabled: false`,
     - or **fail** with an explicit message if `true`.
 
-## Example usage
+### Example usage
 
 ```yaml
 ---

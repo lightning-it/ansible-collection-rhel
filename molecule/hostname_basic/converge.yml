@@ -1,9 +1,8 @@
 ---
 - name: Converge hostname
-  hosts: hostname_instance
-  become: false
+  hosts: all
+  become: true
   vars:
-    ansible_user: root
     ansible_python_interpreter: /usr/bin/python3
     hostname_fqdn: "node1.example.test"
     hostname_manage_etc_hosts: true

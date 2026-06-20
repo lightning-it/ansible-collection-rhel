@@ -5,6 +5,10 @@ it runs `dnf -y update` every Sunday at 06:00 and writes output to
 `/var/log/dnf-auto-weekly.log`. This role does **not** use the
 `dnf-automatic`/systemd timers; it is purely cron-based for simplicity.
 
+## Requirements
+
+None.
+
 ## Variables
 
 - `automatic_updates_enabled` (bool, default: `true`): Enable/disable the cron job.
@@ -17,7 +21,11 @@ it runs `dnf -y update` every Sunday at 06:00 and writes output to
 - `automatic_updates_cron_name` (string, default: `"Weekly automatic updates"`): Cron entry name.
 - `automatic_updates_initial_update` (bool, default: `true`): Run an initial `dnf update -y` when the role executes.
 
-## Example
+## Dependencies
+
+None.
+
+## Example Playbook
 
 ```yaml
 - name: Enable weekly updates on RHEL hosts
@@ -42,3 +50,11 @@ To disable:
 
 Logs are written to `automatic_updates_log_file`. Adjust the command/log
 path or schedule as needed.
+
+## License
+
+MIT
+
+## Author
+
+Lightning IT

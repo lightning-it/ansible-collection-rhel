@@ -1,9 +1,8 @@
 ---
 - name: Verify rhsm role
-  hosts: rhsm_instance
-  become: false
+  hosts: all
+  become: true
   vars:
-    ansible_user: root
     ansible_python_interpreter: /usr/bin/python3
   gather_facts: false
 

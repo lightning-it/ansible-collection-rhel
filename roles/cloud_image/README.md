@@ -58,7 +58,11 @@ as `qemu-img`, `guestfs-tools`, and `libguestfs`.
 - `cloud_image_incus_metadata_dir`: metadata directory path.
 - `cloud_image_incus_metadata_tarball`: metadata tarball path.
 
-## Example
+## Dependencies
+
+None.
+
+## Example Playbook
 
 ```yaml
 ---
@@ -82,3 +86,11 @@ incus image import /srv/rhel-cloud-image/metadata.tar.xz \
   /srv/incus/images/rhel-10-cloud.qcow2 \
   --alias rhel10-ci
 ```
+
+## License
+
+MIT
+
+## Author
+
+Lightning IT
