@@ -120,6 +120,33 @@ When changing shared Renovate or release documentation and agent instructions, f
 2. confirm that `AGENTS.md` contains persistent instructions for future agents/Codex runs
 3. list exactly which `AGENTS.md` files were updated
 4. if no `AGENTS.md` exists, create one in the most appropriate location and state why
+- temporary version pins
+- compatibility constraints
+- collection-specific package rules
+- local custom managers that are not reusable
+
+The standard branch and release model is:
+
+- `develop` is the automated integration branch.
+- Renovate targets `develop`.
+- Safe patch, minor, pin, and digest updates may auto-merge into `develop` after required CI passes.
+- Major updates require manual approval.
+- `main` is the stable release branch.
+- `develop` must not be configured as a semantic-release branch unless an explicit pre-release strategy is
+  requested.
+- Weekly promotion from `develop` to `main` must happen through a pull request.
+- Weekly promotion may use GitHub auto-merge, but must not bypass required checks.
+- Do not direct-push from `develop` to `main`.
+- semantic-release must remain main-only for stable releases.
+
+Automation safety requirements:
+
+- Protected branches must require pull request review.
+- Only trusted Renovate PRs may be auto-approved by collection automation.
+- A trusted Renovate PR must have `renovate[bot]` as both trigger actor and PR author, a `renovate/*` source
+  branch, `develop` as the base branch, and both `renovate` and `dependencies` labels.
+- Human and external contributor PRs must not be auto-approved or auto-merged by collection automation.
+- Do not use `pull_request_target` for Renovate approval or merge automation.
 
 ## 3. Role Variable Naming and Mapping Rules
 
