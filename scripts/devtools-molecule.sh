@@ -46,35 +46,16 @@ if [ -n "${SCENARIO_FILTER}" ]; then
   echo "Scenario filter: ${SCENARIO_FILTER}"
 fi
 
-WUNDER_DEVTOOLS_DISABLE_DOCKER_SOCKET="${WUNDER_DEVTOOLS_DISABLE_DOCKER_SOCKET:-0}"
-WUNDER_DEVTOOLS_ENABLE_INCUS_SOCKET="${WUNDER_DEVTOOLS_ENABLE_INCUS_SOCKET:-0}"
-if [ -n "${SCENARIO_FILTER}" ] &&
-  [ -f "molecule/${SCENARIO_FILTER}/.molecule-mode" ] &&
-  [ "$(tr -d "[:space:]" < "molecule/${SCENARIO_FILTER}/.molecule-mode")" = "protected-incus" ]; then
-  WUNDER_DEVTOOLS_DISABLE_DOCKER_SOCKET=1
-  WUNDER_DEVTOOLS_ENABLE_INCUS_SOCKET=1
-fi
-
 # For Molecule (Docker + delegated etc.) we run as root inside the container
 export WUNDER_DEVTOOLS_RUN_AS_HOST_UID=0
-export WUNDER_DEVTOOLS_DISABLE_DOCKER_SOCKET
-export WUNDER_DEVTOOLS_ENABLE_INCUS_SOCKET
-export COLLECTION_NAMESPACE
-export COLLECTION_NAME
-export SCENARIO_FILTER
-export CONTAINER_HOME=/tmp/wunder
 
+WUNDER_DEVTOOLS_RUN_AS_HOST_UID=0 \
+COLLECTION_NAMESPACE="${COLLECTION_NAMESPACE}" \
+COLLECTION_NAME="${COLLECTION_NAME}" \
+SCENARIO_FILTER="${SCENARIO_FILTER}" \
+CONTAINER_HOME=/tmp/wunder \
 bash scripts/wunder-devtools-ee.sh env \
-  SCENARIO_FILTER="${SCENARIO_FILTER}" \
   MOLECULE_RUN_PROTECTED="${MOLECULE_RUN_PROTECTED:-false}" \
-  INCUS_INSTANCE_NAME="${INCUS_INSTANCE_NAME:-}" \
-  INCUS_MODE="${INCUS_MODE:-}" \
-  INCUS_RHEL_MAJOR_VERSION="${INCUS_RHEL_MAJOR_VERSION:-}" \
-  INCUS_RHEL9_IMAGE="${INCUS_RHEL9_IMAGE:-}" \
-  INCUS_RHEL10_IMAGE="${INCUS_RHEL10_IMAGE:-}" \
-  INCUS_SSH_PRIVATE_KEY="${INCUS_SSH_PRIVATE_KEY:-}" \
-  INCUS_SSH_PUBLIC_KEY="${INCUS_SSH_PUBLIC_KEY:-}" \
-  INCUS_SSH_PUBLIC_KEY_FILE="${INCUS_SSH_PUBLIC_KEY_FILE:-}" \
   bash -c '
   set -euo pipefail
 
@@ -93,6 +74,17 @@ bash scripts/wunder-devtools-ee.sh env \
   echo "Preparing collection ${ns}.${name} for Molecule tests..."
   if [ -n "${scenario_filter}" ]; then
     echo "Limiting to scenario: ${scenario_filter}"
+  fi
+
+  echo "DEBUG: docker info inside ee-wunder-devtools-ubi9..."
+  if ! docker info >/dev/null 2>&1; then
+    echo "WARN: docker info failed inside devtools container." >&2
+    if [ "${CI:-false}" = "true" ] || [ "${GITHUB_ACTIONS:-false}" = "true" ]; then
+      echo "ERROR: Docker is required for Molecule tests in CI." >&2
+      exit 1
+    fi
+    echo "Skipping Molecule tests because Docker is unavailable in the local devtools container." >&2
+    exit 0
   fi
 
   # -------------------------------------------------------------
@@ -121,37 +113,12 @@ bash scripts/wunder-devtools-ee.sh env \
   # 3) Discover scenarios
   # -------------------------------------------------------------
   scenarios=()
-  requires_docker=false
-
-  scenario_driver() {
-    local scen="$1"
-    awk "
-      /^driver:/ {
-        in_driver = 1
-        next
-      }
-      in_driver && /^[^[:space:]]/ {
-        in_driver = 0
-      }
-      in_driver && /^[[:space:]]+name:/ {
-        print \$2
-        found = 1
-        exit
-      }
-      END {
-        if (!found) {
-          print ""
-        }
-      }
-    " "molecule/${scen}/molecule.yml"
-  }
 
   add_scenario() {
     local scen="$1"
     local explicit="${2:-false}"
     local mode_file="molecule/${scen}/.molecule-mode"
     local mode=""
-    local driver=""
 
     if [ -f "${mode_file}" ]; then
       mode="$(tr -d "[:space:]" < "${mode_file}")"
@@ -172,18 +139,8 @@ bash scripts/wunder-devtools-ee.sh env \
           echo "ERROR: Scenario '\''${scen}'\'' requires the incus CLI inside the devtools container." >&2
           exit 1
         fi
-
-        if ! incus list --format csv >/dev/null 2>&1; then
-          echo "ERROR: Scenario '\''${scen}'\'' requires an accessible Incus daemon/socket." >&2
-          exit 1
-        fi
         ;;
     esac
-
-    driver="$(scenario_driver "$scen")"
-    if [ "$driver" = "docker" ]; then
-      requires_docker=true
-    fi
 
     scenarios+=("${scen}")
   }
@@ -214,19 +171,6 @@ bash scripts/wunder-devtools-ee.sh env \
   if [ "${#scenarios[@]}" -eq 0 ]; then
     echo "No Molecule scenarios found (non-heavy)."
     exit 0
-  fi
-
-  if [ "$requires_docker" = "true" ]; then
-    echo "DEBUG: docker info inside ee-wunder-devtools-ubi9..."
-    if ! docker info >/dev/null 2>&1; then
-      echo "WARN: docker info failed inside devtools container." >&2
-      if [ "${CI:-false}" = "true" ] || [ "${GITHUB_ACTIONS:-false}" = "true" ]; then
-        echo "ERROR: Docker is required for selected Molecule scenarios." >&2
-        exit 1
-      fi
-      echo "Skipping Molecule tests because Docker is unavailable in the local devtools container." >&2
-      exit 0
-    fi
   fi
 
   echo "Running Molecule scenarios: ${scenarios[*]}"
