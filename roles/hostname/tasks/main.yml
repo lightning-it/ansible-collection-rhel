@@ -13,7 +13,9 @@
   ansible.builtin.lineinfile:
     path: /etc/hosts
     regexp: >-
-      ^(?!{{ hostname_etc_hosts_ip | regex_escape() }}\s+)\S+\s+.*{{ hostname_fqdn_effective | regex_escape() }}(\s|$).*$
+      ^(?!{{ hostname_etc_hosts_ip | regex_escape() }}\s+)\S+\s+.*{{
+      hostname_fqdn_effective | regex_escape()
+      }}(\s|$).*$
     state: absent
     unsafe_writes: "{{ hostname_etc_hosts_unsafe_writes | bool }}"
   when:
