@@ -40,7 +40,7 @@ If generic guidance conflicts with repository behavior, you MUST prefer reposito
    3. `.ansible-lint`
    4. `ansible.cfg`
    5. `renovate.base.json`
-   6. `.releaserc`
+   6. `changelogs/config.yaml`
    7. `.yamllint`
    8. `.gitignore`
    9. shared block in `.pre-commit-config.yaml`
@@ -62,6 +62,28 @@ If generic guidance conflicts with repository behavior, you MUST prefer reposito
    2. `ansible-lint.yml` YAML max line length 120
 4. Pre-commit runs devtools-based hooks for `yamllint`, `ansible-lint`, and Molecule light scenarios.
 
+## 2.0.1 Release and Changelog Rules (Mandatory)
+
+1. Ansible collection changelog handling MUST stay repository-based.
+2. NEVER replace Ansible collection changelog files with GitHub Release notes only.
+3. Use `antsibull-changelog` for collection changelogs:
+   1. fragments live under `changelogs/fragments/`,
+   2. generated changelog metadata lives in `changelogs/changelog.yaml`,
+   3. generated release notes live in `CHANGELOG.rst`.
+4. Every user-visible feature, fix, deprecation, removal, security fix, or known issue MUST add a fragment under
+   `changelogs/fragments/<meaningful-name>.yml`.
+5. Normal feature/fix PRs MUST NOT manually edit generated changelog files:
+   1. `changelogs/changelog.yaml`,
+   2. `CHANGELOG.rst`,
+   3. legacy `CHANGELOG.md` files where they still exist.
+6. Generated changelog files and `galaxy.yml` version bumps are release-PR changes only.
+7. Release preparation MUST happen on `release/vX.Y.Z` branches and open a PR into `main`.
+8. No workflow or agent may push release commits directly to `main`.
+9. GitHub Release notes are an additional publishing surface; they MUST be generated from or aligned with the
+   repository changelog, not used as the only changelog.
+10. GitHub repository settings, branch protection, required checks, workflow permissions, labels, environments,
+    secrets, and release-bot permissions MUST be changed only through `github-management-lit`.
+
 ## 2.1 Production Review Standard (Community, Red Hat, Efficiency)
 
 Use this standard when reviewing, creating, or changing collection content. Treat it as the baseline audit prompt for
@@ -73,7 +95,7 @@ production readiness, Ansible Galaxy readiness, and Red Hat Ansible Automation P
 2. Keep `galaxy.yml` complete and accurate: namespace, name, version, README, description, repository, authors,
    license, tags, dependencies, and `build_ignore`.
 3. Keep `meta/runtime.yml` aligned with the supported Ansible range.
-4. Keep README, changelog/release notes, examples, role docs, and licensing suitable for publication.
+4. Keep README, Ansible collection changelog files, examples, role docs, and licensing suitable for publication.
 5. Ensure collection dependencies are declared once in `galaxy.yml` unless this guide documents an overlay exception.
 
 ### 2.1.2 Ansible Community Best Practices
@@ -203,31 +225,6 @@ configuration.
 
 Collection repositories may only define repository-specific Renovate overrides, such as:
 
-1. temporary version pins
-2. compatibility constraints
-3. collection-specific package rules
-4. local custom managers that are not reusable
-
-The standard branch and release model is:
-
-1. `develop` is the automated integration branch.
-2. Renovate targets `develop`.
-3. Safe patch, minor, pin, and digest updates may auto-merge into `develop` after required CI passes.
-4. Major updates require manual approval.
-5. `main` is the stable release branch and the only real release branch.
-6. `develop` must not be configured as a `semantic-release` branch unless an explicit pre-release strategy is
-   requested.
-7. Weekly promotion from `develop` to `main` must happen through a pull request.
-8. Weekly promotion may use GitHub auto-merge, but must not bypass required checks.
-9. Do not direct-push from `develop` to `main`.
-10. `semantic-release` must remain main-only for stable releases.
-
-When changing shared Renovate or release documentation and agent instructions, final output MUST:
-
-1. confirm that the `shared-assets` README documents the shared Renovate and release workflow
-2. confirm that `AGENTS.md` contains persistent instructions for future agents/Codex runs
-3. list exactly which `AGENTS.md` files were updated
-4. if no `AGENTS.md` exists, create one in the most appropriate location and state why
 - temporary version pins
 - compatibility constraints
 - collection-specific package rules
@@ -240,12 +237,11 @@ The standard branch and release model is:
 - Safe patch, minor, pin, and digest updates may auto-merge into `develop` after required CI passes.
 - Major updates require manual approval.
 - `main` is the stable release branch.
-- `develop` must not be configured as a semantic-release branch unless an explicit pre-release strategy is
-  requested.
-- Weekly promotion from `develop` to `main` must happen through a pull request.
-- Weekly promotion may use GitHub auto-merge, but must not bypass required checks.
+- Promotion from `develop` to `main` must happen through a pull request.
+- Promotion pull requests must remain a human-visible manual merge checkpoint after required checks pass.
 - Do not direct-push from `develop` to `main`.
-- semantic-release must remain main-only for stable releases.
+- Collection releases must be prepared from `release/vX.Y.Z` branches with `antsibull-changelog`.
+- Release PRs target `main` and must pass required checks before merge.
 
 Automation safety requirements:
 
@@ -253,7 +249,8 @@ Automation safety requirements:
 - Only trusted Renovate PRs may be auto-approved by collection automation.
 - A trusted Renovate PR must have `renovate[bot]` as both trigger actor and PR author, a `renovate/*` source
   branch, `develop` as the base branch, and both `renovate` and `dependencies` labels.
-- Human and external contributor PRs must not be auto-approved or auto-merged by collection automation.
+- Human, external contributor, and develop-to-main promotion PRs must not be auto-approved or auto-merged by
+  collection automation.
 - Do not use `pull_request_target` for Renovate approval or merge automation.
 
 ## 3. Role Variable Naming and Mapping Rules
@@ -615,51 +612,7 @@ For each new or changed role, and for any newly added scenario:
    4. `.ansible/`
    5. `dist/`, `build/`
 
-## 10. Local Deployment Harnesses
-
-This repository may include local system-level deployment harnesses under paths such as `deploy/` or helper
-scripts under `scripts/`. Heavy system tests should use Incus VMs or Incus containers.
-
-### 10.1 Incus Workflow Validation (Mandatory)
-
-When changing the Incus workflow under `deploy/incus/`, related helper scripts, or GitHub Actions workflows that
-exercise Incus/RHEL testing, you MUST validate through the repo devtools container path before finalizing:
-
-1. Run devtools-backed YAML lint for changed Incus profile/workflow/pre-commit files:
-
-```bash
-bash scripts/wunder-devtools-ee.sh yamllint deploy/incus/profiles .github/workflows/incus-rhel-protected.yml .pre-commit-config.yaml
-```
-
-2. Run devtools-backed Ansible lint for the repository:
-
-```bash
-ANSIBLE_CORE_VERSION=2.15.13 ANSIBLE_LINT_VERSION=6.22.2 bash scripts/devtools-ansible-lint.sh
-```
-
-3. Run shell syntax checks inside the devtools container for changed shell scripts:
-
-```bash
-bash scripts/wunder-devtools-ee.sh bash -lc 'bash -n deploy/incus/scripts/create.sh deploy/incus/scripts/destroy.sh deploy/incus/scripts/inventory.sh scripts/devtools-incus-selinux-heavy.sh scripts/devtools-molecule-rdp-rhel9-heavy.sh'
-```
-
-4. If Incus is available locally, run a create/inventory/Ansible/destroy smoke test for the affected version and mode.
-   If Incus is not available, state that clearly and provide the exact command the user should run manually.
-5. Cloud-init templates SHOULD use a non-`.yml` extension (for example `.cloud-config`) when they need
-   `#cloud-config` as the first line, because generic YAML/Ansible linters require `---` document starts.
-
-### 10.2 CI Security Boundary For RHEL Images
-
-1. Public pull-request CI MUST NOT require Red Hat credentials, private RHEL images, subscription-manager
-   credentials, or GitHub secrets.
-2. Real RHEL 9/RHEL 10 Incus VM testing MUST be isolated in protected workflow paths only.
-3. Protected RHEL CI MUST run only on trusted events such as `push` to `main`, `push` to `release/**`,
-   `workflow_dispatch`, or scheduled jobs.
-4. Do NOT use `pull_request_target` for workflows that check out and execute repository code with access to secrets.
-5. Protected Incus/RHEL workflows SHOULD assume preloaded private local image aliases such as `local:rhel9-ci`
-   and `local:rhel10-ci`; do not upload, cache, publish, or log private image material.
-
-## 11. Role README Standard
+## 10. Role README Standard
 
 Each role `README.md` MUST use these section headers in this order:
 
@@ -672,7 +625,7 @@ Each role `README.md` MUST use these section headers in this order:
 
 Variables section SHOULD point to `defaults/main.yml` and highlight key inputs.
 
-## 12. Definition of Done
+## 11. Definition of Done
 
 Before finalizing, confirm all items below:
 
@@ -685,17 +638,8 @@ Before finalizing, confirm all items below:
 3. If a local gate is skipped, the final response names the missing runtime or concrete blocker, such as no
    Docker/Podman socket or protected Incus requirements.
 4. Documentation is updated for changed role interfaces.
-5. No CI, workflow, Renovate, or semantic-release config changes were made unless requested.
-6. Incus/deployment harness changes have passed the devtools-container checks in section 10.1, or any skipped
-   check has a concrete environment reason and a manual command for the user.
-7. Role prechecks are action-scoped and role-scoped:
+5. No CI, workflow, Renovate, or release-automation config changes were made unless requested.
+6. Role prechecks are action-scoped and role-scoped:
    1. no cross-role raw var assertions in `assert.yml`
    2. no duplicate copy-paste assert blocks
    3. required foreign inputs mapped in `defaults/main.yml` with role prefix
-
-## Secret Storage Rule
-
-- Never commit secret values, tokens, passwords, private keys, activation codes, or decrypted Vault output.
-- When HC Vault is configured for a role or runbook, generated credentials must be read from HC Vault first, generated only when missing, written back to HC Vault, and then consumed by the application from the Vault-backed Ansible variables. Do not keep generated plaintext secret files on the managed host unless a role has an explicit break-glass option such as `*_allow_local_secret_files=true`.
-- When HC Vault is not configured, required credentials must be supplied from Ansible Vault encrypted inventory variables. Do not add new plaintext generated-secret fallbacks.
-- Tasks that read, generate, write, template, or compare secret material must use `no_log: true`.
