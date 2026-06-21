@@ -116,19 +116,17 @@ if [ "$CONTAINER_BIN" = "podman" ]; then
 fi
 
 DOCKER_SOCKET=""
-if [ "${WUNDER_DEVTOOLS_DISABLE_DOCKER_SOCKET:-0}" != "1" ]; then
-  if [[ "${DOCKER_HOST:-}" == unix://* ]]; then
-    host_sock="${DOCKER_HOST#unix://}"
-    if [ -S "$host_sock" ]; then
-      DOCKER_SOCKET="$host_sock"
-    fi
-  elif [ -S "/run/user/$(id -u)/podman/podman.sock" ]; then
-    DOCKER_SOCKET="/run/user/$(id -u)/podman/podman.sock"
-  elif [ -S "$HOME/.docker/run/docker.sock" ]; then
-    DOCKER_SOCKET="$HOME/.docker/run/docker.sock"
-  elif [ -S /var/run/docker.sock ]; then
-    DOCKER_SOCKET="/var/run/docker.sock"
+if [[ "${DOCKER_HOST:-}" == unix://* ]]; then
+  host_sock="${DOCKER_HOST#unix://}"
+  if [ -S "$host_sock" ]; then
+    DOCKER_SOCKET="$host_sock"
   fi
+elif [ -S "/run/user/$(id -u)/podman/podman.sock" ]; then
+  DOCKER_SOCKET="/run/user/$(id -u)/podman/podman.sock"
+elif [ -S "$HOME/.docker/run/docker.sock" ]; then
+  DOCKER_SOCKET="$HOME/.docker/run/docker.sock"
+elif [ -S /var/run/docker.sock ]; then
+  DOCKER_SOCKET="/var/run/docker.sock"
 fi
 
 if [ -n "$DOCKER_SOCKET" ]; then
@@ -174,47 +172,6 @@ elif [ "${PODMAN_ROOTLESS}" = "1" ]; then
   DOCKER_ARGS+=(--user 0:0)
 fi
 
-INCUS_SOCKET=""
-if [ "${WUNDER_DEVTOOLS_ENABLE_INCUS_SOCKET:-0}" = "1" ]; then
-  for candidate in \
-    "${INCUS_SOCKET:-}" \
-    /run/incus/unix.socket \
-    /var/lib/incus/unix.socket \
-    /var/snap/lxd/common/lxd/unix.socket \
-    /run/lxd/unix.socket; do
-    if [ -n "${candidate:-}" ] && [ -S "$candidate" ]; then
-      INCUS_SOCKET="$candidate"
-      break
-    fi
-  done
-fi
-
-if [ -n "$INCUS_SOCKET" ]; then
-  DOCKER_ARGS+=(-v "$INCUS_SOCKET:$INCUS_SOCKET")
-  DOCKER_ARGS+=(-e "INCUS_SOCKET=$INCUS_SOCKET")
-  if [ "$CONTAINER_BIN" = "podman" ] && [ "$(uname -s)" = "Linux" ]; then
-    DOCKER_ARGS+=(--security-opt label=disable)
-  fi
-
-  if [ "$CONTAINER_BIN" = "podman" ] && [ "${PODMAN_ROOTLESS}" = "1" ]; then
-    DOCKER_ARGS+=(--group-add keep-groups)
-  else
-    incus_socket_gid="$(
-      stat -c %g "$INCUS_SOCKET" 2>/dev/null \
-      || stat -f %g "$INCUS_SOCKET" 2>/dev/null \
-      || true
-    )"
-    if [ -n "${incus_socket_gid:-}" ]; then
-      DOCKER_ARGS+=(--group-add "$incus_socket_gid")
-    fi
-  fi
-fi
-
-HOST_INCUS_BIN="$(command -v incus 2>/dev/null || true)"
-if [ -n "$HOST_INCUS_BIN" ]; then
-  DOCKER_ARGS+=(-v "$HOST_INCUS_BIN:/usr/local/bin/incus:ro")
-fi
-
 if [ "$(uname -s)" = "Linux" ]; then
   DOCKER_ARGS+=(--add-host=host.docker.internal:host-gateway)
 fi
@@ -243,13 +200,9 @@ fi
   ${COLLECTION_NAME:+-e COLLECTION_NAME} \
   ${SCENARIO_FILTER:+-e SCENARIO_FILTER} \
   ${EXAMPLE_PLAYBOOK:+-e EXAMPLE_PLAYBOOK} \
-  ${INCUS_INSTANCE_NAME:+-e INCUS_INSTANCE_NAME} \
-  ${INCUS_MODE:+-e INCUS_MODE} \
-  ${INCUS_RHEL_MAJOR_VERSION:+-e INCUS_RHEL_MAJOR_VERSION} \
-  ${INCUS_RHEL9_IMAGE:+-e INCUS_RHEL9_IMAGE} \
-  ${INCUS_RHEL10_IMAGE:+-e INCUS_RHEL10_IMAGE} \
-  ${INCUS_SSH_PRIVATE_KEY:+-e INCUS_SSH_PRIVATE_KEY} \
-  ${INCUS_SSH_PUBLIC_KEY:+-e INCUS_SSH_PUBLIC_KEY} \
-  ${INCUS_SSH_PUBLIC_KEY_FILE:+-e INCUS_SSH_PUBLIC_KEY_FILE} \
   ${MOLECULE_NO_LOG:+-e MOLECULE_NO_LOG} \
+  ${VAGRANT_SSH_HOST:+-e VAGRANT_SSH_HOST} \
+  ${VAGRANT_SSH_PORT:+-e VAGRANT_SSH_PORT} \
+  ${VAGRANT_SSH_USER:+-e VAGRANT_SSH_USER} \
+  ${VAGRANT_SSH_KEY:+-e VAGRANT_SSH_KEY} \
   "$IMAGE" "$@"
