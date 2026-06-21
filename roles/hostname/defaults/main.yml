@@ -4,6 +4,7 @@ hostname_fqdn: "{{ inventory_hostname }}"
 
 # Manage /etc/hosts entry for 127.0.1.1
 hostname_manage_etc_hosts: true
+hostname_remove_stale_etc_hosts_entries: true
 
 # Which IP to use for the local hostname line
 hostname_etc_hosts_ip: "127.0.1.1"
