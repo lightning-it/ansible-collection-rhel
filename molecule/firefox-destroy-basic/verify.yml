@@ -4,8 +4,13 @@
   connection: local
   gather_facts: false
   tasks:
+    - name: Read lit.rhel.firefox_destroy coverage marker
+      ansible.builtin.slurp:
+        src: /tmp/lit-rhel-firefox_destroy-molecule-coverage
+      register: firefox_destroy_molecule_coverage_marker
+
     - name: Assert lit.rhel.firefox_destroy coverage stub ran
       ansible.builtin.assert:
         that:
-          - firefox_destroy_molecule_coverage_mode | default('') == 'syntax_stub'
+          - (firefox_destroy_molecule_coverage_marker.content | b64decode | trim) == "syntax_stub"
         quiet: true

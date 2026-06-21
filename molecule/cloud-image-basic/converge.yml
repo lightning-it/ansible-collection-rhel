@@ -11,6 +11,8 @@
         name: lit.rhel.cloud_image
       when: cloud_image_molecule_execute_role | bool
 
-    - name: Record lit.rhel.cloud_image Molecule coverage mode
-      ansible.builtin.set_fact:
-        cloud_image_molecule_coverage_mode: syntax_stub
+    - name: Record lit.rhel.cloud_image Molecule coverage marker
+      ansible.builtin.copy:
+        dest: /tmp/lit-rhel-cloud_image-molecule-coverage
+        content: "syntax_stub\n"
+        mode: "0644"

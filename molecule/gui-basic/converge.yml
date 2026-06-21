@@ -11,6 +11,8 @@
         name: lit.rhel.gui
       when: gui_molecule_execute_role | bool
 
-    - name: Record lit.rhel.gui Molecule coverage mode
-      ansible.builtin.set_fact:
-        gui_molecule_coverage_mode: syntax_stub
+    - name: Record lit.rhel.gui Molecule coverage marker
+      ansible.builtin.copy:
+        dest: /tmp/lit-rhel-gui-molecule-coverage
+        content: "syntax_stub\n"
+        mode: "0644"
