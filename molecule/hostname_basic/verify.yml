@@ -1,7 +1,7 @@
 ---
 - name: Verify rhel.hostname
-  hosts: hostname_instance
-  become: false
+  hosts: all
+  become: true
   gather_facts: false
   vars:
     expected_fqdn: "node1.example.test"

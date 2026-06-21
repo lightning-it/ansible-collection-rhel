@@ -1,5 +1,5 @@
 ---
-- name: Destroy RHEL 10 Incus VM for xrdp
+- name: Destroy RHEL 10 Incus target for xrdp
   hosts: localhost
   gather_facts: false
   vars:
@@ -13,13 +13,13 @@
         xrdp_molecule_instances: "{{ lookup('file', xrdp_molecule_instance_config) | from_yaml }}"
       when: xrdp_molecule_instance_config | length > 0 and xrdp_molecule_instance_config is file
 
-    - name: Read fallback xrdp Incus VM name
+    - name: Read fallback xrdp Incus target name
       ansible.builtin.set_fact:
         xrdp_molecule_fallback_instance_name: >-
           {{ lookup('env', 'INCUS_INSTANCE_NAME') | default(lookup('file', xrdp_molecule_name_file), true) }}
       when: xrdp_molecule_name_file is file or lookup('env', 'INCUS_INSTANCE_NAME') | length > 0
 
-    - name: Destroy configured xrdp Incus VMs
+    - name: Destroy configured xrdp Incus targets
       ansible.builtin.command:
         argv:
           - "{{ xrdp_molecule_project_directory }}/deploy/incus/scripts/destroy.sh"
@@ -28,7 +28,7 @@
       loop: "{{ xrdp_molecule_instances | default([]) }}"
       changed_when: true
 
-    - name: Destroy fallback xrdp Incus VM
+    - name: Destroy fallback xrdp Incus target
       ansible.builtin.command:
         argv:
           - "{{ xrdp_molecule_project_directory }}/deploy/incus/scripts/destroy.sh"
@@ -45,7 +45,7 @@
         state: absent
       when: xrdp_molecule_instance_config | length > 0
 
-    - name: Remove fallback xrdp Incus VM name file
+    - name: Remove fallback xrdp Incus target name file
       ansible.builtin.file:
         path: "{{ xrdp_molecule_name_file }}"
         state: absent

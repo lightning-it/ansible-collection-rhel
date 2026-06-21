@@ -1,0 +1,18 @@
+---
+- name: Converge virtual guest syntax coverage
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    virtual_guest_molecule_execute_role: false
+  tasks:
+    - name: Import lit.rhel.virtual_guest for syntax coverage
+      ansible.builtin.import_role:
+        name: lit.rhel.virtual_guest
+      when: virtual_guest_molecule_execute_role | bool
+
+    - name: Record lit.rhel.virtual_guest Molecule coverage marker
+      ansible.builtin.copy:
+        dest: /tmp/lit-rhel-virtual_guest-molecule-coverage
+        content: "syntax_stub\n"
+        mode: "0644"

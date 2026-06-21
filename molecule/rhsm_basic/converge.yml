@@ -1,9 +1,8 @@
 ---
 - name: Converge rhsm role
-  hosts: rhsm_instance
-  become: false
+  hosts: all
+  become: true
   vars:
-    ansible_user: root
     ansible_python_interpreter: /usr/bin/python3
     rhsm_method: none
   pre_tasks:

@@ -1,7 +1,7 @@
 ---
 - name: Verify automatic_updates
-  hosts: automatic_updates
-  become: false
+  hosts: all
+  become: true
   gather_facts: false
   vars:
     cron_path: /var/spool/cron/root

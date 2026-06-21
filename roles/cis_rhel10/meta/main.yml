@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  role_name: cis_rhel10
+  namespace: lit
+  author: Lightning IT
+  description: Thin wrapper for the ansible-lockdown RHEL10 CIS role.
+  company: Lightning IT
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: EL
+      versions: ["10"]
+  galaxy_tags:
+    - rhel
+    - cis
+    - compliance
+    - hardening
+dependencies: []

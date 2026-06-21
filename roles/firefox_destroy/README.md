@@ -1,10 +1,42 @@
+# lit.rhel.firefox_destroy
+
 ---
 # lit.rhel.firefox_destroy
 
 Remove managed Firefox state on RHEL 9 using the shared `lit.rhel.firefox`
 helper role.
 
-## Scope
+## Requirements
+
+None.
+
+## Variables
+
+See `defaults/main.yml`.
+
+## Dependencies
+
+None.
+
+## Example Playbook
+
+```yaml
+- hosts: workstations
+  roles:
+    - role: lit.rhel.firefox_destroy
+```
+
+## License
+
+MIT
+
+## Author
+
+Lightning IT
+
+## Additional Notes
+
+### Scope
 
 This role can:
 
@@ -20,12 +52,4 @@ firefox_remove_package: false
 firefox_remove_config: false
 firefox_remove_policies: false
 firefox_remove_bookmarks: false
-```
-
-## Example
-
-```yaml
-- hosts: workstations
-  roles:
-    - role: lit.rhel.firefox_destroy
 ```

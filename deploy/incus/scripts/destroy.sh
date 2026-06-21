@@ -62,6 +62,8 @@ rm -f \
   "${generated_dir}/${instance_name}.ini" \
   "${generated_dir}/${instance_name}.env" \
   "${generated_dir}/${instance_name}-cloud-init.yml" \
+  "${generated_dir}/${instance_name}-ssh-key" \
+  "${generated_dir}/${instance_name}-ssh-key.pub" \
   "${generated_dir}/${profile_name}.yml"
 
 echo "Destroyed Incus instance '${instance_name}' and profile '${profile_name}'."

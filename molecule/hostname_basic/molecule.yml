@@ -1,6 +1,6 @@
 ---
 driver:
-  name: docker
+  name: default
 
 dependency:
   name: galaxy
@@ -9,21 +9,14 @@ dependency:
 
 platforms:
   - name: hostname_instance
-    image: quay.io/rockylinux/rockylinux:9
-    pre_build_image: true
-    privileged: true
 
 provisioner:
   name: ansible
-  inventory:
-    hosts:
-      all:
-        hosts:
-          hostname_instance:
-            ansible_connection: docker
   playbooks:
+    create: ../incus_shared/create.yml
     converge: converge.yml
     verify: verify.yml
+    destroy: ../incus_shared/destroy.yml
 
 verifier:
   name: ansible

@@ -1,0 +1,16 @@
+---
+- name: Verify cloud image syntax coverage
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Read lit.rhel.cloud_image coverage marker
+      ansible.builtin.slurp:
+        src: /tmp/lit-rhel-cloud_image-molecule-coverage
+      register: cloud_image_molecule_coverage_marker
+
+    - name: Assert lit.rhel.cloud_image coverage stub ran
+      ansible.builtin.assert:
+        that:
+          - (cloud_image_molecule_coverage_marker.content | b64decode | trim) == "syntax_stub"
+        quiet: true

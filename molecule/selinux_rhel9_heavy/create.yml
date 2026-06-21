@@ -1,0 +1,94 @@
+---
+- name: Create RHEL 9 Incus target for SELinux heavy test
+  hosts: localhost
+  gather_facts: false
+  vars:
+    selinux_molecule_rhel_major_version: "9"
+    selinux_molecule_incus_mode: "{{ lookup('env', 'INCUS_MODE') | default('vm', true) }}"
+    selinux_molecule_ssh_user: ansible
+    selinux_molecule_instance_name: >-
+      {{
+        lookup('env', 'INCUS_INSTANCE_NAME')
+        | default(
+            'lit-selinux-rhel9-' ~ selinux_molecule_incus_mode ~ '-' ~ lookup('pipe', 'date +%Y%m%d%H%M%S'),
+            true
+          )
+      }}
+    selinux_molecule_project_directory: >-
+      {{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | default(playbook_dir ~ '/../..', true) }}
+    selinux_molecule_inventory_file: >-
+      {{ selinux_molecule_project_directory }}/deploy/incus/generated/{{ selinux_molecule_instance_name }}.ini
+    selinux_molecule_instance_config: "{{ lookup('env', 'MOLECULE_INSTANCE_CONFIG') }}"
+    selinux_molecule_name_file: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/incus-instance-name"
+  tasks:
+    - name: Resolve SELinux Incus target name
+      ansible.builtin.set_fact:
+        selinux_molecule_resolved_instance_name: "{{ selinux_molecule_instance_name }}"
+
+    - name: Resolve SELinux Incus inventory file
+      ansible.builtin.set_fact:
+        selinux_molecule_resolved_inventory_file: >-
+          {{ selinux_molecule_project_directory }}/deploy/incus/generated/{{
+            selinux_molecule_resolved_instance_name
+          }}.ini
+
+    - name: Persist SELinux Incus target name for failure cleanup
+      ansible.builtin.copy:
+        dest: "{{ selinux_molecule_name_file }}"
+        mode: "0600"
+        content: "{{ selinux_molecule_resolved_instance_name }}"
+
+    - name: Create SELinux Incus target
+      ansible.builtin.command:
+        argv:
+          - "{{ selinux_molecule_project_directory }}/deploy/incus/scripts/create.sh"
+          - --version
+          - "{{ selinux_molecule_rhel_major_version }}"
+          - --mode
+          - "{{ selinux_molecule_incus_mode }}"
+          - --name
+          - "{{ selinux_molecule_resolved_instance_name }}"
+          - --ssh-user
+          - "{{ selinux_molecule_ssh_user }}"
+      environment:
+        INCUS_RHEL9_IMAGE: "{{ lookup('env', 'INCUS_RHEL9_IMAGE') }}"
+        INCUS_RHEL10_IMAGE: "{{ lookup('env', 'INCUS_RHEL10_IMAGE') }}"
+        INCUS_SSH_PRIVATE_KEY: "{{ lookup('env', 'INCUS_SSH_PRIVATE_KEY') }}"
+        INCUS_SSH_PUBLIC_KEY: "{{ lookup('env', 'INCUS_SSH_PUBLIC_KEY') }}"
+        INCUS_SSH_PUBLIC_KEY_FILE: "{{ lookup('env', 'INCUS_SSH_PUBLIC_KEY_FILE') }}"
+      changed_when: true
+
+    - name: Read generated Incus inventory
+      ansible.builtin.set_fact:
+        selinux_molecule_inventory_text: "{{ lookup('file', selinux_molecule_resolved_inventory_file) }}"
+
+    - name: Set generated Incus connection facts
+      ansible.builtin.set_fact:
+        selinux_molecule_ansible_host: >-
+          {{ selinux_molecule_inventory_text | regex_search('ansible_host=([^ ]+)', '\1') | first }}
+        selinux_molecule_private_key: >-
+          {{
+            selinux_molecule_inventory_text
+            | regex_search('ansible_ssh_private_key_file=([^ ]+)', '\1')
+            | first
+          }}
+
+    - name: Wait for SSH on SELinux Incus target
+      ansible.builtin.wait_for:
+        host: "{{ selinux_molecule_ansible_host }}"
+        port: 22
+        timeout: 300
+        sleep: 5
+
+    - name: Persist Molecule instance config
+      ansible.builtin.copy:
+        dest: "{{ selinux_molecule_instance_config }}"
+        mode: "0600"
+        content: |
+          ---
+          - instance: {{ selinux_molecule_resolved_instance_name }}
+            address: {{ selinux_molecule_ansible_host }}
+            user: {{ selinux_molecule_ssh_user }}
+            port: 22
+            identity_file: {{ selinux_molecule_private_key }}
+            connection: ssh

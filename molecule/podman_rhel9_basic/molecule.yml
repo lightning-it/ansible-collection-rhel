@@ -1,6 +1,6 @@
 ---
 driver:
-  name: docker
+  name: default
 
 dependency:
   name: galaxy
@@ -8,15 +8,12 @@ dependency:
     requirements-file: "${MOLECULE_PROJECT_DIRECTORY}/collections/requirements.yml"
 platforms:
   - name: control
-    image: quay.io/rockylinux/rockylinux:9
-    pre_build_image: true
+
 provisioner:
   name: ansible
-  inventory:
-    hosts:
-      all:
-        hosts:
-          control:
-            ansible_connection: docker
+  playbooks:
+    create: ../incus_shared/create.yml
+    converge: converge.yml
+    destroy: ../incus_shared/destroy.yml
 verifier:
   name: ansible

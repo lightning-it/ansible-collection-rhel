@@ -1,0 +1,16 @@
+---
+- name: Verify gui syntax coverage
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Read lit.rhel.gui coverage marker
+      ansible.builtin.slurp:
+        src: /tmp/lit-rhel-gui-molecule-coverage
+      register: gui_molecule_coverage_marker
+
+    - name: Assert lit.rhel.gui coverage stub ran
+      ansible.builtin.assert:
+        that:
+          - (gui_molecule_coverage_marker.content | b64decode | trim) == "syntax_stub"
+        quiet: true

@@ -121,6 +121,8 @@ if [ -z "${profile_name}" ]; then
   profile_name="${instance_name}-profile"
 fi
 
+mkdir -p "${generated_dir}"
+
 if [ -z "${public_key_content}" ]; then
   if [ -z "${public_key_file}" ]; then
     for candidate in "${HOME}/.ssh/id_ed25519.pub" "${HOME}/.ssh/id_rsa.pub"; do
@@ -132,8 +134,14 @@ if [ -z "${public_key_content}" ]; then
   fi
 
   if [ -z "${public_key_file}" ] || [ ! -f "${public_key_file}" ]; then
-    echo "ERROR: No SSH public key found. Use --public-key-file or --public-key." >&2
-    exit 2
+    generated_key_file="${generated_dir}/${instance_name}-ssh-key"
+    if ! command -v ssh-keygen >/dev/null 2>&1; then
+      echo "ERROR: No SSH public key found and ssh-keygen is unavailable." >&2
+      echo "Use --public-key-file or --public-key." >&2
+      exit 2
+    fi
+    ssh-keygen -q -t ed25519 -N "" -C "${instance_name}" -f "${generated_key_file}"
+    public_key_file="${generated_key_file}.pub"
   fi
 
   public_key_content="$(tr -d '\n' < "${public_key_file}")"
@@ -152,8 +160,6 @@ if [ ! -f "${cloud_init_template}" ] || [ ! -f "${profile_template}" ]; then
   echo "ERROR: Missing Incus template for RHEL ${version} ${mode}." >&2
   exit 1
 fi
-
-mkdir -p "${generated_dir}"
 
 cloud_init_file="${generated_dir}/${instance_name}-cloud-init.yml"
 profile_file="${generated_dir}/${profile_name}.yml"

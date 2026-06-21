@@ -1,0 +1,94 @@
+---
+- name: Create Incus target for Molecule scenario
+  hosts: localhost
+  gather_facts: false
+  vars:
+    incus_molecule_scenario_name: "{{ lookup('env', 'MOLECULE_SCENARIO_NAME') | default('molecule', true) }}"
+    incus_molecule_safe_name: "{{ incus_molecule_scenario_name | regex_replace('[^A-Za-z0-9-]+', '-') }}"
+    incus_molecule_rhel_major_version: "{{ lookup('env', 'INCUS_RHEL_MAJOR_VERSION') | default('9', true) }}"
+    incus_molecule_mode: "{{ lookup('env', 'INCUS_MODE') | default('container', true) }}"
+    incus_molecule_ssh_user: ansible
+    incus_molecule_instance_name: >-
+      {{
+        lookup('env', 'INCUS_INSTANCE_NAME')
+        | default(
+            'lit-' ~ incus_molecule_safe_name ~ '-' ~ incus_molecule_mode ~ '-' ~ lookup('pipe', 'date +%Y%m%d%H%M%S'),
+            true
+          )
+      }}
+    incus_molecule_project_directory: >-
+      {{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | default(playbook_dir ~ '/../..', true) }}
+    incus_molecule_inventory_file: >-
+      {{ incus_molecule_project_directory }}/deploy/incus/generated/{{ incus_molecule_instance_name }}.ini
+    incus_molecule_instance_config: "{{ lookup('env', 'MOLECULE_INSTANCE_CONFIG') }}"
+    incus_molecule_name_file: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/incus-instance-name"
+  tasks:
+    - name: Resolve Incus target name
+      ansible.builtin.set_fact:
+        incus_molecule_resolved_instance_name: "{{ incus_molecule_instance_name }}"
+
+    - name: Resolve Incus inventory file
+      ansible.builtin.set_fact:
+        incus_molecule_resolved_inventory_file: >-
+          {{ incus_molecule_project_directory }}/deploy/incus/generated/{{ incus_molecule_resolved_instance_name }}.ini
+
+    - name: Persist Incus target name for failure cleanup
+      ansible.builtin.copy:
+        dest: "{{ incus_molecule_name_file }}"
+        mode: "0600"
+        content: "{{ incus_molecule_resolved_instance_name }}"
+
+    - name: Create Incus target
+      ansible.builtin.command:
+        argv:
+          - "{{ incus_molecule_project_directory }}/deploy/incus/scripts/create.sh"
+          - --version
+          - "{{ incus_molecule_rhel_major_version }}"
+          - --mode
+          - "{{ incus_molecule_mode }}"
+          - --name
+          - "{{ incus_molecule_resolved_instance_name }}"
+          - --ssh-user
+          - "{{ incus_molecule_ssh_user }}"
+      environment:
+        INCUS_RHEL9_IMAGE: "{{ lookup('env', 'INCUS_RHEL9_IMAGE') }}"
+        INCUS_RHEL10_IMAGE: "{{ lookup('env', 'INCUS_RHEL10_IMAGE') }}"
+        INCUS_SSH_PRIVATE_KEY: "{{ lookup('env', 'INCUS_SSH_PRIVATE_KEY') }}"
+        INCUS_SSH_PUBLIC_KEY: "{{ lookup('env', 'INCUS_SSH_PUBLIC_KEY') }}"
+        INCUS_SSH_PUBLIC_KEY_FILE: "{{ lookup('env', 'INCUS_SSH_PUBLIC_KEY_FILE') }}"
+      changed_when: true
+
+    - name: Read generated Incus inventory
+      ansible.builtin.set_fact:
+        incus_molecule_inventory_text: "{{ lookup('file', incus_molecule_resolved_inventory_file) }}"
+
+    - name: Set generated Incus connection facts
+      ansible.builtin.set_fact:
+        incus_molecule_ansible_host: >-
+          {{ incus_molecule_inventory_text | regex_search('ansible_host=([^ ]+)', '\1') | first }}
+        incus_molecule_private_key: >-
+          {{
+            incus_molecule_inventory_text
+            | regex_search('ansible_ssh_private_key_file=([^ ]+)', '\1')
+            | first
+          }}
+
+    - name: Wait for SSH on Incus target
+      ansible.builtin.wait_for:
+        host: "{{ incus_molecule_ansible_host }}"
+        port: 22
+        timeout: 300
+        sleep: 5
+
+    - name: Persist Molecule instance config
+      ansible.builtin.copy:
+        dest: "{{ incus_molecule_instance_config }}"
+        mode: "0600"
+        content: |
+          ---
+          - instance: {{ incus_molecule_resolved_instance_name }}
+            address: {{ incus_molecule_ansible_host }}
+            user: {{ incus_molecule_ssh_user }}
+            port: 22
+            identity_file: {{ incus_molecule_private_key }}
+            connection: ssh

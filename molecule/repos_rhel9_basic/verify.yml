@@ -1,7 +1,7 @@
 ---
 - name: Verify rhel.repos
-  hosts: rhel_repos
-  become: false
+  hosts: all
+  become: true
   gather_facts: false
 
   tasks:

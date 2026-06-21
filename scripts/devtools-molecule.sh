@@ -156,6 +156,11 @@ bash scripts/wunder-devtools-ee.sh env \
     if [ -d molecule ]; then
       while IFS= read -r dir; do
         scen="${dir##*/}"
+        if [ ! -f "molecule/${scen}/molecule.yml" ]; then
+          echo "Skipping Molecule helper directory '\''${scen}'\'' (no molecule.yml)."
+          continue
+        fi
+
         case "$scen" in
           *_heavy)
             echo "Skipping heavy scenario '\''${scen}'\'' in devtools-molecule.sh (run manually via dedicated script)."

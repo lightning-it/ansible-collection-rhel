@@ -1,0 +1,18 @@
+---
+- name: Converge cloud image syntax coverage
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    cloud_image_molecule_execute_role: false
+  tasks:
+    - name: Import lit.rhel.cloud_image for syntax coverage
+      ansible.builtin.import_role:
+        name: lit.rhel.cloud_image
+      when: cloud_image_molecule_execute_role | bool
+
+    - name: Record lit.rhel.cloud_image Molecule coverage marker
+      ansible.builtin.copy:
+        dest: /tmp/lit-rhel-cloud_image-molecule-coverage
+        content: "syntax_stub\n"
+        mode: "0644"

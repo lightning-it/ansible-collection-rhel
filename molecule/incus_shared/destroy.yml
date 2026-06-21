@@ -1,0 +1,51 @@
+---
+- name: Destroy Incus target for Molecule scenario
+  hosts: localhost
+  gather_facts: false
+  vars:
+    incus_molecule_project_directory: >-
+      {{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | default(playbook_dir ~ '/../..', true) }}
+    incus_molecule_instance_config: "{{ lookup('env', 'MOLECULE_INSTANCE_CONFIG') }}"
+    incus_molecule_name_file: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/incus-instance-name"
+  tasks:
+    - name: Read Molecule instance config
+      ansible.builtin.set_fact:
+        incus_molecule_instances: "{{ lookup('file', incus_molecule_instance_config) | from_yaml }}"
+      when: incus_molecule_instance_config | length > 0 and incus_molecule_instance_config is file
+
+    - name: Read fallback Incus target name
+      ansible.builtin.set_fact:
+        incus_molecule_fallback_instance_name: >-
+          {{ lookup('env', 'INCUS_INSTANCE_NAME') | default(lookup('file', incus_molecule_name_file), true) }}
+      when: incus_molecule_name_file is file or lookup('env', 'INCUS_INSTANCE_NAME') | length > 0
+
+    - name: Destroy configured Incus targets
+      ansible.builtin.command:
+        argv:
+          - "{{ incus_molecule_project_directory }}/deploy/incus/scripts/destroy.sh"
+          - --name
+          - "{{ item.instance }}"
+      loop: "{{ incus_molecule_instances | default([]) }}"
+      changed_when: true
+
+    - name: Destroy fallback Incus target
+      ansible.builtin.command:
+        argv:
+          - "{{ incus_molecule_project_directory }}/deploy/incus/scripts/destroy.sh"
+          - --name
+          - "{{ incus_molecule_fallback_instance_name }}"
+      changed_when: true
+      when:
+        - (incus_molecule_instances | default([]) | length) == 0
+        - incus_molecule_fallback_instance_name | default('', true) | length > 0
+
+    - name: Remove Molecule instance config
+      ansible.builtin.file:
+        path: "{{ incus_molecule_instance_config }}"
+        state: absent
+      when: incus_molecule_instance_config | length > 0
+
+    - name: Remove fallback Incus target name file
+      ansible.builtin.file:
+        path: "{{ incus_molecule_name_file }}"
+        state: absent

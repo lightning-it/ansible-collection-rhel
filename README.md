@@ -77,6 +77,12 @@ Create a RHEL 9-compatible Incus VM:
 deploy/incus/scripts/create.sh --version 9 --mode vm --name lit-rhel9-vm
 ```
 
+Create a RHEL-compatible Incus container:
+
+```bash
+deploy/incus/scripts/create.sh --version 10 --mode container --name lit-rhel10-container
+```
+
 Run a playbook against the generated inventory:
 
 ```bash

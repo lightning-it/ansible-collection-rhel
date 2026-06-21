@@ -1,0 +1,16 @@
+---
+- name: Verify developer tools syntax coverage
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Read lit.rhel.developer_tools coverage marker
+      ansible.builtin.slurp:
+        src: /tmp/lit-rhel-developer_tools-molecule-coverage
+      register: developer_tools_molecule_coverage_marker
+
+    - name: Assert lit.rhel.developer_tools coverage stub ran
+      ansible.builtin.assert:
+        that:
+          - (developer_tools_molecule_coverage_marker.content | b64decode | trim) == "syntax_stub"
+        quiet: true

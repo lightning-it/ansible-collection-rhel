@@ -1,0 +1,16 @@
+---
+- name: Verify firefox deploy syntax coverage
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Read lit.rhel.firefox_deploy coverage marker
+      ansible.builtin.slurp:
+        src: /tmp/lit-rhel-firefox_deploy-molecule-coverage
+      register: firefox_deploy_molecule_coverage_marker
+
+    - name: Assert lit.rhel.firefox_deploy coverage stub ran
+      ansible.builtin.assert:
+        that:
+          - (firefox_deploy_molecule_coverage_marker.content | b64decode | trim) == "syntax_stub"
+        quiet: true

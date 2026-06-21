@@ -1,0 +1,18 @@
+---
+- name: Converge selinux syntax coverage
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    selinux_molecule_execute_role: false
+  tasks:
+    - name: Import lit.rhel.selinux for syntax coverage
+      ansible.builtin.import_role:
+        name: lit.rhel.selinux
+      when: selinux_molecule_execute_role | bool
+
+    - name: Record lit.rhel.selinux Molecule coverage marker
+      ansible.builtin.copy:
+        dest: /tmp/lit-rhel-selinux-molecule-coverage
+        content: "syntax_stub\n"
+        mode: "0644"

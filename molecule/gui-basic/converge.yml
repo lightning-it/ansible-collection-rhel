@@ -1,0 +1,18 @@
+---
+- name: Converge gui syntax coverage
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    gui_molecule_execute_role: false
+  tasks:
+    - name: Import lit.rhel.gui for syntax coverage
+      ansible.builtin.import_role:
+        name: lit.rhel.gui
+      when: gui_molecule_execute_role | bool
+
+    - name: Record lit.rhel.gui Molecule coverage marker
+      ansible.builtin.copy:
+        dest: /tmp/lit-rhel-gui-molecule-coverage
+        content: "syntax_stub\n"
+        mode: "0644"

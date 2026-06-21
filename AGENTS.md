@@ -7,11 +7,12 @@ Scope: role code, defaults, tasks, Molecule tests, role READMEs, and collection 
 
 ## 0. Compatibility Baseline
 
-1. Content MUST be compatible with `ansible-core` 2.18.x.
+1. Content MUST be compatible with the `ansible-core` range declared in `meta/runtime.yml`.
 2. Content MUST NOT require Ansible major versions newer than 2.x.
-3. This repository declares `requires_ansible: ">=2.18.0"` in `meta/runtime.yml`.
-4. New changes SHOULD remain compatible with `>=2.18.0` unless explicitly told otherwise.
-5. Prefer `ansible.builtin.*` modules; use external collections only when required.
+3. `meta/runtime.yml` is the source of truth for `requires_ansible`; do not hardcode a different baseline in code,
+   docs, tests, or CI.
+4. New changes SHOULD remain compatible with the declared minimum version unless explicitly told otherwise.
+5. Prefer `ansible.builtin.*` modules; use external collections only when required and declared in `galaxy.yml`.
 
 ## 1. Mandatory Discovery Before Changes
 
@@ -34,7 +35,7 @@ If generic guidance conflicts with repository behavior, you MUST prefer reposito
    2. `SECURITY.md`
    3. `scripts/wunder-devtools-ee.sh`
 4. Managed collection baseline files from `shared-assets/ansible-collection/base`:
-   1. `AGENT.md`
+   1. `AGENTS.md`
    2. `CONTRIBUTING.md`
    3. `.ansible-lint`
    4. `ansible.cfg`
@@ -43,6 +44,13 @@ If generic guidance conflicts with repository behavior, you MUST prefer reposito
    7. `.yamllint`
    8. `.gitignore`
    9. shared block in `.pre-commit-config.yaml`
+   10. `scripts/bump_galaxy_version.py`
+   11. `scripts/devtools-ansible-lint.sh`
+   12. `scripts/devtools-collection-prepare.sh`
+   13. `scripts/devtools-collection-smoke.sh`
+   14. `scripts/devtools-galaxy-verify.sh`
+   15. `scripts/devtools-galaxy.sh`
+   16. `scripts/devtools-molecule.sh`
 5. Repo-local exceptions MUST be explicit in the sync workflow and documented in the repository.
 
 ## 2. Repository Baseline (This Repo)
@@ -54,7 +62,108 @@ If generic guidance conflicts with repository behavior, you MUST prefer reposito
    2. `ansible-lint.yml` YAML max line length 120
 4. Pre-commit runs devtools-based hooks for `yamllint`, `ansible-lint`, and Molecule light scenarios.
 
-## 2.1 Collection Dependency Management (Mandatory)
+## 2.1 Production Review Standard (Community, Red Hat, Efficiency)
+
+Use this standard when reviewing, creating, or changing collection content. Treat it as the baseline audit prompt for
+production readiness, Ansible Galaxy readiness, and Red Hat Ansible Automation Platform readiness.
+
+### 2.1.1 Collection Structure and Metadata
+
+1. Verify correct collection layout and naming under the repository root.
+2. Keep `galaxy.yml` complete and accurate: namespace, name, version, README, description, repository, authors,
+   license, tags, dependencies, and `build_ignore`.
+3. Keep `meta/runtime.yml` aligned with the supported Ansible range.
+4. Keep README, changelog/release notes, examples, role docs, and licensing suitable for publication.
+5. Ensure collection dependencies are declared once in `galaxy.yml` unless this guide documents an overlay exception.
+
+### 2.1.2 Ansible Community Best Practices
+
+1. Roles and playbooks MUST be idempotent.
+2. Use FQCNs for modules and plugins.
+3. Prefer purpose-built modules over `ansible.builtin.command` or `ansible.builtin.shell`.
+4. When command or shell tasks are justified, define precise `changed_when` and `failed_when` behavior.
+5. Support check mode and diff mode where the underlying operation can do so safely.
+6. Keep task names specific, variables role-prefixed, defaults clear, and handlers explicit.
+7. Avoid hardcoded hosts, users, credentials, private URLs, site-specific paths, and environment-specific values.
+8. Prefer structured module parameters and filters over ad hoc string parsing.
+
+### 2.1.3 Red Hat and Enterprise Readiness
+
+1. Content SHOULD run predictably in Red Hat Ansible Automation Platform and execution environments.
+2. Avoid dependencies that cannot be resolved in the repository's default public CI/runtime path.
+3. Keep entitlement-gated dependencies out of collection metadata and document the consumer/workspace overlay instead.
+4. Do not require controller credentials, Red Hat credentials, or private infrastructure for public lint and unit gates.
+5. Document supported platforms, required privileges, external services, and operational boundaries.
+6. Keep examples realistic for controller-based automation and CI/CD use.
+
+### 2.1.4 Testing and Quality Gates
+
+1. `ansible-lint --profile production .` SHOULD pass, or repository-specific devtools lint MUST pass with documented
+   equivalent strictness.
+2. `ansible-test sanity --docker` SHOULD pass for custom modules/plugins and collection packaging concerns.
+3. Unit tests SHOULD cover custom modules, plugins, filters, and module_utils helpers.
+4. Integration tests SHOULD cover real behavior, failure cases, idempotency, check mode, and upgrade paths.
+5. Molecule scenarios SHOULD cover role behavior with converge, idempotence, and verify.
+6. CI SHOULD run lint, sanity, unit, integration, package build, and smoke install where practical.
+7. For PR or CI fixes, reproduce the failing gate locally first and do not rely on GitHub Actions as the first
+   end-to-end verifier. Run the repository devtools gates from the repo root before finalizing whenever the
+   needed runtime is available. Docker or Podman is sufficient for the default public gates; protected or heavy
+   Incus scenarios additionally require an accessible Incus daemon and suitable images.
+
+Required local PR gates for collection changes, when the scripts exist:
+
+```bash
+bash scripts/devtools-ansible-lint.sh
+bash scripts/devtools-molecule.sh
+bash scripts/devtools-collection-smoke.sh
+```
+
+Recommended commands when applicable:
+
+```bash
+ansible-lint --profile production .
+ansible-test sanity --docker
+ansible-test units --docker
+ansible-test integration --docker
+ansible-galaxy collection build .
+ansible-galaxy collection install ./<built-artifact>.tar.gz --force
+```
+
+### 2.1.5 Code Efficiency and Maintainability
+
+1. Avoid repeated expensive lookups, package queries, fact gathering, API calls, and templating loops.
+2. Disable or scope fact gathering when facts are not needed.
+3. Cache reusable data with registered variables or facts when that is clearer and cheaper.
+4. Use efficient loops, filters, pagination, retries, timeouts, and backoff for API-driven roles.
+5. Put repeated Python logic in `module_utils` and repeated role logic in focused task files or roles.
+6. Keep module argument specs explicit and return values predictable.
+7. Keep YAML readable, sorted where the repo already sorts, and free of duplicated blocks that should be shared.
+
+### 2.1.6 Security Review
+
+1. No secrets, tokens, passwords, keys, private URLs, or sensitive inventory values may be committed.
+2. Use `no_log: true` for tasks handling sensitive values, while still keeping debuggability where safe.
+3. Quote shell inputs and avoid command injection risks.
+4. Do not use unsafe `eval`, `exec`, or template expansion patterns.
+5. Validate TLS certificates by default. Any opt-out MUST be explicit, documented, and narrowly scoped.
+6. Apply least-privilege defaults for users, files, services, API tokens, and controller objects.
+
+### 2.1.7 Review Output Format
+
+When asked for a review, report findings in this order:
+
+1. Executive summary: production-ready, nearly ready, or not ready.
+2. Critical findings: deployment breakers, security risks, or publication blockers.
+3. Major findings: correctness, idempotency, compatibility, maintainability, or testing gaps.
+4. Minor findings: style, naming, documentation, or polish.
+5. Efficiency improvements.
+6. Security review.
+7. Testing gaps.
+8. Recommended fix plan.
+
+For each finding, include severity, file and line, why it matters, recommended fix, and example corrected code when useful.
+
+## 2.2 Collection Dependency Management (Mandatory)
 
 1. Collection dependency source of truth is `galaxy.yml` `dependencies`.
 2. When role code starts using modules/plugins from another collection, you MUST add that collection to
@@ -71,7 +180,7 @@ If generic guidance conflicts with repository behavior, you MUST prefer reposito
 8. If dependency update policy differs per dependency (for example lifecycle-managed collections), encode that as
    targeted Renovate `packageRules` while keeping version ownership in `galaxy.yml`.
 
-## 2.2 Package Version Management (Mandatory)
+## 2.3 Package Version Management (Mandatory)
 
 1. Repository-owned package/tool dependency versions MUST be fixed to explicit versions wherever the repository is
    the source of truth for that version.
@@ -84,7 +193,7 @@ If generic guidance conflicts with repository behavior, you MUST prefer reposito
 5. Do not create parallel version ownership for the same dependency across multiple files unless the repository
    explicitly documents that split.
 
-## 2.3 Ansible Collection Renovate and Release Policy
+## 2.4 Ansible Collection Renovate and Release Policy
 
 For Lightning IT Ansible collection repositories, follow the shared Renovate and release model.
 
@@ -94,6 +203,31 @@ configuration.
 
 Collection repositories may only define repository-specific Renovate overrides, such as:
 
+1. temporary version pins
+2. compatibility constraints
+3. collection-specific package rules
+4. local custom managers that are not reusable
+
+The standard branch and release model is:
+
+1. `develop` is the automated integration branch.
+2. Renovate targets `develop`.
+3. Safe patch, minor, pin, and digest updates may auto-merge into `develop` after required CI passes.
+4. Major updates require manual approval.
+5. `main` is the stable release branch and the only real release branch.
+6. `develop` must not be configured as a `semantic-release` branch unless an explicit pre-release strategy is
+   requested.
+7. Weekly promotion from `develop` to `main` must happen through a pull request.
+8. Weekly promotion may use GitHub auto-merge, but must not bypass required checks.
+9. Do not direct-push from `develop` to `main`.
+10. `semantic-release` must remain main-only for stable releases.
+
+When changing shared Renovate or release documentation and agent instructions, final output MUST:
+
+1. confirm that the `shared-assets` README documents the shared Renovate and release workflow
+2. confirm that `AGENTS.md` contains persistent instructions for future agents/Codex runs
+3. list exactly which `AGENTS.md` files were updated
+4. if no `AGENTS.md` exists, create one in the most appropriate location and state why
 - temporary version pins
 - compatibility constraints
 - collection-specific package rules
@@ -483,8 +617,8 @@ For each new or changed role, and for any newly added scenario:
 
 ## 10. Local Deployment Harnesses
 
-This repository may include local system-level deployment harnesses under paths such as `deploy/`, `vagrant/`,
-or helper scripts under `scripts/`.
+This repository may include local system-level deployment harnesses under paths such as `deploy/` or helper
+scripts under `scripts/`. Heavy system tests should use Incus VMs or Incus containers.
 
 ### 10.1 Incus Workflow Validation (Mandatory)
 
@@ -543,8 +677,13 @@ Variables section SHOULD point to `defaults/main.yml` and highlight key inputs.
 Before finalizing, confirm all items below:
 
 1. `pre-commit run --all-files` passes, or failures are explicitly explained.
-2. `ansible-lint` passes under repo devtools entrypoints.
-3. Molecule light scenarios pass (`scripts/devtools-molecule.sh` or scoped equivalent).
+2. Local collection PR gates pass before using GitHub Actions as verification, whenever the scripts exist and
+   the needed runtime is available:
+   1. `bash scripts/devtools-ansible-lint.sh`
+   2. `bash scripts/devtools-molecule.sh`
+   3. `bash scripts/devtools-collection-smoke.sh`
+3. If a local gate is skipped, the final response names the missing runtime or concrete blocker, such as no
+   Docker/Podman socket or protected Incus requirements.
 4. Documentation is updated for changed role interfaces.
 5. No CI, workflow, Renovate, or semantic-release config changes were made unless requested.
 6. Incus/deployment harness changes have passed the devtools-container checks in section 10.1, or any skipped
@@ -553,3 +692,10 @@ Before finalizing, confirm all items below:
    1. no cross-role raw var assertions in `assert.yml`
    2. no duplicate copy-paste assert blocks
    3. required foreign inputs mapped in `defaults/main.yml` with role prefix
+
+## Secret Storage Rule
+
+- Never commit secret values, tokens, passwords, private keys, activation codes, or decrypted Vault output.
+- When HC Vault is configured for a role or runbook, generated credentials must be read from HC Vault first, generated only when missing, written back to HC Vault, and then consumed by the application from the Vault-backed Ansible variables. Do not keep generated plaintext secret files on the managed host unless a role has an explicit break-glass option such as `*_allow_local_secret_files=true`.
+- When HC Vault is not configured, required credentials must be supplied from Ansible Vault encrypted inventory variables. Do not add new plaintext generated-secret fallbacks.
+- Tasks that read, generate, write, template, or compare secret material must use `no_log: true`.

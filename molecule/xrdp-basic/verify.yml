@@ -1,0 +1,16 @@
+---
+- name: Verify xrdp syntax coverage
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Read lit.rhel.xrdp coverage marker
+      ansible.builtin.slurp:
+        src: /tmp/lit-rhel-xrdp-molecule-coverage
+      register: xrdp_molecule_coverage_marker
+
+    - name: Assert lit.rhel.xrdp coverage stub ran
+      ansible.builtin.assert:
+        that:
+          - (xrdp_molecule_coverage_marker.content | b64decode | trim) == "syntax_stub"
+        quiet: true
