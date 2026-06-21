@@ -74,7 +74,7 @@ Before opening a pull request:
 - [ ] Branch from `main`.  
 - [ ] Run `pre-commit install` once per clone, then `pre-commit run --all-files`.  
 - [ ] Run `molecule test` for affected roles/scenarios (`devtools-molecule.sh` for
-      light scenarios, dedicated `*_heavy` scripts for Incus VM/container tests).  
+      light scenarios, dedicated `*_heavy` scripts for Vagrant/VM-based tests).  
 - [ ] Validate `ansible-galaxy collection build` if you touched `galaxy.yml`,
       `meta/main.yml`, or collection layout.  
 - [ ] Update `README.md` and example playbooks when user-facing behaviour changes.  
@@ -124,7 +124,7 @@ Collections assume the following tooling:
   - ansible-core, ansible-lint, Molecule,
   - semantic-release + Node toolchain.
 - Local scripts under `scripts/` (e.g. `devtools-ansible-lint.sh`,
-  `devtools-molecule.sh`, heavy scenarios like `devtools-incus-*_heavy.sh`)
+  `devtools-molecule.sh`, heavy scenarios like `devtools-molecule-*_heavy.sh`)
   are part of the expected workflow.
 
 When in doubt, prefer running checks through the devtools wrapper scripts so

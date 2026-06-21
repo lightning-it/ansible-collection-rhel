@@ -205,8 +205,8 @@ The standard branch and release model is:
 - `main` is the stable release branch.
 - `develop` must not be configured as a semantic-release branch unless an explicit pre-release strategy is
   requested.
-- Weekly promotion from `develop` to `main` must happen through a pull request.
-- Weekly promotion may use GitHub auto-merge, but must not bypass required checks.
+- Promotion from `develop` to `main` must happen through a pull request.
+- Promotion pull requests must remain a human-visible manual merge checkpoint after required checks pass.
 - Do not direct-push from `develop` to `main`.
 - semantic-release must remain main-only for stable releases.
 
@@ -216,7 +216,8 @@ Automation safety requirements:
 - Only trusted Renovate PRs may be auto-approved by collection automation.
 - A trusted Renovate PR must have `renovate[bot]` as both trigger actor and PR author, a `renovate/*` source
   branch, `develop` as the base branch, and both `renovate` and `dependencies` labels.
-- Human and external contributor PRs must not be auto-approved or auto-merged by collection automation.
+- Human, external contributor, and develop-to-main promotion PRs must not be auto-approved or auto-merged by
+  collection automation.
 - Do not use `pull_request_target` for Renovate approval or merge automation.
 
 ## 3. Role Variable Naming and Mapping Rules
