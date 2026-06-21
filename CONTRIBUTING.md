@@ -8,24 +8,24 @@ This document applies to all `ansible-collection-*` repositories under
 
 ## Ground Rules
 
-1. **Automate everything you can.**  
+1. **Automate everything you can.**
    Run the shared pre-commit hooks (`pre-commit run --all-files`) and ensure all
    GitHub Actions workflows are green before asking for review.
 
-2. **Keep changes scoped.**  
+2. **Keep changes scoped.**
    Focus each pull request on a single fix or feature. Avoid opportunistic
    refactors unless they are clearly part of the change description.
 
-3. **Document behaviour.**  
-   Update READMEs, role documentation, example playbooks, and changelog entries
-   when functionality changes. Explain _why_ as well as _what_.
+3. **Document behaviour.**
+   Update READMEs, role documentation, and example playbooks when functionality
+   changes. Explain _why_ as well as _what_.
 
-4. **Respect the licence.**  
+4. **Respect the licence.**
    All contributions are under `MIT`. New dependencies must be licence
    compatible and, where relevant, documented in `requirements.yml` or
    `requirements.txt`.
 
-5. **No secrets or customer data.**  
+5. **No secrets or customer data.**
    Never commit credentials, tokens, or production configuration. Use CI
    variables, vaults, and environment variables instead.
 
@@ -71,26 +71,26 @@ standards as handwritten code and follow the shared agent specification.
 
 Before opening a pull request:
 
-- [ ] Branch from `main`.  
-- [ ] Run `pre-commit install` once per clone, then `pre-commit run --all-files`.  
+- [ ] Branch from `main`.
+- [ ] Run `pre-commit install` once per clone, then `pre-commit run --all-files`.
 - [ ] Run `molecule test` for affected roles/scenarios (`devtools-molecule.sh` for
-      light scenarios, dedicated `*_heavy` scripts for Vagrant/VM-based tests).  
+      light scenarios, dedicated `*_heavy` scripts for Incus VM/container tests).
 - [ ] Validate `ansible-galaxy collection build` if you touched `galaxy.yml`,
-      `meta/main.yml`, or collection layout.  
-- [ ] Update `README.md` and example playbooks when user-facing behaviour changes.  
+      `meta/main.yml`, or collection layout.
+- [ ] Update `README.md` and example playbooks when user-facing behaviour changes.
 - [ ] Make sure GitHub Actions are green (Collection CI, Semantic Release dry-run
-      on PRs).  
+      on PRs).
 
 For collections using semantic-release:
 
 - [ ] Follow conventional commits (`feat:`, `fix:`, `chore:`, `docs:`) so the
-      release tooling can infer version bumps and changelog entries.
+      release tooling can infer version bumps and GitHub Release notes.
 
 ## Pull Request Expectations
 
 Each pull request should include:
 
-- A concise title following conventional commits  
+- A concise title following conventional commits
   (e.g. `fix: address selinux idempotency`, `feat: add tf_runner role`).
 - A description covering:
   - the problem,
@@ -124,7 +124,7 @@ Collections assume the following tooling:
   - ansible-core, ansible-lint, Molecule,
   - semantic-release + Node toolchain.
 - Local scripts under `scripts/` (e.g. `devtools-ansible-lint.sh`,
-  `devtools-molecule.sh`, heavy scenarios like `devtools-molecule-*_heavy.sh`)
+  `devtools-molecule.sh`, heavy scenarios like `devtools-incus-*_heavy.sh`)
   are part of the expected workflow.
 
 When in doubt, prefer running checks through the devtools wrapper scripts so
