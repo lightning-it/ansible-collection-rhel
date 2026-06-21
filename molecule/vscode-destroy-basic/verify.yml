@@ -4,8 +4,13 @@
   connection: local
   gather_facts: false
   tasks:
+    - name: Read lit.rhel.vscode_destroy coverage marker
+      ansible.builtin.slurp:
+        src: /tmp/lit-rhel-vscode_destroy-molecule-coverage
+      register: vscode_destroy_molecule_coverage_marker
+
     - name: Assert lit.rhel.vscode_destroy coverage stub ran
       ansible.builtin.assert:
         that:
-          - vscode_destroy_molecule_coverage_mode | default('') == 'syntax_stub'
+          - (vscode_destroy_molecule_coverage_marker.content | b64decode | trim) == "syntax_stub"
         quiet: true

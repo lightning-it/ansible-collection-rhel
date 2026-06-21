@@ -9,6 +9,19 @@
     hostname_short: "{{ (hostname_fqdn_effective | string).split('.')[0] }}"
   changed_when: false
 
+- name: Remove stale /etc/hosts entries for this hostname
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: >-
+      ^(?!{{ hostname_etc_hosts_ip | regex_escape() }}\s+)\S+\s+.*{{
+      hostname_fqdn_effective | regex_escape()
+      }}(\s|$).*$
+    state: absent
+    unsafe_writes: "{{ hostname_etc_hosts_unsafe_writes | bool }}"
+  when:
+    - hostname_manage_etc_hosts | bool
+    - hostname_remove_stale_etc_hosts_entries | bool
+
 - name: Ensure /etc/hosts has hostname entry
   ansible.builtin.lineinfile:
     path: /etc/hosts

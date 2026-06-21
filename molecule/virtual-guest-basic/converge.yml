@@ -11,6 +11,8 @@
         name: lit.rhel.virtual_guest
       when: virtual_guest_molecule_execute_role | bool
 
-    - name: Record lit.rhel.virtual_guest Molecule coverage mode
-      ansible.builtin.set_fact:
-        virtual_guest_molecule_coverage_mode: syntax_stub
+    - name: Record lit.rhel.virtual_guest Molecule coverage marker
+      ansible.builtin.copy:
+        dest: /tmp/lit-rhel-virtual_guest-molecule-coverage
+        content: "syntax_stub\n"
+        mode: "0644"
