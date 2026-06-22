@@ -1,0 +1,75 @@
+---
+objects:
+  role:
+    developer_tools:
+      description: Install developer packages, pip packages, and optional CLI tools
+        on RHEL.
+      name: developer_tools
+      version_added: null
+    firefox:
+      description: Shared Firefox defaults, discovery, policy helpers, and teardown
+        helpers for RHEL 9.
+      name: firefox
+      version_added: null
+    firefox_config:
+      description: Configure Firefox on RHEL using the shared lit.rhel.firefox role.
+      name: firefox_config
+      version_added: null
+    firefox_deploy:
+      description: Install Firefox on RHEL using the shared lit.rhel.firefox role.
+      name: firefox_deploy
+      version_added: null
+    firefox_destroy:
+      description: Remove Firefox-managed state on RHEL using the shared lit.rhel.firefox
+        role.
+      name: firefox_destroy
+      version_added: null
+    gui:
+      description: Install a GUI stack (GNOME or XFCE) on RHEL.
+      name: gui
+      version_added: null
+    repos:
+      description: Enable/prepare repository sources (EPEL, CodeReady, proxy) for
+        RHEL.
+      name: repos
+      version_added: null
+    vscode:
+      description: Shared VS Code defaults, discovery, and helper tasks for RHEL 9.
+      name: vscode
+      version_added: null
+    vscode_config:
+      description: Configure Visual Studio Code extensions and user settings on RHEL
+        9.
+      name: vscode_config
+      version_added: null
+    vscode_deploy:
+      description: Deploy Visual Studio Code package and repository state on RHEL
+        9.
+      name: vscode_deploy
+      version_added: null
+    vscode_destroy:
+      description: Remove Visual Studio Code managed state on RHEL 9.
+      name: vscode_destroy
+      version_added: null
+    xrdp:
+      description: Install and configure XRDP server on RHEL 9 and RHEL 10 without
+        enabling repos.
+      name: xrdp
+      version_added: null
+plugins:
+  become: {}
+  cache: {}
+  callback: {}
+  cliconf: {}
+  connection: {}
+  filter: {}
+  httpapi: {}
+  inventory: {}
+  lookup: {}
+  module: {}
+  netconf: {}
+  shell: {}
+  strategy: {}
+  test: {}
+  vars: {}
+version: 1.18.0
