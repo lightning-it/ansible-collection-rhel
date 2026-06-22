@@ -1,4 +1,0 @@
----
-removed_features:
-  - >-
-    rhel - Remove stale semantic-release npm configuration from the collection release workflow.
