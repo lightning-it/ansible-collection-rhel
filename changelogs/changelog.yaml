@@ -1,0 +1,11 @@
+---
+ancestor: null
+releases:
+  1.18.0:
+    changes:
+      removed_features:
+        - rhel - Remove stale semantic-release npm configuration from the collection
+          release workflow.
+    fragments:
+      - remove-semantic-release-files.yml
+    release_date: '2026-06-22'
