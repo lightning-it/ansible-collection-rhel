@@ -74,21 +74,75 @@
     - ansible_facts.selinux is defined
     - ansible_facts.selinux.status | default('disabled') != 'disabled'
 
-- name: Configure SELinux fcontext for rootless podman storage
-  community.general.sefcontext:
-    target: "{{ podman_rootless_storage_base_path }}(/.*)?"
-    setype: "{{ podman_rootless_storage_selinux_type }}"
-    state: present
+- name: Read SELinux fcontext rules for rootless podman storage
+  ansible.builtin.command:
+    argv:
+      - semanage
+      - fcontext
+      - -l
+  register: podman_rootless_storage_fcontext_rules
+  changed_when: false
   when:
     - podman_rootless_storage_selinux_manage | bool
     - ansible_facts.selinux is defined
     - ansible_facts.selinux.status | default('disabled') != 'disabled'
+
+- name: Record SELinux fcontext state for rootless podman storage
+  ansible.builtin.set_fact:
+    podman_rootless_storage_fcontext_target: "{{ podman_rootless_storage_base_path }}(/.*)?"
+    podman_rootless_storage_fcontext_exists: >-
+      {{
+        podman_rootless_storage_fcontext_rules.stdout
+        is search('(?m)^' ~ (podman_rootless_storage_base_path | regex_escape) ~ '\\(/\\.\\*\\)\\?\\s+')
+      }}
+    podman_rootless_storage_fcontext_matches: >-
+      {{
+        podman_rootless_storage_fcontext_rules.stdout
+        is search('(?m)^' ~ (podman_rootless_storage_base_path | regex_escape) ~ '\\(/\\.\\*\\)\\?\\s+.*\\s'
+                  ~ (podman_rootless_storage_selinux_type | regex_escape) ~ '\\s')
+      }}
+  when:
+    - podman_rootless_storage_selinux_manage | bool
+    - ansible_facts.selinux is defined
+    - ansible_facts.selinux.status | default('disabled') != 'disabled'
+
+- name: Add SELinux fcontext for rootless podman storage
+  ansible.builtin.command:
+    argv:
+      - semanage
+      - fcontext
+      - -a
+      - -t
+      - "{{ podman_rootless_storage_selinux_type }}"
+      - "{{ podman_rootless_storage_fcontext_target }}"
+  when:
+    - podman_rootless_storage_selinux_manage | bool
+    - ansible_facts.selinux is defined
+    - ansible_facts.selinux.status | default('disabled') != 'disabled'
+    - not podman_rootless_storage_fcontext_exists | bool
+
+- name: Modify SELinux fcontext for rootless podman storage
+  ansible.builtin.command:
+    argv:
+      - semanage
+      - fcontext
+      - -m
+      - -t
+      - "{{ podman_rootless_storage_selinux_type }}"
+      - "{{ podman_rootless_storage_fcontext_target }}"
+  when:
+    - podman_rootless_storage_selinux_manage | bool
+    - ansible_facts.selinux is defined
+    - ansible_facts.selinux.status | default('disabled') != 'disabled'
+    - podman_rootless_storage_fcontext_exists | bool
+    - not podman_rootless_storage_fcontext_matches | bool
 
 - name: Restore SELinux context for rootless podman storage
   ansible.builtin.command:
     argv:
       - restorecon
       - -R
+      - -v
       - "{{ podman_rootless_storage_base_path }}"
   register: podman_rootless_storage_restorecon
   changed_when: podman_rootless_storage_restorecon.stdout | default('') | trim | length > 0
