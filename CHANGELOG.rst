@@ -4,6 +4,14 @@ Lightning IT Collection Release Notes Release Notes
 
 .. contents:: Topics
 
+v1.21.0
+=======
+
+Bugfixes
+--------
+
+- Mark rootless Podman SELinux fcontext add and modify tasks as changed only when their guarded semanage commands run, keeping the role lint-clean while preserving idempotent task gating.
+
 v1.20.0
 =======
 
