@@ -115,6 +115,7 @@
       - -t
       - "{{ podman_rootless_storage_selinux_type }}"
       - "{{ podman_rootless_storage_fcontext_target }}"
+  changed_when: true
   when:
     - podman_rootless_storage_selinux_manage | bool
     - ansible_facts.selinux is defined
@@ -130,6 +131,7 @@
       - -t
       - "{{ podman_rootless_storage_selinux_type }}"
       - "{{ podman_rootless_storage_fcontext_target }}"
+  changed_when: true
   when:
     - podman_rootless_storage_selinux_manage | bool
     - ansible_facts.selinux is defined
