@@ -23,3 +23,12 @@ releases:
     fragments:
       - release-verification-2.yml
     release_date: '2026-06-22'
+  1.21.0:
+    changes:
+      bugfixes:
+        - Mark rootless Podman SELinux fcontext add and modify tasks as changed only
+          when their guarded semanage commands run, keeping the role lint-clean while
+          preserving idempotent task gating.
+    fragments:
+      - podman-rootless-storage-fcontext-changed.yml
+    release_date: '2026-07-03'

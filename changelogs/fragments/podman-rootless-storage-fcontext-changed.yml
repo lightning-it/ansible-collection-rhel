@@ -1,6 +1,0 @@
----
-bugfixes:
-  - >-
-    Mark rootless Podman SELinux fcontext add and modify tasks as changed only
-    when their guarded semanage commands run, keeping the role lint-clean while
-    preserving idempotent task gating.
