@@ -20,6 +20,10 @@
     executable: "{{ developer_tools_pip_executable }}"
   when: (developer_tools_pip_packages_present | default([], true) | length) > 0
 
+- name: Configure Node.js developer tooling
+  ansible.builtin.include_tasks: nodejs.yml
+  when: developer_tools_nodejs_enabled | bool
+
 - name: Configure GitHub CLI yum repository when enabled
   ansible.builtin.yum_repository:
     name: "{{ developer_tools_github_cli_repo_name }}"
