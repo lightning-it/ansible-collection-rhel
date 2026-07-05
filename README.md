@@ -1,12 +1,16 @@
 # ansible-collection-rhel
 
-<!-- BEGIN LIT_SHARED_RELEASE_MODEL -->
+<!-- BEGIN LIT_QUALITY_BADGES -->
 
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/lightning-it/ansible-collection-rhel/badge)](https://scorecard.dev/viewer/?uri=github.com/lightning-it/ansible-collection-rhel)
 [![CI](https://github.com/lightning-it/ansible-collection-rhel/actions/workflows/collection-ci.yml/badge.svg?branch=develop)](https://github.com/lightning-it/ansible-collection-rhel/actions/workflows/collection-ci.yml)
-[![Release](https://github.com/lightning-it/ansible-collection-rhel/actions/workflows/collection-publish.yml/badge.svg?branch=main)](https://github.com/lightning-it/ansible-collection-rhel/actions/workflows/collection-publish.yml)
-[![Ansible Galaxy](https://img.shields.io/badge/galaxy-lit.rhel-blue)](https://galaxy.ansible.com/ui/repo/published/lit/rhel/)
+[![Latest Release](https://img.shields.io/github/v/release/lightning-it/ansible-collection-rhel?sort=semver)](https://github.com/lightning-it/ansible-collection-rhel/releases/latest)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/lightning-it/ansible-collection-rhel/badge)](https://scorecard.dev/viewer/?uri=github.com/lightning-it/ansible-collection-rhel)
+[![Ansible Galaxy](https://img.shields.io/ansible/collection/v/lit/rhel?label=Ansible%20Galaxy)](https://galaxy.ansible.com/ui/repo/published/lit/rhel/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
+<!-- END LIT_QUALITY_BADGES -->
+
+<!-- BEGIN LIT_SHARED_RELEASE_MODEL -->
 
 ## Release and Quality Model
 
@@ -24,6 +28,17 @@ See [RELEASE.md](./RELEASE.md) for:
 Repository classification: **Ansible Collection**.
 Required test profiles: `pre-commit, lint, light, molecule-light, molecule-heavy-incus, release-validation`.
 Publishing targets: `github-release, ansible-galaxy`.
+
+## Supported and Tested Platforms
+
+| Platform / Product | Status | Validation |
+|---|---:|---|
+| ubuntu-latest | Supported | Molecule / Incus |
+| rhel-9 | Supported | Molecule / Incus |
+| rhel-10 | Supported | Molecule / Incus |
+| ansible-core | Tested where applicable | Molecule / Incus |
+| molecule | Tested where applicable | Molecule / Incus |
+| incus | Tested where applicable | Molecule / Incus |
 
 <!-- END LIT_SHARED_RELEASE_MODEL -->
 
