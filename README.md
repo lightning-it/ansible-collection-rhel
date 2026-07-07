@@ -1,8 +1,10 @@
 # ansible-collection-rhel
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/lightning-it/ansible-collection-rhel/badge)](https://scorecard.dev/viewer/?uri=github.com/lightning-it/ansible-collection-rhel)
+
 <!-- BEGIN LIT_SHARED_RELEASE_MODEL -->
 
-## Release and Quality Model
+## Shared Release and Quality Model
 
 This repository follows the Lightning IT shared release and quality model.
 
@@ -36,7 +38,6 @@ Publishing targets: `github-release, ansible-galaxy`.
 
 [![CI](https://github.com/lightning-it/ansible-collection-rhel/actions/workflows/collection-ci.yml/badge.svg?branch=develop)](https://github.com/lightning-it/ansible-collection-rhel/actions/workflows/collection-ci.yml)
 [![Latest Release](https://img.shields.io/github/v/release/lightning-it/ansible-collection-rhel?sort=semver)](https://github.com/lightning-it/ansible-collection-rhel/releases/latest)
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/lightning-it/ansible-collection-rhel/badge)](https://scorecard.dev/viewer/?uri=github.com/lightning-it/ansible-collection-rhel)
 [![Ansible Galaxy](https://img.shields.io/ansible/collection/v/lit/rhel?label=Ansible%20Galaxy)](https://galaxy.ansible.com/ui/repo/published/lit/rhel/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
