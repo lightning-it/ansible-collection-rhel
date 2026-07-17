@@ -1,5 +1,5 @@
 ---
-minor_changes:
+bugfixes:
   - >-
     developer_tools - Restore the documented protected Incus SELinux heavy-test
     runner and preserve it during shared-assets synchronization.
