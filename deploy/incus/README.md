@@ -97,7 +97,7 @@ Heavy Molecule scenarios use Incus targets only. Run the SELinux heavy scenario
 through the helper script:
 
 ```bash
-scripts/devtools-incus-selinux-heavy.sh
+scripts/devtools-molecule-incus-selinux-heavy.sh
 ```
 
 The helper defaults to `INCUS_MODE=vm`. Use `INCUS_MODE=container` only for

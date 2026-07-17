@@ -106,5 +106,5 @@ repos:
         name: Incus SELinux heavy scenario
         language: system
         stages: [manual]
-        entry: bash scripts/devtools-incus-selinux-heavy.sh
+        entry: bash scripts/devtools-molecule-incus-selinux-heavy.sh
         pass_filenames: false
