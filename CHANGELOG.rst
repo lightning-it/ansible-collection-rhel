@@ -4,6 +4,22 @@ Lightning IT Collection Release Notes Release Notes
 
 .. contents:: Topics
 
+v1.22.1
+=======
+
+Minor Changes
+-------------
+
+- developer_tools - Add configurable Node.js/npm/npx installation and markdownlint-cli2 validation support.
+- docs - Apply the shared enterprise README structure.
+- docs - Consolidate generated governance metadata and license policy on shared-assets-lit.
+- release_model - Add managed compatibility matrix documentation and structured release evidence fields.
+
+Bugfixes
+--------
+
+- shared_tooling - Dispatch collection publishing from protected main with the managed release environment and Galaxy credential, make lint compatibility detection rely on the execution environment, and ignore generated local collection-install and Python cache artifacts.
+
 v1.22.0
 =======
 
