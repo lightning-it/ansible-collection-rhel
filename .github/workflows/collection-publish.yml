@@ -29,7 +29,7 @@ on:
       publish_galaxy:
         description: Publish to Ansible Galaxy.
         required: false
-        default: "false"
+        default: "true"
         type: choice
         options: ["true", "false"]
 
@@ -134,7 +134,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
-          python-version: "3.14"
+          python-version: "3.11"
 
       - name: Install build tools
         run: >-
