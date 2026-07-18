@@ -32,3 +32,11 @@ releases:
     fragments:
       - podman-rootless-storage-fcontext-changed.yml
     release_date: '2026-07-03'
+  1.22.0:
+    changes:
+      minor_changes:
+        - developer_tools - Add optional actionlint installation from the upstream
+          release archive with checksum verification.
+    fragments:
+      - developer-tools-actionlint.yml
+    release_date: '2026-07-05'

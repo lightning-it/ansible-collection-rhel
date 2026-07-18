@@ -4,6 +4,14 @@ Lightning IT Collection Release Notes Release Notes
 
 .. contents:: Topics
 
+v1.22.0
+=======
+
+Minor Changes
+-------------
+
+- developer_tools - Add optional actionlint installation from the upstream release archive with checksum verification.
+
 v1.21.0
 =======
 
