@@ -34,6 +34,18 @@
       changed_when: false
       failed_when: false
 
+    - name: Read mandatory global user sudo policy
+      ansible.builtin.slurp:
+        src: /etc/sudoers.d/90-lit-molecule-global-user
+      register: global_user_sudo
+
+    - name: Assert mandatory global user sudo policy
+      ansible.builtin.assert:
+        that:
+          - >-
+            (global_user_sudo.content | b64decode | trim)
+            == 'lit-molecule-global-user ALL=(ALL) NOPASSWD:ALL'
+
     - name: Assert temp-user is absent
       ansible.builtin.assert:
         that:
