@@ -16,7 +16,11 @@
     - name: Read fallback SELinux Incus target name
       ansible.builtin.set_fact:
         selinux_molecule_fallback_instance_name: >-
-          {{ lookup('env', 'INCUS_INSTANCE_NAME') | default(lookup('file', selinux_molecule_name_file), true) }}
+          {{
+            lookup('env', 'MOLECULE_TEST_INSTANCE')
+            | default(lookup('env', 'INCUS_INSTANCE_NAME'), true)
+            | default(lookup('file', selinux_molecule_name_file), true)
+          }}
       when: selinux_molecule_name_file is file or lookup('env', 'INCUS_INSTANCE_NAME') | length > 0
 
     - name: Destroy configured SELinux Incus targets

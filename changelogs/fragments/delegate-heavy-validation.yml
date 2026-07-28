@@ -1,0 +1,6 @@
+---
+minor_changes:
+  - >-
+    Delegate SELinux Heavy execution to the pinned ``modulix-validation``
+    reusable workflow with an immutable candidate, owner-scoped Incus cleanup,
+    a meaningful success marker, and normalized evidence.

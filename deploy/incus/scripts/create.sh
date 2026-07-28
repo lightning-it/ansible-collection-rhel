@@ -204,6 +204,11 @@ else
   incus launch "${image_alias}" "${instance_name}" --profile default --profile "${profile_name}"
 fi
 
+if [ -n "${MOLECULE_TEST_OWNER:-}" ]; then
+  incus config set "${instance_name}" user.molecule-owner="${MOLECULE_TEST_OWNER}"
+  incus profile set "${profile_name}" user.molecule-owner="${MOLECULE_TEST_OWNER}"
+fi
+
 cat > "${env_file}" <<EOF
 INCUS_INSTANCE_NAME=${instance_name}
 INCUS_PROFILE_NAME=${profile_name}
