@@ -7,7 +7,18 @@
       ansible.builtin.assert:
         that:
           - lookup('env', 'MOLECULE_TEST_SUCCESS_MARKER') | length > 0
-        fail_msg: MOLECULE_TEST_SUCCESS_MARKER must be provided by central orchestration.
+          - lookup('env', 'RUNNER_TEMP') | length > 0
+          - >-
+            lookup('env', 'MOLECULE_TEST_SUCCESS_MARKER')
+            is match(
+              '^'
+              ~ (lookup('env', 'RUNNER_TEMP') | regex_escape)
+              ~ '/collection-profile/[A-Za-z0-9._/-]+/evidence/[A-Za-z0-9._/-]+$'
+            )
+          - "'..' not in lookup('env', 'MOLECULE_TEST_SUCCESS_MARKER').split('/')"
+        fail_msg: >-
+          MOLECULE_TEST_SUCCESS_MARKER must be a centrally provided evidence
+          path below RUNNER_TEMP/collection-profile.
   tasks:
     - name: Write the central success marker
       ansible.builtin.copy:
