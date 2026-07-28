@@ -18,4 +18,5 @@
           - repo_file.content | b64decode is search('enabled\\s*=\\s*0')
         fail_msg: "Custom repo not created or not disabled"
 
-- import_playbook: ../incus_shared/record-success.yml
+- name: Record successful repository verification
+  ansible.builtin.import_playbook: ../incus_shared/record-success.yml

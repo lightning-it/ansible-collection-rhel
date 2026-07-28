@@ -45,4 +45,5 @@
           - hosts_file.content | b64decode is search(expected_hosts_regex, multiline=True)
         fail_msg: "Expected /etc/hosts entry not found"
 
-- import_playbook: ../incus_shared/record-success.yml
+- name: Record successful hostname verification
+  ansible.builtin.import_playbook: ../incus_shared/record-success.yml

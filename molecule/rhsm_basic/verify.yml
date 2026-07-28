@@ -12,4 +12,5 @@
         that:
           - true
 
-- import_playbook: ../incus_shared/record-success.yml
+- name: Record successful RHSM verification
+  ansible.builtin.import_playbook: ../incus_shared/record-success.yml
