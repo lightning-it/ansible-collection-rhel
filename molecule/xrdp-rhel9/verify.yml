@@ -123,3 +123,11 @@
           FreeRDP authentication check failed for {{ xrdp_molecule_rdp_host }}:{{ xrdp_molecule_port }}.
           Last FreeRDP output:
           {{ xrdp_molecule_rdp_output.stdout | default('No FreeRDP output captured.') }}
+
+    - name: Record successful meaningful Heavy verification
+      ansible.builtin.copy:
+        dest: "{{ lookup('env', 'MOLECULE_TEST_SUCCESS_MARKER') }}"
+        mode: "0600"
+        content: "xrdp-rhel9 verified\n"
+      delegate_to: localhost
+      when: lookup('env', 'MOLECULE_TEST_SUCCESS_MARKER') | length > 0

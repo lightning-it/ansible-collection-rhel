@@ -50,7 +50,8 @@ Heavy Incus tests require an Ubuntu host or runner with Incus available, suitabl
 
 ## Heavy execution ownership
 
-The SELinux Heavy scenario and its assertions remain in this repository.
+The SELinux Heavy scenario and the protected Incus XRDP scenarios for RHEL 9
+and RHEL 10, including their assertions, remain in this repository.
 Protected execution is owned exclusively by the commit-pinned reusable workflow
 in `lightning-it/modulix-validation`, in accordance with the accepted
 [Modulix test execution ownership ADR](https://wiki.cloud.l-it.io/wiki/spaces/LIT/pages/2886566105).

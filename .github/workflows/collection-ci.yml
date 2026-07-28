@@ -139,7 +139,7 @@ jobs:
       (github.event_name == 'push' &&
        (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'))
     needs: build-candidate
-    uses: lightning-it/modulix-validation/.github/workflows/collection-molecule-profile.yml@5e377c72eeb69a6514a798fda21909983da87b9c
+    uses: lightning-it/modulix-validation/.github/workflows/collection-molecule-profile.yml@bd19ea27da9b948b1a83c609804fe65e326ffc9e
     with:
       profile: heavy
       matrix-json: >-
@@ -151,7 +151,23 @@ jobs:
            "image":"images:rockylinux/9/cloud",
            "instance_type":"vm",
            "roles":["selinux"],
-           "success_marker":"assertions/selinux-rhel9.passed"}
+           "success_marker":"assertions/selinux-rhel9.passed"},
+          {"runner":["self-hosted","linux","x64","incus","nested-virt"],
+           "scenario":"xrdp-rhel9",
+           "target":"rhel-9",
+           "infrastructure":"incus",
+           "image":"images:rockylinux/9/cloud",
+           "instance_type":"vm",
+           "roles":["xrdp"],
+           "success_marker":"assertions/xrdp-rhel9.passed"},
+          {"runner":["self-hosted","linux","x64","incus","nested-virt"],
+           "scenario":"xrdp-rhel10",
+           "target":"rhel-10",
+           "infrastructure":"incus",
+           "image":"images:rockylinux/10/cloud",
+           "instance_type":"vm",
+           "roles":["xrdp"],
+           "success_marker":"assertions/xrdp-rhel10.passed"}
         ]}
       candidate-artifact: rhel-candidate-${{ github.sha }}
       source-sha: ${{ github.sha }}
