@@ -112,7 +112,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install --disable-pip-version-check \
-            "ansible-core==2.18.18"
+            "ansible-core==2.18.13"
           mkdir -p dist/candidate
           ansible-galaxy collection build --output-path dist/candidate --force
           mapfile -t candidates < <(
@@ -209,7 +209,6 @@ jobs:
       collection-namespace: lit
       collection-name: rhel
       environment-name: rhel-ci
-    secrets: inherit
 
   heavy:
     name: Collection / Heavy
