@@ -11,3 +11,5 @@
       ansible.builtin.assert:
         that:
           - true
+
+- import_playbook: ../incus_shared/record-success.yml

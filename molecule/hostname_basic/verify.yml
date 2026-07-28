@@ -44,3 +44,5 @@
           - hosts_file is defined
           - hosts_file.content | b64decode is search(expected_hosts_regex, multiline=True)
         fail_msg: "Expected /etc/hosts entry not found"
+
+- import_playbook: ../incus_shared/record-success.yml
