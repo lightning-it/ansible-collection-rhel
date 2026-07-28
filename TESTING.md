@@ -48,22 +48,6 @@ bash scripts/wunder-devtools-ee.sh true
 
 Heavy Incus tests require an Ubuntu host or runner with Incus available, suitable images, and repository-specific scenario configuration. Heavy tests must use sanitized inputs and must not rely on private inventory values.
 
-## Heavy execution ownership
-
-The SELinux Heavy scenario, the protected Incus XRDP scenarios for RHEL 9 and
-RHEL 10, and every scenario marked `protected-incus`, including their
-assertions, remain in this repository.
-Protected execution is owned exclusively by the commit-pinned reusable workflow
-in `lightning-it/modulix-validation`, in accordance with the accepted
-[Modulix test execution ownership ADR](https://wiki.cloud.l-it.io/wiki/spaces/LIT/pages/2886566105).
-
-The caller supplies the exact collection archive and source SHA plus a
-machine-readable Rocky Linux 9 VM cell. The scenario uses centrally generated
-instance and owner identities and writes a post-assertion success marker.
-Missing assertions, cleanup failures, or skipped execution therefore fail the
-required Heavy result. Normalized evidence records the candidate, profile,
-scenario, platform, lifecycle, and owner.
-
 ## Interpreting GitHub Actions
 
 The GitHub Actions matrix is the primary dashboard. Job names should expose the repository class, OS/runtime, and profile, for example `ansible / rhel9 / molecule-heavy-incus` or `container / ubuntu / build-smoke`.
