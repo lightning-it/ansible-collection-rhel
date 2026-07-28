@@ -9,6 +9,7 @@ on:
     tags: ["v*"]
   # CI on all PRs
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -92,3 +93,144 @@ jobs:
           EXAMPLE_PLAYBOOK_ARGS: ${{ env.EXAMPLE_PLAYBOOK_ARGS }}
         run: |
           bash scripts/devtools-collection-smoke.sh
+
+  build-candidate:
+    name: Build immutable Heavy candidate
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Build and checksum exact collection candidate
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check \
+            "ansible-core==2.18.13"
+          mkdir -p dist/candidate
+          ansible-galaxy collection build --output-path dist/candidate --force
+          mapfile -t candidates < <(
+            find dist/candidate -maxdepth 1 -type f -name '*.tar.gz' -print
+          )
+          test "${#candidates[@]}" -eq 1
+          (
+            cd dist/candidate
+            sha256sum "$(basename "${candidates[0]}")" > candidate-SHA256SUMS
+            sha256sum --check candidate-SHA256SUMS
+          )
+      - name: Upload exact candidate
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6
+        with:
+          name: rhel-candidate-${{ github.sha }}
+          path: dist/candidate/
+          if-no-files-found: error
+          retention-days: 7
+
+  heavy-cells:
+    name: Heavy matrix (delegated to modulix-validation)
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+       (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'))
+    needs: build-candidate
+    uses: lightning-it/modulix-validation/.github/workflows/collection-molecule-profile.yml@6a78dcbd0931c7184336e7a5c6d11e6bfcc4b2d7
+    with:
+      profile: heavy
+      matrix-json: >-
+        {"include":[
+          {"runner":["self-hosted","linux","x64","incus","nested-virt"],
+           "scenario":"selinux_rhel9_heavy",
+           "target":"rockylinux-9",
+           "infrastructure":"incus",
+           "image":"images:rockylinux/9/cloud",
+           "instance_type":"vm",
+           "roles":["selinux"],
+           "success_marker":"assertions/selinux-rhel9.passed"},
+          {"runner":["self-hosted","linux","x64","incus","nested-virt"],
+           "scenario":"xrdp-rhel9",
+           "target":"rhel-9",
+           "infrastructure":"incus",
+           "image":"images:rockylinux/9/cloud",
+           "instance_type":"vm",
+           "roles":["xrdp"],
+           "success_marker":"assertions/xrdp-rhel9.passed"},
+          {"runner":["self-hosted","linux","x64","incus","nested-virt"],
+           "scenario":"xrdp-rhel10",
+           "target":"rhel-10",
+           "infrastructure":"incus",
+           "image":"images:rockylinux/10/cloud",
+           "instance_type":"vm",
+           "roles":["xrdp"],
+           "success_marker":"assertions/xrdp-rhel10.passed"},
+          {"runner":["self-hosted","linux","x64","incus"],
+           "scenario":"automatic_updates_basic","target":"rockylinux-9",
+           "infrastructure":"incus","image":"images:rockylinux/9/cloud",
+           "instance_type":"container","roles":["automatic_updates"],
+           "success_marker":"assertions/automatic-updates.passed"},
+          {"runner":["self-hosted","linux","x64","incus"],
+           "scenario":"baseline_rhel9_basic","target":"rockylinux-9",
+           "infrastructure":"incus","image":"images:rockylinux/9/cloud",
+           "instance_type":"container","roles":["baseline"],
+           "success_marker":"assertions/baseline-rhel9.passed"},
+          {"runner":["self-hosted","linux","x64","incus"],
+           "scenario":"hostname_basic","target":"rockylinux-9",
+           "infrastructure":"incus","image":"images:rockylinux/9/cloud",
+           "instance_type":"container","roles":["hostname"],
+           "success_marker":"assertions/hostname.passed"},
+          {"runner":["self-hosted","linux","x64","incus"],
+           "scenario":"podman_rhel9_basic","target":"rockylinux-9",
+           "infrastructure":"incus","image":"images:rockylinux/9/cloud",
+           "instance_type":"container","roles":["podman"],
+           "success_marker":"assertions/podman-rhel9.passed"},
+          {"runner":["self-hosted","linux","x64","incus"],
+           "scenario":"repos_rhel9_basic","target":"rockylinux-9",
+           "infrastructure":"incus","image":"images:rockylinux/9/cloud",
+           "instance_type":"container","roles":["repos"],
+           "success_marker":"assertions/repos-rhel9.passed"},
+          {"runner":["self-hosted","linux","x64","incus"],
+           "scenario":"rhsm_basic","target":"rockylinux-9",
+           "infrastructure":"incus","image":"images:rockylinux/9/cloud",
+           "instance_type":"container","roles":["rhsm"],
+           "success_marker":"assertions/rhsm.passed"},
+          {"runner":["self-hosted","linux","x64","incus"],
+           "scenario":"users_rhel9_basic","target":"rockylinux-9",
+           "infrastructure":"incus","image":"images:rockylinux/9/cloud",
+           "instance_type":"container","roles":["users"],
+           "success_marker":"assertions/users-rhel9.passed"}
+        ]}
+      candidate-artifact: rhel-candidate-${{ github.sha }}
+      source-sha: ${{ github.sha }}
+      collection-namespace: lit
+      collection-name: rhel
+      environment-name: rhel-ci
+
+  heavy:
+    name: Collection / Heavy
+    if: always()
+    needs: [build-candidate, heavy-cells]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require Heavy when the protected matrix is selected
+        env:
+          BUILD_RESULT: ${{ needs.build-candidate.result }}
+          HEAVY_RESULT: ${{ needs.heavy-cells.result }}
+          EVENT_NAME: ${{ github.event_name }}
+          GIT_REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          test "$BUILD_RESULT" = success
+          if [ "$EVENT_NAME" = workflow_dispatch ] ||
+            { [ "$EVENT_NAME" = push ] &&
+              { [ "$GIT_REF" = refs/heads/develop ] ||
+                [ "$GIT_REF" = refs/heads/main ]; }; }
+          then
+            test "$HEAVY_RESULT" = success
+          else
+            test "$HEAVY_RESULT" = skipped
+          fi

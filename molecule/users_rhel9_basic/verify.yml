@@ -51,3 +51,6 @@
         that:
           - temp_user_id.rc != 0
         fail_msg: "temp-user still present"
+
+- name: Record successful users verification
+  ansible.builtin.import_playbook: ../incus_shared/record-success.yml

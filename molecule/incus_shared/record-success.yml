@@ -1,0 +1,27 @@
+---
+- name: Record successful meaningful Heavy verification
+  hosts: localhost
+  gather_facts: false
+  pre_tasks:
+    - name: Require centrally provided Heavy success marker
+      ansible.builtin.assert:
+        that:
+          - lookup('env', 'MOLECULE_TEST_SUCCESS_MARKER') | length > 0
+          - lookup('env', 'RUNNER_TEMP') | length > 0
+          - >-
+            lookup('env', 'MOLECULE_TEST_SUCCESS_MARKER')
+            is match(
+              '^'
+              ~ (lookup('env', 'RUNNER_TEMP') | regex_escape)
+              ~ '/collection-profile/[A-Za-z0-9._/-]+/evidence/[A-Za-z0-9._/-]+$'
+            )
+          - "'..' not in lookup('env', 'MOLECULE_TEST_SUCCESS_MARKER').split('/')"
+        fail_msg: >-
+          MOLECULE_TEST_SUCCESS_MARKER must be a centrally provided evidence
+          path below RUNNER_TEMP/collection-profile.
+  tasks:
+    - name: Write the central success marker
+      ansible.builtin.copy:
+        dest: "{{ lookup('env', 'MOLECULE_TEST_SUCCESS_MARKER') }}"
+        mode: "0600"
+        content: "{{ lookup('env', 'MOLECULE_SCENARIO_NAME') }} verified\n"

@@ -67,3 +67,6 @@
           - sysctl_out.stdout == '0'
         fail_msg: "net.ipv4.ip_forward not set to 0"
       when: baseline_sysctl | length > 0
+
+- name: Record successful baseline verification
+  ansible.builtin.import_playbook: ../incus_shared/record-success.yml

@@ -1,0 +1,32 @@
+---
+- name: Verify Podman installation
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Read installed Podman version
+      ansible.builtin.command: podman --version
+      register: podman_version
+      changed_when: false
+
+    - name: Require a usable Podman command
+      ansible.builtin.assert:
+        that:
+          - podman_version.rc == 0
+          - podman_version.stdout is search('podman version')
+
+- name: Record successful meaningful Heavy verification
+  hosts: localhost
+  gather_facts: false
+  pre_tasks:
+    - name: Require centrally provided Heavy success marker
+      ansible.builtin.assert:
+        that:
+          - lookup('env', 'MOLECULE_TEST_SUCCESS_MARKER') | length > 0
+        fail_msg: MOLECULE_TEST_SUCCESS_MARKER must be provided by central orchestration.
+  tasks:
+    - name: Write the central success marker
+      ansible.builtin.copy:
+        dest: "{{ lookup('env', 'MOLECULE_TEST_SUCCESS_MARKER') }}"
+        mode: "0600"
+        content: "podman-rhel9 verified\n"

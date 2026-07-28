@@ -14,6 +14,7 @@ provisioner:
   playbooks:
     create: ../incus_shared/create.yml
     converge: converge.yml
+    verify: verify.yml
     destroy: ../incus_shared/destroy.yml
 verifier:
   name: ansible
