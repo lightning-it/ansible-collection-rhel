@@ -1,0 +1,7 @@
+---
+minor_changes:
+  - >-
+    Delegate SELinux, XRDP, and every ``protected-incus`` scenario to the
+    pinned ``modulix-validation`` reusable workflow with an immutable
+    candidate, owner-scoped Incus cleanup, meaningful success markers, and
+    normalized evidence.

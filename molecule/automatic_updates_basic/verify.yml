@@ -51,3 +51,6 @@
         that:
           - expected_job not in cron_after_content
         fail_msg: "Automatic updates cron entry still present after disabling"
+
+- name: Record successful automatic updates verification
+  ansible.builtin.import_playbook: ../incus_shared/record-success.yml

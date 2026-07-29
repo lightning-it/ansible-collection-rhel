@@ -4,11 +4,17 @@
   gather_facts: false
   vars:
     selinux_molecule_rhel_major_version: "9"
-    selinux_molecule_incus_mode: "{{ lookup('env', 'INCUS_MODE') | default('vm', true) }}"
+    selinux_molecule_incus_mode: >-
+      {{
+        lookup('env', 'MOLECULE_TEST_INSTANCE_TYPE')
+        | default(lookup('env', 'INCUS_MODE'), true)
+        | default('vm', true)
+      }}
     selinux_molecule_ssh_user: ansible
     selinux_molecule_instance_name: >-
       {{
-        lookup('env', 'INCUS_INSTANCE_NAME')
+        lookup('env', 'MOLECULE_TEST_INSTANCE')
+        | default(lookup('env', 'INCUS_INSTANCE_NAME'), true)
         | default(
             'lit-selinux-rhel9-' ~ selinux_molecule_incus_mode ~ '-' ~ lookup('pipe', 'date +%Y%m%d%H%M%S'),
             true
@@ -51,7 +57,11 @@
           - --ssh-user
           - "{{ selinux_molecule_ssh_user }}"
       environment:
-        INCUS_RHEL9_IMAGE: "{{ lookup('env', 'INCUS_RHEL9_IMAGE') }}"
+        INCUS_RHEL9_IMAGE: >-
+          {{
+            lookup('env', 'MOLECULE_TEST_IMAGE')
+            | default(lookup('env', 'INCUS_RHEL9_IMAGE'), true)
+          }}
         INCUS_RHEL10_IMAGE: "{{ lookup('env', 'INCUS_RHEL10_IMAGE') }}"
         INCUS_SSH_PRIVATE_KEY: "{{ lookup('env', 'INCUS_SSH_PRIVATE_KEY') }}"
         INCUS_SSH_PUBLIC_KEY: "{{ lookup('env', 'INCUS_SSH_PUBLIC_KEY') }}"

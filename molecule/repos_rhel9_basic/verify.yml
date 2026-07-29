@@ -17,3 +17,6 @@
           - repo_file is defined
           - repo_file.content | b64decode is search('enabled\\s*=\\s*0')
         fail_msg: "Custom repo not created or not disabled"
+
+- name: Record successful repository verification
+  ansible.builtin.import_playbook: ../incus_shared/record-success.yml

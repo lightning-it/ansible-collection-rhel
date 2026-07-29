@@ -11,3 +11,6 @@
       ansible.builtin.assert:
         that:
           - true
+
+- name: Record successful RHSM verification
+  ansible.builtin.import_playbook: ../incus_shared/record-success.yml
