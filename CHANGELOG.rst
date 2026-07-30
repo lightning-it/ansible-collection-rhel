@@ -4,6 +4,16 @@ Lightning IT Collection Release Notes Release Notes
 
 .. contents:: Topics
 
+v1.23.0
+=======
+
+Minor Changes
+-------------
+
+- Add users_accounts_global as a final user-definition layer whose values take precedence over base and extra definitions for the same account.
+- Delegate SELinux, XRDP, and every ``protected-incus`` scenario to the pinned ``modulix-validation`` reusable workflow with an immutable candidate, owner-scoped Incus cleanup, meaningful success markers, and normalized evidence.
+- collection_tooling - Synchronize the centrally managed Renovate policy and guarded automation workflows.
+
 v1.22.1
 =======
 
