@@ -18,9 +18,10 @@ They use Molecule create/destroy playbooks with externally managed Incus VMs and
 the existing Incus wrapper scripts:
 
 ```bash
-deploy/incus/scripts/create.sh --version 9 --mode vm --name <instance>
-deploy/incus/scripts/create.sh --version 10 --mode vm --name <instance>
-deploy/incus/scripts/destroy.sh --name <instance>
+deploy/incus/scripts/create.sh --version 9 --mode vm --name xrdp-rhel9-example
+deploy/incus/scripts/create.sh --version 10 --mode vm --name xrdp-rhel10-example
+deploy/incus/scripts/destroy.sh --name xrdp-rhel9-example
+deploy/incus/scripts/destroy.sh --name xrdp-rhel10-example
 ```
 
 The scenarios create unique instance names by default and write Molecule
